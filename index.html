@@ -313,7 +313,7 @@ function getBlockedNames(allAss, targetDayId, targetMission) {
         const sEnd = di*24 + sm.endH, tStart = ti*24 + targetMission.startH;
         const isSameSlot = (dayId===targetDayId && sm.id===targetMission.id);
         const targetIsAfterPatrolStart = tStart >= di*24 + sm.startH;
-        if (tStart < sEnd+16 && !isSameSlot && targetIsAfterPatrolStart) {
+        if (tStart < sEnd+8 && !isSameSlot && targetIsAfterPatrolStart) {
           const dayExempt = (REST_EXEMPTIONS[targetDayId]||{});
           const missionExempt = dayExempt[targetMission.id];
           if (missionExempt && missionExempt.has(person.name)) return;
@@ -463,7 +463,7 @@ function App() {
   const freshAftar = () => { const r={}; DAY_IDS.forEach(id=>{r[id]=[];}); return r; };
 
   // ═══ הגנת סיסמה ═══
-  const PASSWORDS = ["shabzak1", "ידידיה", "חצי"];
+  const PASSWORDS = ["סימור", "ידידיה", "חצי"];
   const [authed, setAuthed] = React.useState(() => !!sessionStorage.getItem('shabzak_auth'));
   const [pwInput, setPwInput] = React.useState('');
   const [pwError, setPwError] = React.useState(false);

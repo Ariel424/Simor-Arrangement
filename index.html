@@ -347,8 +347,21 @@ function getBlockedNames(allAss, targetDayId, targetMission) {
   return { blocked, blockedReasons: reasons };
 }
 
+function SafeDisplayCard(props) {
+  try {
+    return <DisplayCard {...props}/>;
+  } catch(e) {
+    return <div style={{padding:8,color:"#ef5350",fontSize:11,border:"1px solid #ef535044",borderRadius:8}}>שגיאה: {e.message}</div>;
+  }
+}
+
 function DisplayCard({ mission, assignment, dayId }) {
-  const filled = [...(assignment.commanders||[]),...(assignment.soldiers||[])].filter(Boolean).length;
+  if (!assignment) return null;
+  const ass = {
+    commanders: Array.isArray(assignment.commanders) ? assignment.commanders : Array(mission.slots.commander).fill(null),
+    soldiers:   Array.isArray(assignment.soldiers)   ? assignment.soldiers   : Array(mission.slots.soldiers).fill(null),
+  };
+  const filled = [...ass.commanders,...ass.soldiers].filter(Boolean).length;
   const total = mission.slots.commander + mission.slots.soldiers;
   const done = filled===total && total>0;
   const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2";
@@ -477,13 +490,33 @@ function App() {
     const onValue = window._firebaseOnValue;
 
     const unsubAss = onValue(ref(db, 'shabzak/ass'), snap => {
+      if (isLocalWrite.current) return;
       if (snap.exists()) {
         const saved = snap.val();
         const base = freshAss();
         DAY_IDS.forEach(day => {
           if (!saved[day]) return;
           Object.keys(base[day]).forEach(mid => {
-            if (saved[day][mid]) base[day][mid] = saved[day][mid];
+            const s = saved[day][mid];
+            if (!s) return;
+            const m = MISSION_DEFS.find(x=>x.id===mid);
+            if (!m) return;
+            // נרמול: Firebase מוחק null מתוך arrays, משחזרים בגודל נכון
+            const normalize = (arr, size) => {
+              const a = Array(size).fill(null);
+              if (!arr) return a;
+              // Firebase מחזיר object עם keys מספריים אם יש nulls
+              if (!Array.isArray(arr)) {
+                Object.entries(arr).forEach(([k,v]) => { if (parseInt(k)<size) a[parseInt(k)]=v; });
+                return a;
+              }
+              arr.forEach((v,i) => { if (i<size) a[i]=v; });
+              return a;
+            };
+            base[day][mid] = {
+              commanders: normalize(s.commanders, m.slots.commander),
+              soldiers:   normalize(s.soldiers,   m.slots.soldiers),
+            };
           });
         });
         setAllAss(base);
@@ -504,10 +537,17 @@ function App() {
   }, [fbReady, authed]);
 
   // שמירה ל-Firebase בכל שינוי
+  const isLocalWrite = React.useRef(false);
+
   const setAllAssAndSave = React.useCallback((valOrFn) => {
     setAllAss(prev => {
       const next = typeof valOrFn === 'function' ? valOrFn(prev) : valOrFn;
-      if (fbReady) window._firebaseSet(window._firebaseRef(window._firebaseDb, 'shabzak/ass'), next).catch(()=>{});
+      if (fbReady) {
+        isLocalWrite.current = true;
+        window._firebaseSet(window._firebaseRef(window._firebaseDb, 'shabzak/ass'), next)
+          .catch(()=>{})
+          .finally(()=>{ isLocalWrite.current = false; });
+      }
       return next;
     });
   }, [fbReady]);
@@ -515,7 +555,9 @@ function App() {
   const setAftarByDayAndSave = React.useCallback((valOrFn) => {
     setAftarByDay(prev => {
       const next = typeof valOrFn === 'function' ? valOrFn(prev) : valOrFn;
-      if (fbReady) window._firebaseSet(window._firebaseRef(window._firebaseDb, 'shabzak/aftar'), next).catch(()=>{});
+      if (fbReady) {
+        window._firebaseSet(window._firebaseRef(window._firebaseDb, 'shabzak/aftar'), next).catch(()=>{});
+      }
       return next;
     });
   }, [fbReady]);
@@ -544,7 +586,10 @@ function App() {
     );
   }, [dayAss, activeDay]);
 
-  const { blocked, blockedReasons } = useMemo(() => getBlockedNames(allAss,activeDay,mission), [allAss,activeDay,activeMission]);
+  const { blocked, blockedReasons } = useMemo(() => {
+    if (!mission) return { blocked: new Set(), blockedReasons: {} };
+    return getBlockedNames(allAss, activeDay, mission);
+  }, [allAss, activeDay, activeMission]);
 
   const gimelThisDay = useMemo(() => new Set(
     [...(dayAss["gimel"]?.soldiers||[])].filter(Boolean).map(p=>p.name)
@@ -662,12 +707,12 @@ function App() {
               </div>
             </div>
           </div>
-          {col1.length>0 && <div className="display-col">{col1.map(m=><DisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col2.length>0 && <div className="display-col">{col2.map(m=><DisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col3.length>0 && <div className="display-col">{col3.map(m=><DisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col4.length>0 && <div className="display-col">{col4.map(m=><DisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col5.length>0 && <div className="display-col">{col5.map(m=><DisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col6.length>0 && <div className="display-col">{col6.map(m=><DisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col1.length>0 && <div className="display-col">{col1.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col2.length>0 && <div className="display-col">{col2.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col3.length>0 && <div className="display-col">{col3.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col4.length>0 && <div className="display-col">{col4.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col5.length>0 && <div className="display-col">{col5.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col6.length>0 && <div className="display-col">{col6.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
         </div>
         </div>
       </div>
@@ -880,7 +925,16 @@ function App() {
         <div className="day-tabs">
           {DAYS.map(d=>(
             <button key={d.id} className={`day-tab ${activeDay===d.id?"active":""}`}
-              onClick={()=>{setActiveDay(d.id);setSelPeople([]);}}>
+              onClick={()=>{
+                setActiveDay(d.id);
+                setSelPeople([]);
+                const firstVisible = MISSION_DEFS.find(m => {
+                  if (m.showOnDays && !m.showOnDays.includes(d.id)) return false;
+                  if (m.hideOnDays && m.hideOnDays.includes(d.id)) return false;
+                  return true;
+                });
+                if (firstVisible) setActiveMission(firstVisible.id);
+              }}>
               {d.label}<span className="ds">{d.date}</span>
             </button>
           ))}
@@ -920,7 +974,7 @@ function App() {
           }}/>
         </label>
       </div>
-      {view==="display"?<DisplayView/>:<BuilderView/>}
+      {view==="display" ? <DisplayView key="display"/> : <BuilderView key="builder"/>}
     </div>
   );
 }

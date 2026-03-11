@@ -789,6 +789,46 @@ function App() {
         <div className="builder-right">
           <div style={{fontSize:12,color:"var(--text2)",marginBottom:14}}>סמן אנשים ואז לחץ על תא פנוי במשימה — ניתן לבחור כמה בבת אחת</div>
 
+          {/* MATBAH TRACKER */}
+          {(() => {
+            const matbahIds = ["matbah","matbah_boker","matbah_tzaharayim","matbah_new"];
+            const counts = {};
+            allMembers.forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
+            DAY_IDS.forEach(dayId => {
+              const da = allAss[dayId] || {};
+              matbahIds.forEach(mid => {
+                const ass = da[mid];
+                if (!ass) return;
+                [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).forEach(p => {
+                  if (counts[p.name] !== undefined) counts[p.name].count++;
+                });
+              });
+            });
+            const sorted = Object.entries(counts).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
+            return (
+              <div style={{background:"var(--surface)",border:"1.5px solid #ff980044",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
+                <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:16}}>🍳</span>
+                  <div style={{fontSize:14,fontWeight:700,flex:1}}>מעקב תורנות מטבח</div>
+                  <div style={{fontSize:11,color:"var(--text3)"}}>כל הימים</div>
+                </div>
+                <div style={{padding:"10px 12px"}}>
+                  {sorted.length === 0
+                    ? <div style={{fontSize:12,color:"var(--text3)"}}>אין תורנויות מטבח עדיין</div>
+                    : <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                        {sorted.map(([name,{count,platoon}]) => (
+                          <div key={name} style={{...getPlatoonStyle(platoon),borderRadius:8,padding:"4px 10px",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+                            <span>{name}</span>
+                            <span style={{background:"rgba(0,0,0,0.25)",borderRadius:5,padding:"1px 6px",fontSize:11,fontWeight:800}}>{count}</span>
+                          </div>
+                        ))}
+                      </div>
+                  }
+                </div>
+              </div>
+            );
+          })()}
+
           {/* AFTAR PANEL */}
           <div className="aftar-card" style={{marginBottom:20}}>
             <div className="aftar-header">
@@ -868,7 +908,7 @@ function App() {
                       {!isSel&&isGimelBlk&&<span className="chip-sub">בגימל</span>}
                       {!isSel&&!isRestBlk&&!isAftarBlk&&!isGimelBlk&&personMissions[name]&&personMissions[name].length>0&&<span className="chip-sub">{personMissions[name].join(" | ")}</span>}
                       {!isSel&&isAss&&!isBlk&&<span className="chip-badge" style={{background:"#26c6da",color:"#000"}}>✓</span>}
-                      {matbahCount[name]>0&&<span className="chip-badge" style={{background:"#ff9800",color:"#000",left:"auto",right:-5,top:-5}}>🍳{matbahCount[name]}</span>}
+
                     </button>
                   );
                 })}

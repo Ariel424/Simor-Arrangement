@@ -393,7 +393,13 @@ function DisplayCard({ mission, assignment, dayId }) {
         ) : mission.id==="katzin" ? (
           /* קצין מוצב — קוביה אחת צמודה */
           <div style={{display:"flex",flexDirection:"column",gap:4}}>
-            {assignment.commanders.map((p,i)=>(
+            {dayId==="2025_03_14" && (
+              <div style={{fontSize:10,color:"#a5d6a7",background:"#66bb6a22",borderRadius:6,padding:"3px 7px",textAlign:"center",marginBottom:2}}>אריאל טופז החל מ-6:00 🟡</div>
+            )}
+            {dayId==="2025_03_14" && (
+              <div style={{fontSize:10,color:"#ce93d8",background:"#ab47bc22",borderRadius:6,padding:"3px 7px",textAlign:"center",marginBottom:2}}>ידידיה שמואליאן החל מ-14:00 🟡</div>
+            )}
+            {!(dayId==="2025_03_14") && ass.commanders.map((p,i)=>(
                 <div key={i} className={`ntag ${p?"filled":"empty"}`} style={p?getPlatoonStyle(p.platoon):{}}>{p?p.name:"קצין"}</div>
               ))
             }
@@ -893,10 +899,10 @@ function App() {
                   const isAss=assignedThisDay.has(name), isSel=selPeople.some(p=>p.name===name);
                   const isAllowBlk=mission.allowedNames&&!mission.allowedNames.includes(name);
                   const isRestBlk=blocked.has(name);
-                  const isAftarBlk=aftarThisDay.includes(name) && mission.id!=="siyur_boker" && mission.id!=="aftar_add";
+                  const isAftarBlk=aftarThisDay.includes(name) && mission.id!=="aftar_add" && mission.startH >= 14;
                   const dayOrder2=DAY_IDS, ti2=dayOrder2.indexOf(activeDay);
                   const prevAftar = ti2>0 ? (aftarByDay[dayOrder2[ti2-1]]||[]) : [];
-                  const isAftarYesterdayBlk = (mission.id==="siyur_boker" || mission.id==="matbah" || mission.id==="matbah_new") && prevAftar.includes(name);
+                  const isAftarYesterdayBlk = prevAftar.includes(name) && mission.startH < 14;
                   const isGimelBlk=gimelThisDay.has(name) && mission.id!=="gimel";
                   const _sb=(dayAss["siyur_boker"]||{});
                   const isInSiyurBoker=[...(_sb.commanders||[]),...(_sb.soldiers||[])].filter(Boolean).some(p=>p.name===name);

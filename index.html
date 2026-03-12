@@ -177,13 +177,13 @@ const MISSION_DEFS = [
   { id:"siyur_tzo",   label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, hideOnDays:[...OLD_GAZRA_HIDE,"2025_03_12"] },
   { id:"siyur_layla", label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:6, startH:22, endH:30, isSiyur:true, isNightPatrol:true, hideOnDays:[...OLD_GAZRA_HIDE,"2025_03_12"] },
   { id:"maatzar",     label:"פעילות מבצעית",  icon:"🔒", slots:{commander:0,soldiers:10},time:"",               border:"#ef5350", col:4, startH:0,  endH:24, hideOnDays:[...OLD_GAZRA_HIDE,"2025_03_12"] },
-  { id:"katzin",      label:"קצין מוצב",      icon:"🟡", slots:{commander:1,soldiers:0}, time:"",               border:"#555",    col:1, startH:0,  endH:24, noLabel:true, allowedNames:["אריאל טופז","חזי דיין","ידידיה שמואליאן","איתי דרייר"] },
+  { id:"katzin",      label:"קצין מוצב",      icon:"🟡", slots:{commander:1,soldiers:0}, time:"החל מ-6:00",     border:"#555",    col:1, startH:0,  endH:24, noLabel:true, allowedNames:["אריאל טופז","חזי דיין","ידידיה שמואליאן","איתי דרייר"] },
   { id:"gimel",       label:"גימל",           icon:"🤒", slots:{commander:0,soldiers:2}, time:"",               border:"#78909c", col:6, startH:0,  endH:24, noCount:true, hideFromDisplay:true },
   { id:"rachpan",     label:"קורס רחפנים",    icon:"🚁", slots:{commander:0,soldiers:1}, time:"",               border:"#80cbc4", col:6, startH:0,  endH:24, showOnDays:["2025_03_09","2025_03_10","2025_03_11","2025_03_12"] },
 
   // ═══ גזרה חדשה (מ-12/3) ═══
   { id:"matbah_new",    label:"מטבח",           icon:"🍳", slots:{commander:0,soldiers:1}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA },
-  { id:"amada_maaravit",label:"עמדה מערבית",    icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 6:00",   border:"#7e57c2", col:1, startH:0,  endH:6,  showOnDays:NEW_GAZRA },
+  { id:"amada_maaravit",label:"עמדה מערבית",    icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 6:00",   border:"#7e57c2", col:1, startH:24, endH:30, showOnDays:NEW_GAZRA },
   { id:"sg1",           label:'ש"ג 6:00–10:00', icon:"🪖", slots:{commander:0,soldiers:1}, time:"6:00 - 10:00",   border:"#8d6e63", col:2, startH:6,  endH:10, showOnDays:NEW_GAZRA },
   { id:"sg2",           label:'ש"ג 10:00–14:00',icon:"🪖", slots:{commander:0,soldiers:1}, time:"10:00 - 14:00",  border:"#8d6e63", col:2, startH:10, endH:14, showOnDays:NEW_GAZRA },
   { id:"sg3",           label:'ש"ג 14:00–18:00',icon:"🪖", slots:{commander:0,soldiers:1}, time:"14:00 - 18:00",  border:"#8d6e63", col:2, startH:14, endH:18, showOnDays:NEW_GAZRA },
@@ -193,8 +193,8 @@ const MISSION_DEFS = [
   { id:"siyur_boker2",  label:"סיור בוקר",      icon:"🚗", slots:{commander:1,soldiers:2}, time:"6:00 - 14:00",   border:"#26c6da", col:3, startH:6,  endH:14, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_tzo2",    label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_layla2",  label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:3, startH:22, endH:30, isSiyur:true, isNightPatrol:true, showOnDays:NEW_GAZRA },
-  { id:"hetz",          label:"חץ דרוך",        icon:"🏹", slots:{commander:1,soldiers:7}, time:"",               border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA },
-  { id:"philbox_horsa", label:"פילבוקס חורסה",  icon:"🏠", slots:{commander:1,soldiers:7}, time:"",               border:"#f06292", col:5, startH:0,  endH:24, showOnDays:NEW_GAZRA },
+  { id:"hetz",          label:"חץ דרוך",        icon:"🏹", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA },
+  { id:"philbox_horsa", label:"פילבוקס חורסה",  icon:"🏠", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#f06292", col:5, startH:0,  endH:24, showOnDays:NEW_GAZRA },
   { id:"karem_negoshot",label:"כרם נגוהות",     icon:"🌿", slots:{commander:1,soldiers:3}, time:"",               border:"#aed581", col:6, startH:0,  endH:24, showOnDays:[] },
 ];
 
@@ -325,7 +325,7 @@ function getBlockedNames(allAss, targetDayId, targetMission) {
       });
     });
 
-    // מנוחה 12 שעות אחרי ש"ג ועמדה מערבית (מחושב מסוף המשמרת)
+    // מנוחה 8 שעות אחרי ש"ג ועמדה מערבית (מחושב מסוף המשמרת)
     MISSION_DEFS.filter(m => m.id.startsWith("sg") || m.id==="amada_maaravit").forEach(sm => {
       const ass = da[sm.id]; if (!ass) return;
       const isSameSlot = (dayId===targetDayId && sm.id===targetMission.id);
@@ -333,9 +333,9 @@ function getBlockedNames(allAss, targetDayId, targetMission) {
       [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).forEach(person => {
         const sEnd = di*24 + sm.endH;
         let tStart = ti*24 + targetMission.startH;
-        // אם target באותו dayId אבל שעתו קטנה מסוף המשמרת — הוא אחרי חצות (יום הבא לוגית)
-        if (ti === di && targetMission.startH < (sm.endH % 24) && targetMission.startH < 12) tStart += 24;
-        // חסום אם target מתחיל לפני סוף 12 שעות המנוחה
+        // אם target באותו dayId ושעתו קטנה או שווה לסוף המשמרת — הוא לוגית ביום הבא
+        if (ti === di && targetMission.startH <= (sm.endH % 24) && targetMission.startH < 12) tStart += 24;
+        // חסום אם target מתחיל בתוך 8 שעות מסוף המשמרת
         if (tStart >= sEnd && tStart < sEnd + 8) {
           if (!blocked.has(person.name)) {
             blocked.add(person.name); reasons[person.name] = `במנוחה לאחר ${sm.label}`;
@@ -408,7 +408,10 @@ function DisplayCard({ mission, assignment, dayId }) {
         ) : mission.id==="matbah"||mission.id==="matbah_boker"||mission.id==="matbah_tzaharayim"||mission.id==="matbah_new"||mission.id.startsWith("sg")||mission.id==="amada_maaravit" ? (
           /* מטבח / ש"ג / עמדה — חייל אחד על כל הרוחב */
           <div style={{display:"flex",flexDirection:"column",gap:4}}>
-            {assignment.soldiers.map((p,i)=>(
+            {(mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15") && (
+              <div style={{fontSize:10,color:"#ffcc80",background:"#ff980022",borderRadius:6,padding:"3px 7px",textAlign:"center",marginBottom:2}}>כוח חץ דרוך 🏹</div>
+            )}
+            {!((mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15")) && ass.soldiers.map((p,i)=>(
               <div key={i} className={`ntag ${p?"filled":"empty"}`} style={{...(p?getPlatoonStyle(p.platoon):{}),width:"100%",textAlign:"center",fontSize:13,fontWeight:700,padding:"6px 8px"}}>{p?p.name:"חייל"}</div>
             ))}
           </div>
@@ -562,6 +565,21 @@ function App() {
     });
   }, [fbReady]);
 
+  const [missionSettings, setMissionSettings] = useState(() => {
+    const s = {};
+    MISSION_DEFS.forEach(m => {
+      s[m.id] = {
+        restHours: m.isSiyur ? 8 : (m.id.startsWith("sg")||m.id==="amada_maaravit") ? 8 : 0,
+        startH: m.startH,
+        endH: m.endH % 24 === 0 ? 24 : m.endH % 24,
+        slots_commander: m.slots.commander,
+        slots_soldiers: m.slots.soldiers,
+        hiddenDays: [],
+      };
+    });
+    return s;
+  });
+
   // מסך סיסמה — רק אחרי כל ה-hooks
   const [showAftarSelect,setShowAftarSelect] = useState(false);
 
@@ -688,6 +706,7 @@ function App() {
             </div>
           </div>
         )}
+        
         <div className="display-grid" style={{gridTemplateColumns:`repeat(${numCols},1fr)`,zoom:1}}>
           {/* באנר תאריך — מתפרס על כל העמודות */}
           <div style={{gridColumn:"1 / -1",display:"grid",placeItems:"center",marginBottom:4}}>
@@ -958,6 +977,97 @@ function App() {
     </div>
   );
 
+
+  const SettingsView = () => {
+    const [editId, setEditId] = useState(null);
+    const [draft, setDraft] = useState({});
+    const visibleForSettings = MISSION_DEFS.filter(m => !m.hideFromDisplay);
+
+    const startEdit = (m) => {
+      setEditId(m.id);
+      setDraft({ ...missionSettings[m.id] });
+    };
+    const saveEdit = () => {
+      setMissionSettings(prev => ({ ...prev, [editId]: { ...draft } }));
+      setEditId(null);
+    };
+
+    return (
+      <div className="main" style={{maxWidth:900,margin:"0 auto",padding:"24px 16px"}}>
+        <div style={{fontSize:20,fontWeight:800,color:"var(--text)",marginBottom:20}}>⚙️ הגדרות משימות</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:12}}>
+          {visibleForSettings.map(m => {
+            const s = missionSettings[m.id];
+            const isEditing = editId === m.id;
+            return (
+              <div key={m.id} style={{background:"var(--surface)",border:`1.5px solid ${isEditing?"var(--accent)":m.border+"66"}`,borderRadius:14,padding:"14px 16px",display:"flex",flexDirection:"column",gap:8}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+                  <span style={{fontSize:18}}>{m.icon}</span>
+                  <span style={{fontWeight:700,fontSize:14,color:"var(--text)"}}>{m.label}</span>
+                  {!isEditing && (
+                    <button onClick={()=>startEdit(m)} style={{marginRight:"auto",background:"var(--surface2)",border:"1px solid var(--border2)",borderRadius:7,color:"var(--text2)",cursor:"pointer",fontSize:11,padding:"3px 10px",fontFamily:"Heebo,sans-serif"}}>✏️ ערוך</button>
+                  )}
+                </div>
+
+                {isEditing ? (
+                  <>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                      <label style={{fontSize:11,color:"var(--text2)"}}>
+                        שעת התחלה
+                        <input type="number" min={0} max={24} value={draft.startH}
+                          onChange={e=>setDraft(d=>({...d,startH:+e.target.value}))}
+                          style={{display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13}}/>
+                      </label>
+                      <label style={{fontSize:11,color:"var(--text2)"}}>
+                        שעת סיום
+                        <input type="number" min={0} max={30} value={draft.endH}
+                          onChange={e=>setDraft(d=>({...d,endH:+e.target.value}))}
+                          style={{display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13}}/>
+                      </label>
+                      <label style={{fontSize:11,color:"var(--text2)"}}>
+                        מנוחה לאחר (שעות)
+                        <input type="number" min={0} max={24} value={draft.restHours}
+                          onChange={e=>setDraft(d=>({...d,restHours:+e.target.value}))}
+                          style={{display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13}}/>
+                      </label>
+                      <label style={{fontSize:11,color:"var(--text2)"}}>
+                        מפקדים
+                        <input type="number" min={0} max={10} value={draft.slots_commander}
+                          onChange={e=>setDraft(d=>({...d,slots_commander:+e.target.value}))}
+                          style={{display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13}}/>
+                      </label>
+                      <label style={{fontSize:11,color:"var(--text2)"}}>
+                        חיילים
+                        <input type="number" min={0} max={20} value={draft.slots_soldiers}
+                          onChange={e=>setDraft(d=>({...d,slots_soldiers:+e.target.value}))}
+                          style={{display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13}}/>
+                      </label>
+                    </div>
+                    <div style={{display:"flex",gap:8,marginTop:4}}>
+                      <button onClick={saveEdit} style={{flex:1,background:"var(--accent)",border:"none",borderRadius:8,color:"#fff",cursor:"pointer",fontFamily:"Heebo,sans-serif",fontSize:13,fontWeight:700,padding:"7px"}}>✓ שמור</button>
+                      <button onClick={()=>setEditId(null)} style={{flex:1,background:"var(--surface2)",border:"1px solid var(--border2)",borderRadius:8,color:"var(--text2)",cursor:"pointer",fontFamily:"Heebo,sans-serif",fontSize:13,padding:"7px"}}>ביטול</button>
+                    </div>
+                  </>
+                ) : (
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4,fontSize:12,color:"var(--text2)"}}>
+                    <div>🕐 <span style={{color:"var(--text)"}}>{s.startH}:00 – {s.endH > 24 ? (s.endH-24)+":00 למחרת" : s.endH+":00"}</span></div>
+                    <div>😴 מנוחה: <span style={{color:"var(--text)"}}>{s.restHours} שעות</span></div>
+                    <div>⭐ מפקדים: <span style={{color:"var(--text)"}}>{s.slots_commander}</span></div>
+                    <div>🪖 חיילים: <span style={{color:"var(--text)"}}>{s.slots_soldiers}</span></div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div style={{marginTop:16,fontSize:11,color:"var(--text3)"}}>
+          * שינויים בהגדרות ישפיעו על חסימות מנוחה ותצוגה מהפעם הבאה שתיכנס לכל יום.
+        </div>
+      </div>
+    );
+  };
+
+
   return (
     <div style={{minHeight:"100vh"}}>
       <div className="topbar">
@@ -986,6 +1096,7 @@ function App() {
         <div className="view-toggle">
           <button className={`view-btn ${view==="display"?"active":""}`} onClick={()=>setView("display")}>👁 תצוגה</button>
           <button className={`view-btn ${view==="builder"?"active":""}`} onClick={()=>setView("builder")}>🛠 בנייה</button>
+          <button className={`view-btn ${view==="settings"?"active":""}`} onClick={()=>setView("settings")}>⚙️ הגדרות</button>
         </div>
         <button onClick={()=>{ if(confirm("למחוק את כל השיבוצים?")){ const r={}; DAY_IDS.forEach(id=>{r[id]=initDayAssignments();}); const a={}; DAY_IDS.forEach(id=>{a[id]=[];}); setAllAssAndSave(r); setAftarByDayAndSave(a); }}} style={{background:"none",border:"1px solid var(--border2)",borderRadius:7,color:"var(--text3)",cursor:"pointer",fontFamily:"Heebo,sans-serif",fontSize:11,padding:"4px 10px"}}>🗑 איפוס</button>
         <button onClick={()=>{
@@ -1014,10 +1125,11 @@ function App() {
           }}/>
         </label>
       </div>
-      {view==="display" ? <DisplayView key="display"/> : <BuilderView key="builder"/>}
+      {view==="display" ? <DisplayView key="display"/> : view==="settings" ? <SettingsView key="settings"/> : <BuilderView key="builder"/>}
     </div>
   );
 }
+
 
 ReactDOM.render(<App/>, document.getElementById("root"));
 </script>

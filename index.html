@@ -169,8 +169,8 @@ const MISSION_DEFS = [
   // ═══ גזרה ישנה (עד 11/3) ═══
   { id:"agamim",      label:"אגמים",          icon:"🏊", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#f06292", col:1, startH:0,  endH:24, hideOnDays:OLD_GAZRA_HIDE },
   { id:"matbah",      label:"מטבח",           icon:"🍳", slots:{commander:0,soldiers:1}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#555",    col:2, startH:8,  endH:14, hideOnDays:[...OLD_GAZRA_HIDE,"2025_03_12"] },
-  { id:"matbah_boker", label:"מטבח בוקר",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"8:30 - 12:00",    border:"#555",    col:2, startH:8,  endH:12, showOnDays:[] },
-  { id:"matbah_tzaharayim", label:"מטבח צהריים", icon:"🍳", slots:{commander:0,soldiers:1}, time:"12:00 - סוף יום", border:"#555", col:2, startH:12, endH:20, showOnDays:[] },
+  { id:"matbah_boker", label:"מטבח בוקר",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"8:30 - 14:00",    border:"#555",    col:2, startH:8,  endH:14, showOnDays:[] },
+  { id:"matbah_tzaharayim", label:"מטבח צהריים", icon:"🍳", slots:{commander:0,soldiers:1}, time:"14:00 - סוף יום", border:"#555", col:2, startH:14, endH:20, showOnDays:[] },
   { id:"hilton",      label:"פילבוקס ביתילו", icon:"🏠", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#f06292", col:1, startH:0,  endH:24, hideOnDays:OLD_GAZRA_HIDE },
   { id:"konnut",      label:"כוננות (חץ)",    icon:"🤜", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#26c6da", col:2, startH:14, endH:24, hideOnDays:OLD_GAZRA_HIDE },
   { id:"siyur_boker", label:"סיור בוקר",      icon:"🚗", slots:{commander:1,soldiers:2}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#26c6da", col:3, startH:6,  endH:14, isSiyur:true, hideOnDays:OLD_GAZRA_HIDE },
@@ -183,7 +183,9 @@ const MISSION_DEFS = [
 
   // ═══ גזרה חדשה (מ-12/3) ═══
   { id:"matbah_new",    label:"מטבח",           icon:"🍳", slots:{commander:0,soldiers:1}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA },
-  { id:"amada_maaravit",label:"עמדה מערבית",    icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 6:00",   border:"#7e57c2", col:1, startH:24, endH:30, showOnDays:NEW_GAZRA },
+  { id:"bimuy_oyev", label:"בימוי אויב", icon:"🎭", slots:{commander:0,soldiers:2}, time:"14:00 - 19:00", border:"#ef5350", col:3, startH:14, endH:19, showOnDays:["2025_03_16"] },      icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 6:00",  border:"#7e57c2", col:1, startH:24, endH:30, showOnDays:NEW_GAZRA.filter(d=>d==="2025_03_13"||d==="2025_03_14") },
+  { id:"amada_maaravit_a",label:"עמדה מערבית א׳",   icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 3:00",  border:"#7e57c2", col:1, startH:24, endH:27, showOnDays:NEW_GAZRA.filter(d=>d!=="2025_03_13"&&d!=="2025_03_14") },
+  { id:"amada_maaravit_b",label:"עמדה מערבית ב׳",   icon:"🔭", slots:{commander:0,soldiers:1}, time:"3:00 - 6:00",   border:"#7e57c2", col:1, startH:27, endH:30, showOnDays:NEW_GAZRA.filter(d=>d!=="2025_03_13"&&d!=="2025_03_14") },
   { id:"sg1",           label:'ש"ג 6:00–10:00', icon:"🪖", slots:{commander:0,soldiers:1}, time:"6:00 - 10:00",   border:"#8d6e63", col:2, startH:6,  endH:10, showOnDays:NEW_GAZRA },
   { id:"sg2",           label:'ש"ג 10:00–14:00',icon:"🪖", slots:{commander:0,soldiers:1}, time:"10:00 - 14:00",  border:"#8d6e63", col:2, startH:10, endH:14, showOnDays:NEW_GAZRA },
   { id:"sg3",           label:'ש"ג 14:00–18:00',icon:"🪖", slots:{commander:0,soldiers:1}, time:"14:00 - 18:00",  border:"#8d6e63", col:2, startH:14, endH:18, showOnDays:NEW_GAZRA },
@@ -313,7 +315,7 @@ function getBlockedNames(allAss, targetDayId, targetMission) {
         const sEnd = di*24 + sm.endH, tStart = ti*24 + targetMission.startH;
         const isSameSlot = (dayId===targetDayId && sm.id===targetMission.id);
         const targetIsAfterPatrolStart = tStart >= di*24 + sm.startH;
-        if (tStart < sEnd+8 && !isSameSlot && targetIsAfterPatrolStart) {
+        if (tStart < sEnd+16 && !isSameSlot && targetIsAfterPatrolStart) {
           const dayExempt = (REST_EXEMPTIONS[targetDayId]||{});
           const missionExempt = dayExempt[targetMission.id];
           if (missionExempt && missionExempt.has(person.name)) return;
@@ -326,7 +328,7 @@ function getBlockedNames(allAss, targetDayId, targetMission) {
     });
 
     // מנוחה 8 שעות אחרי ש"ג ועמדה מערבית (מחושב מסוף המשמרת)
-    MISSION_DEFS.filter(m => m.id.startsWith("sg") || m.id==="amada_maaravit").forEach(sm => {
+    MISSION_DEFS.filter(m => m.id.startsWith("sg") || m.id==="amada_maaravit" || m.id==="amada_maaravit_a" || m.id==="amada_maaravit_b").forEach(sm => {
       const ass = da[sm.id]; if (!ass) return;
       const isSameSlot = (dayId===targetDayId && sm.id===targetMission.id);
       if (isSameSlot) return;
@@ -336,7 +338,7 @@ function getBlockedNames(allAss, targetDayId, targetMission) {
         // אם target באותו dayId ושעתו קטנה או שווה לסוף המשמרת — הוא לוגית ביום הבא
         if (ti === di && targetMission.startH <= (sm.endH % 24) && targetMission.startH < 12) tStart += 24;
         // חסום אם target מתחיל בתוך 8 שעות מסוף המשמרת
-        if (tStart >= sEnd && tStart < sEnd + 8) {
+        if (tStart >= sEnd && tStart < sEnd + 12) {
           if (!blocked.has(person.name)) {
             blocked.add(person.name); reasons[person.name] = `במנוחה לאחר ${sm.label}`;
           }
@@ -364,7 +366,7 @@ function DisplayCard({ mission, assignment, dayId }) {
   const filled = [...ass.commanders,...ass.soldiers].filter(Boolean).length;
   const total = mission.slots.commander + mission.slots.soldiers;
   const done = filled===total && total>0;
-  const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2";
+  const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="amada_maaravit_a" || mission.id==="amada_maaravit_b" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2";
   const displayTime = (DAY_TIME_OVERRIDES[dayId]||{})[mission.id] || mission.time;
   return (
     <div className={`mcard${isCompact?" compact":""}`} style={{ borderColor: mission.border!=="#555" ? mission.border+"88" : undefined }}>
@@ -411,13 +413,13 @@ function DisplayCard({ mission, assignment, dayId }) {
               <div key={i} className={`ntag ${p?"filled":"empty"}`} style={p?getPlatoonStyle(p.platoon):{}}>{p?p.name:"חייל"}</div>
             ))}
           </div>
-        ) : mission.id==="matbah"||mission.id==="matbah_boker"||mission.id==="matbah_tzaharayim"||mission.id==="matbah_new"||mission.id.startsWith("sg")||mission.id==="amada_maaravit" ? (
+        ) : mission.id==="matbah"||mission.id==="matbah_boker"||mission.id==="matbah_tzaharayim"||mission.id==="matbah_new"||mission.id.startsWith("sg")||mission.id==="amada_maaravit"||mission.id==="amada_maaravit_a"||mission.id==="amada_maaravit_b" ? (
           /* מטבח / ש"ג / עמדה — חייל אחד על כל הרוחב */
           <div style={{display:"flex",flexDirection:"column",gap:4}}>
-            {(mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15") && (
-              <div style={{fontSize:10,color:"#ffcc80",background:"#ff980022",borderRadius:6,padding:"3px 7px",textAlign:"center",marginBottom:2}}>כוח חץ דרוך 🏹</div>
+            {(mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16") && (
+              <div style={{fontSize:10,color:"#ffcc80",background:"#ff980022",borderRadius:6,padding:"3px 7px",textAlign:"center",marginBottom:2}}>כוח חץ דרוך 🏹{dayId==="2025_03_15" ? " — אבי גולדשטיין" : dayId==="2025_03_16" ? " — יאיר ספיר" : ""}</div>
             )}
-            {!((mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15")) && ass.soldiers.map((p,i)=>(
+            {!((mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16")) && ass.soldiers.map((p,i)=>(
               <div key={i} className={`ntag ${p?"filled":"empty"}`} style={{...(p?getPlatoonStyle(p.platoon):{}),width:"100%",textAlign:"center",fontSize:13,fontWeight:700,padding:"6px 8px"}}>{p?p.name:"חייל"}</div>
             ))}
           </div>
@@ -510,6 +512,9 @@ function App() {
             if (!s) return;
             const m = MISSION_DEFS.find(x=>x.id===mid);
             if (!m) return;
+            // דלג על משימות שלא מוצגות ביום הזה
+            if (m.showOnDays && !m.showOnDays.includes(day)) return;
+            if (m.hideOnDays && m.hideOnDays.includes(day)) return;
             // נרמול: Firebase מוחק null מתוך arrays, משחזרים בגודל נכון
             const normalize = (arr, size) => {
               const a = Array(size).fill(null);
@@ -575,7 +580,7 @@ function App() {
     const s = {};
     MISSION_DEFS.forEach(m => {
       s[m.id] = {
-        restHours: m.isSiyur ? 8 : (m.id.startsWith("sg")||m.id==="amada_maaravit") ? 8 : 0,
+        restHours: m.isSiyur ? 16 : (m.id.startsWith("sg")||m.id==="amada_maaravit"||m.id==="amada_maaravit_a"||m.id==="amada_maaravit_b") ? 12 : 0,
         startH: m.startH,
         endH: m.endH % 24 === 0 ? 24 : m.endH % 24,
         slots_commander: m.slots.commander,
@@ -824,8 +829,9 @@ function App() {
               matbahIds.forEach(mid => {
                 const ass = da[mid];
                 if (!ass) return;
+                const isHalf = mid==="matbah_boker" || mid==="matbah_tzaharayim";
                 [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).forEach(p => {
-                  if (counts[p.name] !== undefined) counts[p.name].count++;
+                  if (counts[p.name] !== undefined) counts[p.name].count += isHalf ? 0.5 : 1;
                 });
               });
             });
@@ -844,7 +850,7 @@ function App() {
                         {sorted.map(([name,{count,platoon}]) => (
                           <div key={name} style={{...getPlatoonStyle(platoon),borderRadius:8,padding:"4px 10px",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
                             <span>{name}</span>
-                            <span style={{background:"rgba(0,0,0,0.25)",borderRadius:5,padding:"1px 6px",fontSize:11,fontWeight:800}}>{count}</span>
+                            <span style={{background:"rgba(0,0,0,0.25)",borderRadius:5,padding:"1px 6px",fontSize:11,fontWeight:800}}>{Number.isInteger(count)?count:(Math.floor(count)>0?Math.floor(count)+"½":"½")}</span>
                           </div>
                         ))}
                       </div>
@@ -902,7 +908,7 @@ function App() {
                   const isAftarBlk=aftarThisDay.includes(name) && mission.id!=="aftar_add" && mission.startH >= 14;
                   const dayOrder2=DAY_IDS, ti2=dayOrder2.indexOf(activeDay);
                   const prevAftar = ti2>0 ? (aftarByDay[dayOrder2[ti2-1]]||[]) : [];
-                  const isAftarYesterdayBlk = prevAftar.includes(name) && mission.startH < 14;
+                  const isAftarYesterdayBlk = prevAftar.includes(name) && mission.startH < 14 && mission.id!=="philbox_horsa" && mission.id!=="hetz";
                   const isGimelBlk=gimelThisDay.has(name) && mission.id!=="gimel";
                   const _sb=(dayAss["siyur_boker"]||{});
                   const isInSiyurBoker=[...(_sb.commanders||[]),...(_sb.soldiers||[])].filter(Boolean).some(p=>p.name===name);

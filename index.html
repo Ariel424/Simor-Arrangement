@@ -131,14 +131,14 @@ body{background:var(--bg);color:var(--text);font-family:'Heebo',sans-serif;font-
 <script type="text/babel">
 const { useState, useMemo } = React;
 
-const PLATOONS = {
+const PLATOONS_DEFAULT = {
   cmd1:     { label:"מפקדי מחלקה 1", color:"#ff9800", textColor:"#0a0f1a", members:["חזי דיין","דניאל בר-שי","צבי ווגל","מרדכי אלפרסי"] },
   soldiers1:{ label:"חיילי מחלקה 1",  color:"#4db6e8", textColor:"#0a0f1a", members:["ישי לשם","יהודה ישי","יהודה וויזר","שלמה לייבל","אלי ברץ","מקסים שמורקוב","רועי שמיר","דניס שחרוביץ","שילה דוד","דימה","תומר כנר","אולג"] },
   cmd2:     { label:"מפקדי מחלקה 2", color:"#ab47bc", textColor:"#fff",    members:["ידידיה שמואליאן","אליאור מרטן","נאור גדמו","משה נחשון","ישי קבדה","ניב לאופר"] },
   soldiers2:{ label:"חיילי מחלקה 2",  color:"#ce93d8", textColor:"#0a0f1a", members:["לזבניק","יוני אמרה","יוני אקנין","משה חזן","דניאל ברדריק","יוסי וורקו","אראל רחימי","נאור גזולי","גורדון","גיטלמן","שחר מרגלית","עזריאל סון","פנחס לניאדו"] },
   cmd3:     { label:"מפקדי מחלקה 3", color:"#66bb6a", textColor:"#0a0f1a", members:["אריאל טופז","דורון בוכהולץ","חנן שטיין","רפאל מבשר"] },
   soldiers3:{ label:"חיילי מחלקה 3",  color:"#a5d6a7", textColor:"#0a0f1a", members:["ישי אדרי","אביב אוחנה","אברהם גולדשטיין","ירדן גיאת","אביחן לוי","אהרון נתניא","יאיר ספיר","נאור עזרא","יעקב נרי","נעם קפלנסקי","רועי שאג","יצחק שטטמן"] },
-  pluga:    { label:"מפקדת פלוגה",    color:"#ffd54f", textColor:"#0a0f1a", members:["איתי דרייר","יהודה אסוס","אלי ויינברג","שאבי","סוסנוביץ"] },
+  pluga:    { label:"מחלקת המסופחים", color:"#ffd54f", textColor:"#0a0f1a", members:["ידידיה אבולעפיה","בנימין טייב","איתן שוורץ","משה חדד"] },
 };
 
 const CMD_PLATOONS = new Set(["cmd1","cmd2","cmd3","pluga"]);
@@ -183,7 +183,8 @@ const MISSION_DEFS = [
 
   // ═══ גזרה חדשה (מ-12/3) ═══
   { id:"matbah_new",    label:"מטבח",           icon:"🍳", slots:{commander:0,soldiers:1}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA },
-  { id:"bimuy_oyev", label:"בימוי אויב", icon:"🎭", slots:{commander:0,soldiers:2}, time:"14:00 - 19:00", border:"#ef5350", col:3, startH:14, endH:19, showOnDays:["2025_03_16"] },
+  { id:"bimuy_oyev",   label:"בימוי אויב",  icon:"🎭", slots:{commander:0,soldiers:2}, time:"14:00 - 19:00 | לדבר עם אסוס בנוגע למידע מחר שמגיעים", border:"#ef5350", col:1, startH:14, endH:19, showOnDays:["2025_03_16"] },
+  { id:"kurs_pritza",  label:"קורס פריצה", icon:"🔓", slots:{commander:0,soldiers:1}, time:"",             border:"#ff9800", col:1, startH:6,  endH:24, showOnDays:["2025_03_17","2025_03_18"] },
   { id:"amada_maaravit",  label:"עמדה מערבית",      icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 6:00",  border:"#7e57c2", col:1, startH:24, endH:30, showOnDays:NEW_GAZRA.filter(d=>d==="2025_03_13"||d==="2025_03_14") },
   { id:"amada_maaravit_a",label:"עמדה מערבית א׳",   icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 3:00",  border:"#7e57c2", col:1, startH:24, endH:27, showOnDays:NEW_GAZRA.filter(d=>d!=="2025_03_13"&&d!=="2025_03_14") },
   { id:"amada_maaravit_b",label:"עמדה מערבית ב׳",   icon:"🔭", slots:{commander:0,soldiers:1}, time:"3:00 - 6:00",   border:"#7e57c2", col:1, startH:27, endH:30, showOnDays:NEW_GAZRA.filter(d=>d!=="2025_03_13"&&d!=="2025_03_14") },
@@ -254,10 +255,11 @@ const DAYS = [
 
 const DAY_IDS = DAYS.map(d=>d.id);
 
-const allMembers = Object.entries(PLATOONS).flatMap(([pl,d]) => d.members.map(name => ({ name, platoon:pl })));
+const allMembersDefault = Object.entries(PLATOONS_DEFAULT).flatMap(([pl,d]) => d.members.map(name => ({ name, platoon:pl })));
 
 function getPlatoonStyle(platoon) {
-  const p = PLATOONS[platoon];
+  const plts = window._platoons || PLATOONS_DEFAULT;
+  const p = plts[platoon];
   if (!p) return { background:"#555", color:"#fff" };
   return { background:p.color, color:p.textColor };
 }
@@ -367,7 +369,7 @@ function DisplayCard({ mission, assignment, dayId }) {
   const filled = [...ass.commanders,...ass.soldiers].filter(Boolean).length;
   const total = mission.slots.commander + mission.slots.soldiers;
   const done = filled===total && total>0;
-  const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="amada_maaravit_a" || mission.id==="amada_maaravit_b" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2";
+  const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="amada_maaravit_a" || mission.id==="amada_maaravit_b" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2" || mission.id==="bimuy_oyev" || mission.id==="kurs_pritza";
   const displayTime = (DAY_TIME_OVERRIDES[dayId]||{})[mission.id] || mission.time;
   return (
     <div className={`mcard${isCompact?" compact":""}`} style={{ borderColor: mission.border!=="#555" ? mission.border+"88" : undefined }}>
@@ -414,7 +416,7 @@ function DisplayCard({ mission, assignment, dayId }) {
               <div key={i} className={`ntag ${p?"filled":"empty"}`} style={p?getPlatoonStyle(p.platoon):{}}>{p?p.name:"חייל"}</div>
             ))}
           </div>
-        ) : mission.id==="matbah"||mission.id==="matbah_boker"||mission.id==="matbah_tzaharayim"||mission.id==="matbah_new"||mission.id.startsWith("sg")||mission.id==="amada_maaravit"||mission.id==="amada_maaravit_a"||mission.id==="amada_maaravit_b" ? (
+        ) : mission.id==="matbah"||mission.id==="matbah_boker"||mission.id==="matbah_tzaharayim"||mission.id==="matbah_new"||mission.id.startsWith("sg")||mission.id==="amada_maaravit"||mission.id==="amada_maaravit_a"||mission.id==="amada_maaravit_b"||mission.id==="bimuy_oyev"||mission.id==="kurs_pritza" ? (
           /* מטבח / ש"ג / עמדה — חייל אחד על כל הרוחב */
           <div style={{display:"flex",flexDirection:"column",gap:4}}>
             {(mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16") && (
@@ -467,6 +469,7 @@ function SlotBox({ label, assigned, onRemove, onClick, highlight }) {
 
 function App() {
   const [activeDay,setActiveDay] = useState("2025_03_09");
+  const activeDayObj = DAYS.find(d=>d.id===activeDay);
   const [activeMission,setActiveMission] = useState(MISSION_DEFS[0].id);
   const [view,setView]                   = useState("display");
   const [selPeople,setSelPeople]         = useState([]);
@@ -548,7 +551,26 @@ function App() {
       }
     });
 
-    return () => { unsubAss(); unsubAftar(); };
+    const unsubSettings = onValue(ref(db, 'shabzak/settings'), snap => {
+      if (snap.exists()) {
+        const s = snap.val();
+        if (s.missionSettings) setMissionSettings(prev => ({...prev, ...s.missionSettings}));
+        if (s.aftarSettings) setAftarSettings(s.aftarSettings);
+        if (s.specials) setSpecials(s.specials);
+        if (s.spontMissions) setSpontMissions(s.spontMissions);
+        if (s.hiddenMissionsByDay) setHiddenMissionsByDay(s.hiddenMissionsByDay);
+        if (s.deletedMissions) setDeletedMissions(s.deletedMissions);
+        if (s.platoons) {
+          setPlatoons(prev => {
+            const next = JSON.parse(JSON.stringify(prev));
+            Object.entries(s.platoons).forEach(([k,members]) => { if (next[k]) next[k].members = members; });
+            return next;
+          });
+        }
+      }
+    });
+
+    return () => { unsubAss(); unsubAftar(); unsubSettings(); };
   }, [fbReady, authed]);
 
   // שמירה ל-Firebase בכל שינוי
@@ -577,6 +599,12 @@ function App() {
     });
   }, [fbReady]);
 
+  const saveSettingsToFb = React.useCallback((patch) => {
+    if (!fbReady) return;
+    const db = window._firebaseDb;
+    window._firebaseSet(window._firebaseRef(db, 'shabzak/settings'), patch).catch(()=>{});
+  }, [fbReady]);
+
   const [missionSettings, setMissionSettings] = useState(() => {
     const s = {};
     MISSION_DEFS.forEach(m => {
@@ -586,11 +614,38 @@ function App() {
         endH: m.endH % 24 === 0 ? 24 : m.endH % 24,
         slots_commander: m.slots.commander,
         slots_soldiers: m.slots.soldiers,
-        hiddenDays: [],
+        label: m.label,
+        allowedNames: m.allowedNames || [],
       };
     });
     return s;
   });
+
+  const [aftarSettings, setAftarSettings] = useState({ startH: 14, endH: 14 });
+  const [specials, setSpecials] = useState([]);
+  const [spontMissions, setSpontMissions] = useState([]);
+  const [hiddenMissionsByDay, setHiddenMissionsByDay] = useState({});
+  const [deletedMissions, setDeletedMissions] = useState([]);
+  const [platoons, setPlatoons] = useState(() => JSON.parse(JSON.stringify(PLATOONS_DEFAULT)));
+  React.useEffect(() => { window._platoons = platoons; }, [platoons]);
+
+  const getPlatoonStyle = (platoon) => {
+    const p = platoons[platoon];
+    if (!p) return { background:"#555", color:"#fff" };
+    return { background:p.color, color:p.textColor };
+  };
+  const allMembers = Object.entries(platoons).flatMap(([pl,d]) => d.members.map(name => ({ name, platoon:pl })));
+  const isMissionHiddenOnDay = (dayId, missionId) => (hiddenMissionsByDay[dayId]||[]).includes(missionId);
+  const toggleMissionDay = (dayId, missionId) => {
+    setHiddenMissionsByDay(prev => {
+      const cur = prev[dayId]||[];
+      return {...prev, [dayId]: cur.includes(missionId) ? cur.filter(x=>x!==missionId) : [...cur, missionId]};
+    });
+  };
+
+  // שמירה אוטומטית של כל ההגדרות ל-Firebase
+  React.useEffect(() => { if(fbReady) saveSettingsToFb({missionSettings,aftarSettings,specials,spontMissions,hiddenMissionsByDay,deletedMissions,platoons:Object.fromEntries(Object.entries(platoons).map(([k,p])=>[k,p.members]))}); },
+    [missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, platoons, fbReady]);
 
   // מסך סיסמה — רק אחרי כל ה-hooks
   const [showAftarSelect,setShowAftarSelect] = useState(false);
@@ -695,15 +750,16 @@ function App() {
 
   // filter missions by day visibility
   const visibleMissions = MISSION_DEFS.filter(m => {
+    if (deletedMissions.includes(m.id)) return false;
     if (m.showOnDays && !m.showOnDays.includes(activeDay)) return false;
     if (m.hideOnDays && m.hideOnDays.includes(activeDay)) return false;
+    if (isMissionHiddenOnDay(activeDay, m.id)) return false;
     return true;
   });
 
   const DisplayView = () => {
     const f = visibleMissions.filter(m => !m.hideFromDisplay);
     const col1=f.filter(m=>m.col===1), col2=f.filter(m=>m.col===2), col3=f.filter(m=>m.col===3), col4=f.filter(m=>m.col===4), col5=f.filter(m=>m.col===5), col6=f.filter(m=>m.col===6);
-    const activeDayObj = DAYS.find(d=>d.id===activeDay);
     const numCols = [col1,col2,col3,col4,col5,col6].filter(c=>c.length>0).length;
     return (
       <div className="main">
@@ -755,16 +811,29 @@ function App() {
       <div className="builder-layout">
         <div className="builder-left">
           <div className="mpicker">
-            {visibleMissions.map(m=>{
-              const a=dayAss[m.id], f=[...(a.commanders||[]),...(a.soldiers||[])].filter(Boolean).length, t=m.slots.commander+m.slots.soldiers, done=f===t;
+            {MISSION_DEFS.filter(m => {
+              if (deletedMissions.includes(m.id)) return false;
+              if (m.showOnDays && !m.showOnDays.includes(activeDay)) return false;
+              if (m.hideOnDays && m.hideOnDays.includes(activeDay)) return false;
+              return true;
+            }).map(m=>{
+              const isHidden = isMissionHiddenOnDay(activeDay, m.id);
+              const a=dayAss[m.id], f=[...(a?.commanders||[]),...(a?.soldiers||[])].filter(Boolean).length, t=m.slots.commander+m.slots.soldiers, done=f===t;
               return (
-                <button key={m.id} className={`mpick-btn ${activeMission===m.id?"active":""}`}
-                  style={activeMission===m.id&&mission.border!=="#555"?{borderColor:mission.border}:{}}
-                  onClick={()=>{setActiveMission(m.id);setSelPeople([]);}}>
-                  <div className="mpick-icon">{m.icon}</div>
-                  <div>{m.label}</div>
-                  <div className={`mpick-prog ${done?"done":"partial"}`}>{m.noCount ? "" : done?"✓ הושלם":`${f}/${t}`}</div>
-                </button>
+                <div key={m.id} style={{display:"flex",alignItems:"center",gap:2}}>
+                  <button className={`mpick-btn ${activeMission===m.id&&!isHidden?"active":""}`}
+                    style={{flex:1,opacity:isHidden?0.4:1,textDecoration:isHidden?"line-through":"none",
+                      ...(activeMission===m.id&&mission?.border!=="#555"?{borderColor:mission.border}:{})}}
+                    onClick={()=>{if(!isHidden){setActiveMission(m.id);setSelPeople([]);}}}>
+                    <div className="mpick-icon">{m.icon}</div>
+                    <div>{m.label}</div>
+                    <div className={`mpick-prog ${done?"done":"partial"}`}>{m.noCount||isHidden ? "" : done?"✓ הושלם":`${f}/${t}`}</div>
+                  </button>
+                  <button title={isHidden?"הפעל יום זה":"כבה יום זה"} onClick={()=>toggleMissionDay(activeDay,m.id)}
+                    style={{background:"none",border:"none",cursor:"pointer",fontSize:14,padding:"2px 4px",color:isHidden?"var(--text3)":"var(--text2)"}}>
+                    {isHidden?"🔴":"🟢"}
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -895,7 +964,7 @@ function App() {
               </div>
             </div>
           </div>
-          {Object.entries(PLATOONS).map(([key,p])=>p.members.length===0?null:(
+          {Object.entries(platoons).map(([key,p])=>p.members.length===0?null:(
             <div key={key} className="pool-sec">
               <div className="pool-lbl" style={{color:p.color,borderColor:p.color+"33"}}>
                 <div style={{width:8,height:8,borderRadius:"50%",background:p.color,flexShrink:0}}/>
@@ -906,10 +975,10 @@ function App() {
                   const isAss=assignedThisDay.has(name), isSel=selPeople.some(p=>p.name===name);
                   const isAllowBlk=mission.allowedNames&&!mission.allowedNames.includes(name);
                   const isRestBlk=blocked.has(name);
-                  const isAftarBlk=aftarThisDay.includes(name) && mission.id!=="aftar_add" && mission.startH >= 14;
+                  const isAftarBlk=aftarThisDay.includes(name) && mission.id!=="aftar_add" && mission.startH >= aftarSettings.startH;
                   const dayOrder2=DAY_IDS, ti2=dayOrder2.indexOf(activeDay);
                   const prevAftar = ti2>0 ? (aftarByDay[dayOrder2[ti2-1]]||[]) : [];
-                  const isAftarYesterdayBlk = prevAftar.includes(name) && mission.startH < 14 && mission.id!=="philbox_horsa" && mission.id!=="hetz";
+                  const isAftarYesterdayBlk = prevAftar.includes(name) && mission.startH < aftarSettings.endH && mission.id!=="philbox_horsa" && mission.id!=="hetz";
                   const isGimelBlk=gimelThisDay.has(name) && mission.id!=="gimel";
                   const _sb=(dayAss["siyur_boker"]||{});
                   const isInSiyurBoker=[...(_sb.commanders||[]),...(_sb.soldiers||[])].filter(Boolean).some(p=>p.name===name);
@@ -991,100 +1060,389 @@ function App() {
   );
 
 
+
   const SettingsView = () => {
+    const [settingsTab, setSettingsTab] = useState("missions"); // missions | aftar | spontaneous | specials
+    const inp = {display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13};
+    const btn = (extra={}) => ({background:"var(--surface2)",border:"1px solid var(--border2)",borderRadius:7,color:"var(--text2)",cursor:"pointer",fontFamily:"Heebo,sans-serif",fontSize:12,padding:"4px 10px",...extra});
+    const allMembers = Object.entries(platoons).flatMap(([k,p])=>p.members.map(n=>({name:n,platoon:k})));
+
+    // ── MISSIONS TAB ──
     const [editId, setEditId] = useState(null);
     const [draft, setDraft] = useState({});
-    const visibleForSettings = MISSION_DEFS.filter(m => !m.hideFromDisplay);
+    const HIDE_FROM_SETTINGS = new Set(["agamim","hilton","konnut","rachpan","siyur_boker","siyur_tzo","siyur_layla","maatzar"]);
+    const visibleForSettings = MISSION_DEFS.filter(m => !m.hideFromDisplay && !HIDE_FROM_SETTINGS.has(m.id) && !deletedMissions.includes(m.id));
+    const startEdit = (m) => { setEditId(m.id); setDraft({...missionSettings[m.id]}); };
+    const saveEdit = () => { setMissionSettings(prev=>({...prev,[editId]:{...draft}})); setEditId(null); };
 
-    const startEdit = (m) => {
-      setEditId(m.id);
-      setDraft({ ...missionSettings[m.id] });
-    };
-    const saveEdit = () => {
-      setMissionSettings(prev => ({ ...prev, [editId]: { ...draft } }));
-      setEditId(null);
-    };
+    // ── SPONTANEOUS TAB ──
+    const [spontDraft, setSpontDraft] = useState({label:"",icon:"🎯",startH:8,endH:16,slots_soldiers:1,slots_commander:0,restHours:0,days:[]});
+    const [editSpontIdx, setEditSpontIdx] = useState(null);
+
+    // ── SPECIALS TAB ──
+    const [specialDraft, setSpecialDraft] = useState({name:"",note:""});
+    const [editSpecialIdx, setEditSpecialIdx] = useState(null);
+
+    const tabStyle = (t) => ({
+      padding:"6px 14px", borderRadius:8, border:"none", cursor:"pointer",
+      fontFamily:"Heebo,sans-serif", fontSize:13, fontWeight: settingsTab===t ? 700 : 400,
+      background: settingsTab===t ? "var(--accent)" : "var(--surface2)",
+      color: settingsTab===t ? "#fff" : "var(--text2)",
+    });
 
     return (
-      <div className="main" style={{maxWidth:900,margin:"0 auto",padding:"24px 16px"}}>
-        <div style={{fontSize:20,fontWeight:800,color:"var(--text)",marginBottom:20}}>⚙️ הגדרות משימות</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:12}}>
-          {visibleForSettings.map(m => {
-            const s = missionSettings[m.id];
-            const isEditing = editId === m.id;
-            return (
-              <div key={m.id} style={{background:"var(--surface)",border:`1.5px solid ${isEditing?"var(--accent)":m.border+"66"}`,borderRadius:14,padding:"14px 16px",display:"flex",flexDirection:"column",gap:8}}>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
-                  <span style={{fontSize:18}}>{m.icon}</span>
-                  <span style={{fontWeight:700,fontSize:14,color:"var(--text)"}}>{m.label}</span>
-                  {!isEditing && (
-                    <button onClick={()=>startEdit(m)} style={{marginRight:"auto",background:"var(--surface2)",border:"1px solid var(--border2)",borderRadius:7,color:"var(--text2)",cursor:"pointer",fontSize:11,padding:"3px 10px",fontFamily:"Heebo,sans-serif"}}>✏️ ערוך</button>
-                  )}
-                </div>
+      <div className="main" style={{maxWidth:960,margin:"0 auto",padding:"20px 16px"}}>
+        {/* TABS */}
+        <div style={{display:"flex",gap:8,marginBottom:20,flexWrap:"wrap"}}>
+          <button style={tabStyle("missions")} onClick={()=>setSettingsTab("missions")}>⚙️ משימות</button>
+          <button style={tabStyle("aftar")} onClick={()=>setSettingsTab("aftar")}>🏠 אפטר</button>
+          <button style={tabStyle("spontaneous")} onClick={()=>setSettingsTab("spontaneous")}>➕ משימות ספונטניות</button>
+          <button style={tabStyle("specials")} onClick={()=>setSettingsTab("specials")}>⭐ מיוחדים</button>
+        </div>
 
-                {isEditing ? (
-                  <>
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-                      <label style={{fontSize:11,color:"var(--text2)"}}>
-                        שעת התחלה
-                        <input type="number" min={0} max={24} value={draft.startH}
-                          onChange={e=>setDraft(d=>({...d,startH:+e.target.value}))}
-                          style={{display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13}}/>
-                      </label>
-                      <label style={{fontSize:11,color:"var(--text2)"}}>
-                        שעת סיום
-                        <input type="number" min={0} max={30} value={draft.endH}
-                          onChange={e=>setDraft(d=>({...d,endH:+e.target.value}))}
-                          style={{display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13}}/>
-                      </label>
-                      <label style={{fontSize:11,color:"var(--text2)"}}>
-                        מנוחה לאחר (שעות)
-                        <input type="number" min={0} max={24} value={draft.restHours}
-                          onChange={e=>setDraft(d=>({...d,restHours:+e.target.value}))}
-                          style={{display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13}}/>
-                      </label>
-                      <label style={{fontSize:11,color:"var(--text2)"}}>
-                        מפקדים
-                        <input type="number" min={0} max={10} value={draft.slots_commander}
-                          onChange={e=>setDraft(d=>({...d,slots_commander:+e.target.value}))}
-                          style={{display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13}}/>
-                      </label>
-                      <label style={{fontSize:11,color:"var(--text2)"}}>
-                        חיילים
-                        <input type="number" min={0} max={20} value={draft.slots_soldiers}
-                          onChange={e=>setDraft(d=>({...d,slots_soldiers:+e.target.value}))}
-                          style={{display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13}}/>
-                      </label>
+        {/* ══ MISSIONS ══ */}
+        {settingsTab==="missions" && (
+          <div>
+            <div style={{fontSize:16,fontWeight:800,marginBottom:14,color:"var(--text)"}}>⚙️ הגדרות משימות</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))",gap:10}}>
+              {visibleForSettings.map(m => {
+                const s = missionSettings[m.id];
+                const isEditing = editId === m.id;
+                const hiddenCount = DAY_IDS.filter(d => isMissionHiddenOnDay(d, m.id)).length;
+                return (
+                  <div key={m.id} style={{background:"var(--surface)",border:`1.5px solid ${isEditing?"var(--accent)":m.border+"66"}`,borderRadius:14,padding:"12px 14px",display:"flex",flexDirection:"column",gap:8}}>
+                    <div style={{display:"flex",alignItems:"center",gap:8}}>
+                      <span style={{fontSize:10}}>{hiddenCount===0?"🟢":hiddenCount===DAY_IDS.length?"🔴":"🟡"}</span>
+                      <span style={{fontSize:16}}>{m.icon}</span>
+                      <span style={{fontWeight:700,fontSize:13,color:"var(--text)",flex:1}}>{s.label||m.label}</span>
+                      {!isEditing && <button onClick={()=>startEdit(m)} style={btn()}>✏️ ערוך</button>}
+                      {!isEditing && <button onClick={()=>{if(confirm(`למחוק את "${m.label}"?`)) setDeletedMissions(p=>[...p,m.id]);}} style={btn({color:"#ef5350"})}>🗑</button>}
                     </div>
-                    <div style={{display:"flex",gap:8,marginTop:4}}>
-                      <button onClick={saveEdit} style={{flex:1,background:"var(--accent)",border:"none",borderRadius:8,color:"#fff",cursor:"pointer",fontFamily:"Heebo,sans-serif",fontSize:13,fontWeight:700,padding:"7px"}}>✓ שמור</button>
-                      <button onClick={()=>setEditId(null)} style={{flex:1,background:"var(--surface2)",border:"1px solid var(--border2)",borderRadius:8,color:"var(--text2)",cursor:"pointer",fontFamily:"Heebo,sans-serif",fontSize:13,padding:"7px"}}>ביטול</button>
-                    </div>
-                  </>
-                ) : (
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4,fontSize:12,color:"var(--text2)"}}>
-                    <div>🕐 <span style={{color:"var(--text)"}}>{s.startH}:00 – {s.endH > 24 ? (s.endH-24)+":00 למחרת" : s.endH+":00"}</span></div>
-                    <div>😴 מנוחה: <span style={{color:"var(--text)"}}>{s.restHours} שעות</span></div>
-                    <div>⭐ מפקדים: <span style={{color:"var(--text)"}}>{s.slots_commander}</span></div>
-                    <div>🪖 חיילים: <span style={{color:"var(--text)"}}>{s.slots_soldiers}</span></div>
+                    {!isEditing && (
+                      <div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:4}}>
+                        {DAYS.map(d=>{
+                          const hidden = isMissionHiddenOnDay(d.id, m.id);
+                          return <button key={d.id} onClick={()=>toggleMissionDay(d.id,m.id)}
+                            title={d.date}
+                            style={{...btn(),background:hidden?"var(--surface2)":"#26c6da22",color:hidden?"var(--text3)":"#26c6da",fontSize:10,padding:"1px 5px",border:hidden?"1px solid var(--border)":"1px solid #26c6da44"}}>
+                            {hidden?"🔴":"🟢"} {d.date}
+                          </button>;
+                        })}
+                      </div>
+                    )}
+                    {isEditing ? (
+                      <>
+                        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7}}>
+                          <label style={{fontSize:11,color:"var(--text2)"}}>שם משימה<input style={inp} value={draft.label||""} onChange={e=>setDraft(d=>({...d,label:e.target.value}))}/></label>
+                          <label style={{fontSize:11,color:"var(--text2)"}}>שעת התחלה<input type="number" min={0} max={30} style={inp} value={draft.startH} onChange={e=>setDraft(d=>({...d,startH:+e.target.value}))}/></label>
+                          <label style={{fontSize:11,color:"var(--text2)"}}>שעת סיום<input type="number" min={0} max={30} style={inp} value={draft.endH} onChange={e=>setDraft(d=>({...d,endH:+e.target.value}))}/></label>
+                          <label style={{fontSize:11,color:"var(--text2)"}}>מנוחה אחרי (שעות)<input type="number" min={0} max={24} style={inp} value={draft.restHours} onChange={e=>setDraft(d=>({...d,restHours:+e.target.value}))}/></label>
+                          <label style={{fontSize:11,color:"var(--text2)"}}>מפקדים<input type="number" min={0} max={10} style={inp} value={draft.slots_commander} onChange={e=>setDraft(d=>({...d,slots_commander:+e.target.value}))}/></label>
+                          <label style={{fontSize:11,color:"var(--text2)"}}>חיילים<input type="number" min={0} max={20} style={inp} value={draft.slots_soldiers} onChange={e=>setDraft(d=>({...d,slots_soldiers:+e.target.value}))}/></label>
+                        </div>
+                        <label style={{fontSize:11,color:"var(--text2)"}}>
+                          חיילים מורשים (ריק = כולם)
+                          <div style={{display:"flex",flexWrap:"wrap",gap:4,marginTop:4}}>
+                            {allMembers.map(({name,platoon})=>{
+                              const allowed = draft.allowedNames||[];
+                              const isSel = allowed.includes(name);
+                              return <button key={name} onClick={()=>setDraft(d=>({...d,allowedNames:isSel?allowed.filter(n=>n!==name):[...allowed,name]}))}
+                                style={{...btn(),background:isSel?"var(--accent)":"var(--surface2)",color:isSel?"#fff":"var(--text2)",fontSize:11,padding:"2px 7px"}}>{name}</button>;
+                            })}
+                          </div>
+                        </label>
+                        <div style={{display:"flex",gap:8}}>
+                          <button onClick={saveEdit} style={btn({background:"var(--accent)",color:"#fff",flex:1,fontWeight:700})}>✓ שמור</button>
+                          <button onClick={()=>setEditId(null)} style={btn({flex:1})}>ביטול</button>
+                        </div>
+                        <div style={{marginTop:8}}>
+                          <div style={{fontSize:11,color:"var(--text2)",marginBottom:4}}>ימים שהמשימה פעילה בהם:</div>
+                          <div style={{display:"flex",flexWrap:"wrap",gap:3}}>
+                            {DAYS.map(d=>{
+                              const hidden = isMissionHiddenOnDay(d.id, m.id);
+                              return <button key={d.id} onClick={()=>toggleMissionDay(d.id,m.id)}
+                                style={{...btn(),background:hidden?"var(--surface2)":"var(--accent)",color:hidden?"var(--text3)":"#fff",fontSize:10,padding:"2px 6px",textDecoration:hidden?"line-through":"none"}}>
+                                {d.date}
+                              </button>;
+                            })}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{fontSize:11,color:"var(--text2)",display:"grid",gridTemplateColumns:"1fr 1fr",gap:3}}>
+                        <div>🕐 {s.startH}:00 – {s.endH>24?(s.endH-24)+":00 למחרת":s.endH+":00"}</div>
+                        <div>😴 {s.restHours} שעות מנוחה</div>
+                        <div>⭐ {s.slots_commander} מפקדים</div>
+                        <div>🪖 {s.slots_soldiers} חיילים</div>
+                        {s.allowedNames?.length>0 && <div style={{gridColumn:"1/-1",color:"var(--text3)",fontSize:10}}>מורשים: {s.allowedNames.join(", ")}</div>}
+                      </div>
+                    )}
                   </div>
-                )}
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ══ AFTAR ══ */}
+        {settingsTab==="aftar" && (
+          <div style={{maxWidth:400}}>
+            <div style={{fontSize:16,fontWeight:800,marginBottom:14,color:"var(--text)"}}>🏠 הגדרות אפטר</div>
+            <div style={{background:"var(--surface)",border:"1.5px solid var(--border)",borderRadius:14,padding:"20px"}}>
+              <div style={{fontSize:13,color:"var(--text2)",marginBottom:16,lineHeight:1.6}}>
+                הגדר את שעות האפטר. חייל שיצא אפטר ב-יום X:<br/>
+                • חסום למשימות מ-<strong>שעת היציאה</strong> ועד סוף יום X<br/>
+                • חסום למשימות עד <strong>שעת החזרה</strong> ביום X+1
               </div>
-            );
-          })}
-        </div>
-        <div style={{marginTop:16,fontSize:11,color:"var(--text3)"}}>
-          * שינויים בהגדרות ישפיעו על חסימות מנוחה ותצוגה מהפעם הבאה שתיכנס לכל יום.
-        </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                <label style={{fontSize:12,color:"var(--text2)"}}>
+                  שעת יציאה לאפטר
+                  <input type="number" min={0} max={23} style={inp} value={aftarSettings.startH}
+                    onChange={e=>setAftarSettings(s=>({...s,startH:+e.target.value}))}/>
+                </label>
+                <label style={{fontSize:12,color:"var(--text2)"}}>
+                  שעת חזרה מאפטר
+                  <input type="number" min={0} max={23} style={inp} value={aftarSettings.endH}
+                    onChange={e=>setAftarSettings(s=>({...s,endH:+e.target.value}))}/>
+                </label>
+              </div>
+              <div style={{marginTop:14,padding:"10px 12px",background:"var(--surface2)",borderRadius:9,fontSize:12,color:"var(--text2)"}}>
+                💡 לפי ההגדרה הנוכחית: יוצא ב-{aftarSettings.startH}:00, חוזר למחרת ב-{aftarSettings.endH}:00
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══ SPONTANEOUS ══ */}
+        {settingsTab==="spontaneous" && (
+          <div>
+            <div style={{fontSize:16,fontWeight:800,marginBottom:14,color:"var(--text)"}}>➕ משימות ספונטניות</div>
+            {/* Add/Edit form */}
+            <div style={{background:"var(--surface)",border:"1.5px solid var(--accent)44",borderRadius:14,padding:"16px",marginBottom:16}}>
+              <div style={{fontSize:13,fontWeight:700,color:"var(--accent)",marginBottom:10}}>{editSpontIdx!==null?"✏️ עריכת משימה":"➕ הוספת משימה חדשה"}</div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:8}}>
+                <label style={{fontSize:11,color:"var(--text2)"}}>שם משימה<input style={inp} value={spontDraft.label} onChange={e=>setSpontDraft(d=>({...d,label:e.target.value}))}/></label>
+                <label style={{fontSize:11,color:"var(--text2)"}}>אייקון<input style={inp} value={spontDraft.icon} onChange={e=>setSpontDraft(d=>({...d,icon:e.target.value}))}/></label>
+                <label style={{fontSize:11,color:"var(--text2)"}}>שעת התחלה<input type="number" min={0} max={30} style={inp} value={spontDraft.startH} onChange={e=>setSpontDraft(d=>({...d,startH:+e.target.value}))}/></label>
+                <label style={{fontSize:11,color:"var(--text2)"}}>שעת סיום<input type="number" min={0} max={30} style={inp} value={spontDraft.endH} onChange={e=>setSpontDraft(d=>({...d,endH:+e.target.value}))}/></label>
+                <label style={{fontSize:11,color:"var(--text2)"}}>מנוחה אחרי (שעות)<input type="number" min={0} max={24} style={inp} value={spontDraft.restHours} onChange={e=>setSpontDraft(d=>({...d,restHours:+e.target.value}))}/></label>
+                <label style={{fontSize:11,color:"var(--text2)"}}>מפקדים<input type="number" min={0} max={10} style={inp} value={spontDraft.slots_commander} onChange={e=>setSpontDraft(d=>({...d,slots_commander:+e.target.value}))}/></label>
+                <label style={{fontSize:11,color:"var(--text2)"}}>חיילים<input type="number" min={0} max={20} style={inp} value={spontDraft.slots_soldiers} onChange={e=>setSpontDraft(d=>({...d,slots_soldiers:+e.target.value}))}/></label>
+              </div>
+              <div style={{marginTop:10}}>
+                <div style={{fontSize:11,color:"var(--text2)",marginBottom:6}}>ימים שהמשימה מופיעה בהם:</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+                  {DAYS.map(d=>{
+                    const sel = spontDraft.days.includes(d.id);
+                    return <button key={d.id} onClick={()=>setSpontDraft(p=>({...p,days:sel?p.days.filter(x=>x!==d.id):[...p.days,d.id]}))}
+                      style={{...btn(),background:sel?"var(--accent)":"var(--surface2)",color:sel?"#fff":"var(--text2)",fontSize:11,padding:"2px 8px"}}>{d.date}</button>;
+                  })}
+                </div>
+              </div>
+              <div style={{display:"flex",gap:8,marginTop:12}}>
+                <button style={btn({background:"var(--accent)",color:"#fff",fontWeight:700,padding:"7px 18px"})} onClick={()=>{
+                  if(!spontDraft.label.trim()) return;
+                  if(editSpontIdx!==null){
+                    setSpontMissions(p=>p.map((m,i)=>i===editSpontIdx?{...spontDraft,id:"spont_"+Date.now()}:m));
+                    setEditSpontIdx(null);
+                  } else {
+                    setSpontMissions(p=>[...p,{...spontDraft,id:"spont_"+Date.now()}]);
+                  }
+                  setSpontDraft({label:"",icon:"🎯",startH:8,endH:16,slots_soldiers:1,slots_commander:0,restHours:0,days:[]});
+                }}>✓ {editSpontIdx!==null?"עדכן":"הוסף"}</button>
+                {editSpontIdx!==null && <button style={btn()} onClick={()=>{setEditSpontIdx(null);setSpontDraft({label:"",icon:"🎯",startH:8,endH:16,slots_soldiers:1,slots_commander:0,restHours:0,days:[]});}}>ביטול</button>}
+              </div>
+            </div>
+            {/* List */}
+            {spontMissions.length===0
+              ? <div style={{color:"var(--text3)",fontSize:13}}>אין משימות ספונטניות עדיין</div>
+              : <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:10}}>
+                  {spontMissions.map((m,i)=>(
+                    <div key={m.id} style={{background:"var(--surface)",border:"1.5px solid var(--border)",borderRadius:12,padding:"12px 14px"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
+                        <span style={{fontSize:18}}>{m.icon}</span>
+                        <span style={{fontWeight:700,fontSize:13,flex:1,color:"var(--text)"}}>{m.label}</span>
+                        <button style={btn({fontSize:11})} onClick={()=>{setEditSpontIdx(i);setSpontDraft({...m});}}>✏️</button>
+                        <button style={btn({fontSize:11,color:"#ef5350"})} onClick={()=>setSpontMissions(p=>p.filter((_,j)=>j!==i))}>🗑</button>
+                      </div>
+                      <div style={{fontSize:11,color:"var(--text2)"}}>🕐 {m.startH}:00–{m.endH}:00 | 😴 {m.restHours}ש׳ | ⭐{m.slots_commander} 🪖{m.slots_soldiers}</div>
+                      <div style={{fontSize:10,color:"var(--text3)",marginTop:4}}>{m.days.length===0?"כל הימים":m.days.map(id=>DAYS.find(d=>d.id===id)?.date||id).join(", ")}</div>
+                    </div>
+                  ))}
+                </div>
+            }
+          </div>
+        )}
+
+        {/* ══ SPECIALS ══ */}
+        {settingsTab==="specials" && (
+          <div>
+            <div style={{fontSize:16,fontWeight:800,marginBottom:14,color:"var(--text)"}}>⭐ חיילים מיוחדים</div>
+            <div style={{background:"var(--surface)",border:"1.5px solid var(--accent)44",borderRadius:14,padding:"16px",marginBottom:16}}>
+              <div style={{fontSize:13,fontWeight:700,color:"var(--accent)",marginBottom:10}}>{editSpecialIdx!==null?"✏️ עריכה":"➕ הוספת חייל מיוחד"}</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                <label style={{fontSize:11,color:"var(--text2)"}}>
+                  שם החייל
+                  <select style={inp} value={specialDraft.name} onChange={e=>setSpecialDraft(d=>({...d,name:e.target.value}))}>
+                    <option value="">-- בחר חייל --</option>
+                    {allMembers.map(({name})=><option key={name} value={name}>{name}</option>)}
+                  </select>
+                </label>
+                <label style={{fontSize:11,color:"var(--text2)"}}>
+                  הערה / תנאי
+                  <input style={inp} placeholder='למשל: לא להעלות לש"ג לילה' value={specialDraft.note} onChange={e=>setSpecialDraft(d=>({...d,note:e.target.value}))}/>
+                </label>
+              </div>
+              <div style={{display:"flex",gap:8,marginTop:10}}>
+                <button style={btn({background:"var(--accent)",color:"#fff",fontWeight:700,padding:"7px 18px"})} onClick={()=>{
+                  if(!specialDraft.name) return;
+                  if(editSpecialIdx!==null){
+                    setSpecials(p=>p.map((s,i)=>i===editSpecialIdx?{...specialDraft}:s));
+                    setEditSpecialIdx(null);
+                  } else {
+                    setSpecials(p=>[...p,{...specialDraft}]);
+                  }
+                  setSpecialDraft({name:"",note:""});
+                }}>✓ {editSpecialIdx!==null?"עדכן":"הוסף"}</button>
+                {editSpecialIdx!==null && <button style={btn()} onClick={()=>{setEditSpecialIdx(null);setSpecialDraft({name:"",note:""});}}>ביטול</button>}
+              </div>
+            </div>
+            {specials.length===0
+              ? <div style={{color:"var(--text3)",fontSize:13}}>אין חיילים מיוחדים עדיין</div>
+              : <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                  {specials.map((s,i)=>{
+                    const member = allMembers.find(m=>m.name===s.name);
+                    return (
+                      <div key={i} style={{background:"var(--surface)",border:"1.5px solid var(--border)",borderRadius:12,padding:"12px 16px",display:"flex",alignItems:"center",gap:10}}>
+                        <div className="ntag filled" style={{...getPlatoonStyle(member?.platoon),minWidth:90,textAlign:"center",fontSize:13}}>{s.name}</div>
+                        <div style={{flex:1,fontSize:12,color:"var(--text2)"}}>{s.note||"—"}</div>
+                        <button style={btn({fontSize:11})} onClick={()=>{setEditSpecialIdx(i);setSpecialDraft({...s});}}>✏️</button>
+                        <button style={btn({fontSize:11,color:"#ef5350"})} onClick={()=>setSpecials(p=>p.filter((_,j)=>j!==i))}>🗑</button>
+                      </div>
+                    );
+                  })}
+                </div>
+            }
+          </div>
+        )}
       </div>
     );
   };
 
 
+  const SpecialsView = () => {
+    const inp = {display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13};
+    const btn = (extra={}) => ({background:"var(--surface2)",border:"1px solid var(--border2)",borderRadius:7,color:"var(--text2)",cursor:"pointer",fontFamily:"Heebo,sans-serif",fontSize:12,padding:"4px 10px",...extra});
+    const allMembers = Object.entries(platoons).flatMap(([k,p])=>p.members.map(n=>({name:n,platoon:k})));
+    const [draft, setDraft] = useState({name:"",note:""});
+    const [editIdx, setEditIdx] = useState(null);
+    const [specialsTab, setSpecialsTab] = useState("notes"); // notes | members
+    const [newMemberName, setNewMemberName] = useState("");
+    const [newMemberPlatoon, setNewMemberPlatoon] = useState("soldiers1");
+    const tabS = (t) => ({padding:"5px 12px",borderRadius:7,border:"none",cursor:"pointer",fontFamily:"Heebo,sans-serif",fontSize:12,fontWeight:specialsTab===t?700:400,background:specialsTab===t?"var(--accent)":"var(--surface2)",color:specialsTab===t?"#fff":"var(--text2)"});
+    return (
+      <div className="main" style={{maxWidth:700,margin:"0 auto",padding:"20px 16px"}}>
+        <div style={{fontSize:18,fontWeight:800,marginBottom:14,color:"var(--text)"}}>⭐ מיוחדים</div>
+        <div style={{display:"flex",gap:6,marginBottom:16}}>
+          <button style={tabS("notes")} onClick={()=>setSpecialsTab("notes")}>📝 הערות חיילים</button>
+          <button style={tabS("members")} onClick={()=>setSpecialsTab("members")}>➕ הוספת חיילים למחלקה</button>
+        </div>
+
+        {specialsTab==="notes" && (<>
+          <div style={{background:"var(--surface)",border:"1.5px solid var(--accent)44",borderRadius:14,padding:"16px",marginBottom:16}}>
+            <div style={{fontSize:13,fontWeight:700,color:"var(--accent)",marginBottom:10}}>{editIdx!==null?"✏️ עריכה":"➕ הוספת חייל מיוחד"}</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+              <label style={{fontSize:11,color:"var(--text2)"}}>שם החייל
+                <select style={inp} value={draft.name} onChange={e=>setDraft(d=>({...d,name:e.target.value}))}>
+                  <option value="">-- בחר חייל --</option>
+                  {allMembers.map(({name})=><option key={name} value={name}>{name}</option>)}
+                </select>
+              </label>
+              <label style={{fontSize:11,color:"var(--text2)"}}>הערה / תנאי
+                <input style={inp} placeholder='למשל: לא להעלות לש"ג לילה' value={draft.note} onChange={e=>setDraft(d=>({...d,note:e.target.value}))}/>
+              </label>
+            </div>
+            <div style={{display:"flex",gap:8,marginTop:10}}>
+              <button style={btn({background:"var(--accent)",color:"#fff",fontWeight:700,padding:"7px 18px"})} onClick={()=>{
+                if(!draft.name) return;
+                if(editIdx!==null){ setSpecials(p=>p.map((s,i)=>i===editIdx?{...draft}:s)); setEditIdx(null); }
+                else { setSpecials(p=>[...p,{...draft}]); }
+                setDraft({name:"",note:""});
+              }}>✓ {editIdx!==null?"עדכן":"הוסף"}</button>
+              {editIdx!==null && <button style={btn()} onClick={()=>{setEditIdx(null);setDraft({name:"",note:""});}}>ביטול</button>}
+            </div>
+          </div>
+          {specials.length===0
+            ? <div style={{color:"var(--text3)",fontSize:13}}>אין חיילים מיוחדים עדיין</div>
+            : <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                {specials.map((s,i)=>{
+                  const member = allMembers.find(m=>m.name===s.name);
+                  return (
+                    <div key={i} style={{background:"var(--surface)",border:"1.5px solid var(--border)",borderRadius:12,padding:"12px 16px",display:"flex",alignItems:"center",gap:10}}>
+                      <div className="ntag filled" style={{...getPlatoonStyle(member?.platoon),minWidth:90,textAlign:"center",fontSize:13}}>{s.name}</div>
+                      <div style={{flex:1,fontSize:13,color:"var(--text2)"}}>{s.note||"—"}</div>
+                      <button style={btn({fontSize:11})} onClick={()=>{setEditIdx(i);setDraft({...s});}}>✏️</button>
+                      <button style={btn({fontSize:11,color:"#ef5350"})} onClick={()=>setSpecials(p=>p.filter((_,j)=>j!==i))}>🗑</button>
+                    </div>
+                  );
+                })}
+              </div>
+          }
+        </>)}
+
+        {specialsTab==="members" && (<>
+          <div style={{background:"var(--surface)",border:"1.5px solid var(--accent)44",borderRadius:14,padding:"16px",marginBottom:16}}>
+            <div style={{fontSize:13,fontWeight:700,color:"var(--accent)",marginBottom:10}}>➕ הוספת חייל / מפקד חדש</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+              <label style={{fontSize:11,color:"var(--text2)"}}>שם
+                <input style={inp} placeholder="שם מלא" value={newMemberName} onChange={e=>setNewMemberName(e.target.value)}/>
+              </label>
+              <label style={{fontSize:11,color:"var(--text2)"}}>מחלקה
+                <select style={inp} value={newMemberPlatoon} onChange={e=>setNewMemberPlatoon(e.target.value)}>
+                  {Object.entries(platoons).map(([k,p])=><option key={k} value={k}>{p.label}</option>)}
+                </select>
+              </label>
+            </div>
+            <button style={btn({background:"var(--accent)",color:"#fff",fontWeight:700,padding:"7px 18px",marginTop:10})} onClick={()=>{
+              const name = newMemberName.trim();
+              if(!name) return;
+              if(platoons[newMemberPlatoon].members.includes(name)){ alert("החייל כבר קיים במחלקה זו"); return; }
+              setPlatoons(prev => { const n=JSON.parse(JSON.stringify(prev)); n[newMemberPlatoon].members.push(name); return n; });
+              setNewMemberName("");
+            }}>✓ הוסף</button>
+          </div>
+          {/* Show all platoons and their members */}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:10}}>
+            {Object.entries(platoons).map(([k,p])=>(
+              <div key={k} style={{background:"var(--surface)",border:"1.5px solid var(--border)",borderRadius:12,padding:"12px 14px"}}>
+                <div style={{fontWeight:700,fontSize:13,color:"var(--text)",marginBottom:8}}>{p.label}</div>
+                <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                  {p.members.map(name=>(
+                    <div key={name} style={{display:"flex",alignItems:"center",gap:6}}>
+                      <div style={{...getPlatoonStyle(k),borderRadius:6,padding:"2px 8px",fontSize:12,flex:1}}>{name}</div>
+                      <button style={btn({fontSize:10,padding:"2px 6px",color:"#ef5350"})} onClick={()=>{
+                        if(confirm(`למחוק את ${name}?`)){ setPlatoons(prev => { const n=JSON.parse(JSON.stringify(prev)); n[k].members=n[k].members.filter(m=>m!==name); return n; }); }
+                      }}>✕</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>)}
+      </div>
+    );
+  };
+
   return (
     <div style={{minHeight:"100vh"}}>
       <div className="topbar">
         <div className="topbar-logo">שבצ<span>"</span>ק</div>
+        {view==="display" && activeDayObj && (
+          <div style={{fontSize:12,fontWeight:700,color:"var(--accent)",background:"var(--surface2)",border:"1px solid var(--border)",borderRadius:8,padding:"3px 10px",whiteSpace:"nowrap"}}>
+            יום {activeDayObj.label} · {activeDayObj.date}
+          </div>
+        )}
         <div className="day-tabs">
           {DAYS.map(d=>(
             <button key={d.id} className={`day-tab ${activeDay===d.id?"active":""}`}
@@ -1110,6 +1468,7 @@ function App() {
           <button className={`view-btn ${view==="display"?"active":""}`} onClick={()=>setView("display")}>👁 תצוגה</button>
           <button className={`view-btn ${view==="builder"?"active":""}`} onClick={()=>setView("builder")}>🛠 בנייה</button>
           <button className={`view-btn ${view==="settings"?"active":""}`} onClick={()=>setView("settings")}>⚙️ הגדרות</button>
+          <button className={`view-btn ${view==="specials"?"active":""}`} onClick={()=>setView("specials")}>⭐ מיוחדים</button>
         </div>
         <button onClick={()=>{ if(confirm("למחוק את כל השיבוצים?")){ const r={}; DAY_IDS.forEach(id=>{r[id]=initDayAssignments();}); const a={}; DAY_IDS.forEach(id=>{a[id]=[];}); setAllAssAndSave(r); setAftarByDayAndSave(a); }}} style={{background:"none",border:"1px solid var(--border2)",borderRadius:7,color:"var(--text3)",cursor:"pointer",fontFamily:"Heebo,sans-serif",fontSize:11,padding:"4px 10px"}}>🗑 איפוס</button>
         <button onClick={()=>{
@@ -1138,7 +1497,7 @@ function App() {
           }}/>
         </label>
       </div>
-      {view==="display" ? <DisplayView key="display"/> : view==="settings" ? <SettingsView key="settings"/> : <BuilderView key="builder"/>}
+      {view==="display" ? <DisplayView key="display"/> : view==="settings" ? <SettingsView key="settings"/> : view==="specials" ? <SpecialsView key="specials"/> : <BuilderView key="builder"/>}
     </div>
   );
 }

@@ -11,7 +11,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
   const firebaseConfig = {
     apiKey: "AIzaSyDDUlVwinhJMMPLlYGparZDjBiBtCExbVk",
     authDomain: "simor-arrangement.firebaseapp.com",
@@ -27,6 +27,7 @@
   window._firebaseRef = ref;
   window._firebaseOnValue = onValue;
   window._firebaseSet = set;
+  window._firebaseGet = get;
   window._firebaseReady = true;
   window.dispatchEvent(new Event('firebase-ready'));
 </script>
@@ -118,7 +119,7 @@ body{background:var(--bg);color:var(--text);font-family:'Heebo',sans-serif;font-
 .aftar-title{font-size:15px;font-weight:700;flex:1;}
 .aftar-body{padding:10px 12px;display:flex;flex-direction:column;gap:6px;}
 .aftar-chip{border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:6px;}
-.aftar-add-btn{width:100%;border:1.5px dashed var(--border2);background:transparent;border-radius:8px;padding:7px;color:var(--text3);font-size:12px;cursor:pointer;font-family:'Heebo',sans-serif;transition:all .15s;text-align:center;}
+.day-toggle-btn { transition: none !important; }
 .aftar-add-btn:hover{border-color:var(--border);color:var(--text2);}
 .aftar-dropdown{position:relative;}
 .aftar-select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;font-family:'Heebo',sans-serif;cursor:pointer;outline:none;margin-top:4px;}
@@ -168,7 +169,7 @@ const OLD_GAZRA_HIDE = NEW_GAZRA; // המשימות הישנות נסתרות ב
 const MISSION_DEFS = [
   // ═══ גזרה ישנה (עד 11/3) ═══
   { id:"agamim",      label:"אגמים",          icon:"🏊", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#f06292", col:1, startH:0,  endH:24, hideOnDays:OLD_GAZRA_HIDE },
-  { id:"matbah",      label:"מטבח",           icon:"🍳", slots:{commander:0,soldiers:1}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#555",    col:2, startH:8,  endH:14, hideOnDays:[...OLD_GAZRA_HIDE,"2025_03_12"] },
+  { id:"matbah",      label:"מטבח",           icon:"🍳", slots:{commander:0,soldiers:1}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#555",    col:2, startH:8,  endH:14, hideOnDays:[...OLD_GAZRA_HIDE,"2025_03_12"], hideFromDisplay:true },
   { id:"matbah_boker", label:"מטבח בוקר",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"8:30 - 14:00",    border:"#555",    col:2, startH:8,  endH:14, showOnDays:[] },
   { id:"matbah_tzaharayim", label:"מטבח צהריים", icon:"🍳", slots:{commander:0,soldiers:1}, time:"14:00 - סוף יום", border:"#555", col:2, startH:14, endH:20, showOnDays:[] },
   { id:"hilton",      label:"פילבוקס ביתילו", icon:"🏠", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#f06292", col:1, startH:0,  endH:24, hideOnDays:OLD_GAZRA_HIDE },
@@ -270,7 +271,8 @@ function initDayAssignments() {
   return init;
 }
 
-function getBlockedNames(allAss, targetDayId, targetMission) {
+function getBlockedNames(allAss, targetDayId, targetMission, missionSettings) {
+  const ms = missionSettings || {};
   const blocked = new Set(), reasons = {};
   const dayOrder = DAY_IDS;
   const ti = dayOrder.indexOf(targetDayId);
@@ -310,15 +312,17 @@ function getBlockedNames(allAss, targetDayId, targetMission) {
   dayOrder.forEach((dayId, di) => {
     const da = allAss[dayId] || {};
 
-    // מנוחה 16 שעות אחרי סיור
+    // מנוחה אחרי סיור — לפי missionSettings
     MISSION_DEFS.filter(m => m.isSiyur).forEach(sm => {
       const ass = da[sm.id]; if (!ass) return;
+      const restH = ms[sm.id]?.restHours ?? 16;
+      if (restH === 0) return;
       [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).forEach(person => {
         if (MULTI_MISSION_OFFICERS.has(person.name)) return;
         const sEnd = di*24 + sm.endH, tStart = ti*24 + targetMission.startH;
         const isSameSlot = (dayId===targetDayId && sm.id===targetMission.id);
         const targetIsAfterPatrolStart = tStart >= di*24 + sm.startH;
-        if (tStart < sEnd+16 && !isSameSlot && targetIsAfterPatrolStart) {
+        if (tStart < sEnd+restH && !isSameSlot && targetIsAfterPatrolStart) {
           const dayExempt = (REST_EXEMPTIONS[targetDayId]||{});
           const missionExempt = dayExempt[targetMission.id];
           if (missionExempt && missionExempt.has(person.name)) return;
@@ -330,18 +334,18 @@ function getBlockedNames(allAss, targetDayId, targetMission) {
       });
     });
 
-    // מנוחה 8 שעות אחרי ש"ג ועמדה מערבית (מחושב מסוף המשמרת)
+    // מנוחה אחרי ש"ג ועמדה מערבית — לפי missionSettings
     MISSION_DEFS.filter(m => m.id.startsWith("sg") || m.id==="amada_maaravit" || m.id==="amada_maaravit_a" || m.id==="amada_maaravit_b").forEach(sm => {
       const ass = da[sm.id]; if (!ass) return;
+      const restH = ms[sm.id]?.restHours ?? 12;
+      if (restH === 0) return;
       const isSameSlot = (dayId===targetDayId && sm.id===targetMission.id);
       if (isSameSlot) return;
       [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).forEach(person => {
         const sEnd = di*24 + sm.endH;
         let tStart = ti*24 + targetMission.startH;
-        // אם target באותו dayId ושעתו קטנה או שווה לסוף המשמרת — הוא לוגית ביום הבא
         if (ti === di && targetMission.startH <= (sm.endH % 24) && targetMission.startH < 12) tStart += 24;
-        // חסום אם target מתחיל בתוך 8 שעות מסוף המשמרת
-        if (tStart >= sEnd && tStart < sEnd + 12) {
+        if (tStart >= sEnd && tStart < sEnd + restH) {
           if (!blocked.has(person.name)) {
             blocked.add(person.name); reasons[person.name] = `במנוחה לאחר ${sm.label}`;
           }
@@ -419,10 +423,10 @@ function DisplayCard({ mission, assignment, dayId }) {
         ) : mission.id==="matbah"||mission.id==="matbah_boker"||mission.id==="matbah_tzaharayim"||mission.id==="matbah_new"||mission.id.startsWith("sg")||mission.id==="amada_maaravit"||mission.id==="amada_maaravit_a"||mission.id==="amada_maaravit_b"||mission.id==="bimuy_oyev"||mission.id==="kurs_pritza" ? (
           /* מטבח / ש"ג / עמדה — חייל אחד על כל הרוחב */
           <div style={{display:"flex",flexDirection:"column",gap:4}}>
-            {(mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16") && (
-              <div style={{fontSize:10,color:"#ffcc80",background:"#ff980022",borderRadius:6,padding:"3px 7px",textAlign:"center",marginBottom:2}}>כוח חץ דרוך 🏹{dayId==="2025_03_15" ? " — אבי גולדשטיין" : dayId==="2025_03_16" ? " — יאיר ספיר" : ""}</div>
+            {(mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16"||dayId==="2025_03_17") && (
+              <div style={{fontSize:10,color:"#ffcc80",background:"#ff980022",borderRadius:6,padding:"3px 7px",textAlign:"center",marginBottom:2}}>כוח חץ דרוך 🏹{dayId==="2025_03_15" ? " — אבי גולדשטיין" : dayId==="2025_03_16" ? " — יאיר ספיר" : dayId==="2025_03_17" ? " — ירדן גיאת" : ""}</div>
             )}
-            {!((mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16")) && ass.soldiers.map((p,i)=>(
+            {!((mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16"||dayId==="2025_03_17")) && ass.soldiers.map((p,i)=>(
               <div key={i} className={`ntag ${p?"filled":"empty"}`} style={{...(p?getPlatoonStyle(p.platoon):{}),width:"100%",textAlign:"center",fontSize:13,fontWeight:700,padding:"6px 8px"}}>{p?p.name:"חייל"}</div>
             ))}
           </div>
@@ -468,7 +472,12 @@ function SlotBox({ label, assigned, onRemove, onClick, highlight }) {
 }
 
 function App() {
-  const [activeDay,setActiveDay] = useState("2025_03_09");
+  const [activeDay,setActiveDay] = useState(() => {
+    const today = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const todayId = `${today.getFullYear()}_${pad(today.getMonth()+1)}_${pad(today.getDate())}`;
+    return DAY_IDS.includes(todayId) ? todayId : (DAY_IDS.find(d=>d>=todayId) || DAY_IDS[DAY_IDS.length-1]);
+  });
   const activeDayObj = DAYS.find(d=>d.id===activeDay);
   const [activeMission,setActiveMission] = useState(MISSION_DEFS[0].id);
   const [view,setView]                   = useState("display");
@@ -551,8 +560,9 @@ function App() {
       }
     });
 
-    const unsubSettings = onValue(ref(db, 'shabzak/settings'), snap => {
-      if (snap.exists()) {
+    // טעינה חד-פעמית של הגדרות (לא onValue כדי למנוע לולאה)
+    window._firebaseGet(ref(db, 'shabzak/settings')).then(snap => {
+      if (snap && snap.exists()) {
         const s = snap.val();
         if (s.missionSettings) setMissionSettings(prev => ({...prev, ...s.missionSettings}));
         if (s.aftarSettings) setAftarSettings(s.aftarSettings);
@@ -568,9 +578,9 @@ function App() {
           });
         }
       }
-    });
+    }).catch(()=>{});
 
-    return () => { unsubAss(); unsubAftar(); unsubSettings(); };
+    return () => { unsubAss(); unsubAftar(); };
   }, [fbReady, authed]);
 
   // שמירה ל-Firebase בכל שינוי
@@ -599,10 +609,14 @@ function App() {
     });
   }, [fbReady]);
 
+  const _settingsSaveTimer = React.useRef(null);
   const saveSettingsToFb = React.useCallback((patch) => {
     if (!fbReady) return;
-    const db = window._firebaseDb;
-    window._firebaseSet(window._firebaseRef(db, 'shabzak/settings'), patch).catch(()=>{});
+    clearTimeout(_settingsSaveTimer.current);
+    _settingsSaveTimer.current = setTimeout(() => {
+      const db = window._firebaseDb;
+      window._firebaseSet(window._firebaseRef(db, 'shabzak/settings'), patch).catch(()=>{});
+    }, 800);
   }, [fbReady]);
 
   const [missionSettings, setMissionSettings] = useState(() => {
@@ -635,13 +649,13 @@ function App() {
     return { background:p.color, color:p.textColor };
   };
   const allMembers = Object.entries(platoons).flatMap(([pl,d]) => d.members.map(name => ({ name, platoon:pl })));
-  const isMissionHiddenOnDay = (dayId, missionId) => (hiddenMissionsByDay[dayId]||[]).includes(missionId);
-  const toggleMissionDay = (dayId, missionId) => {
+  const isMissionHiddenOnDay = React.useCallback((dayId, missionId) => (hiddenMissionsByDay[dayId]||[]).includes(missionId), [hiddenMissionsByDay]);
+  const toggleMissionDay = React.useCallback((dayId, missionId) => {
     setHiddenMissionsByDay(prev => {
       const cur = prev[dayId]||[];
       return {...prev, [dayId]: cur.includes(missionId) ? cur.filter(x=>x!==missionId) : [...cur, missionId]};
     });
-  };
+  }, []);
 
   // שמירה אוטומטית של כל ההגדרות ל-Firebase
   React.useEffect(() => { if(fbReady) saveSettingsToFb({missionSettings,aftarSettings,specials,spontMissions,hiddenMissionsByDay,deletedMissions,platoons:Object.fromEntries(Object.entries(platoons).map(([k,p])=>[k,p.members]))}); },
@@ -673,7 +687,7 @@ function App() {
 
   const { blocked, blockedReasons } = useMemo(() => {
     if (!mission) return { blocked: new Set(), blockedReasons: {} };
-    return getBlockedNames(allAss, activeDay, mission);
+    return getBlockedNames(allAss, activeDay, mission, missionSettings);
   }, [allAss, activeDay, activeMission]);
 
   const gimelThisDay = useMemo(() => new Set(
@@ -757,7 +771,7 @@ function App() {
     return true;
   });
 
-  const DisplayView = () => {
+  const DisplayView = ({ visibleMissions }) => {
     const f = visibleMissions.filter(m => !m.hideFromDisplay);
     const col1=f.filter(m=>m.col===1), col2=f.filter(m=>m.col===2), col3=f.filter(m=>m.col===3), col4=f.filter(m=>m.col===4), col5=f.filter(m=>m.col===5), col6=f.filter(m=>m.col===6);
     const numCols = [col1,col2,col3,col4,col5,col6].filter(c=>c.length>0).length;
@@ -829,10 +843,6 @@ function App() {
                     <div>{m.label}</div>
                     <div className={`mpick-prog ${done?"done":"partial"}`}>{m.noCount||isHidden ? "" : done?"✓ הושלם":`${f}/${t}`}</div>
                   </button>
-                  <button title={isHidden?"הפעל יום זה":"כבה יום זה"} onClick={()=>toggleMissionDay(activeDay,m.id)}
-                    style={{background:"none",border:"none",cursor:"pointer",fontSize:14,padding:"2px 4px",color:isHidden?"var(--text3)":"var(--text2)"}}>
-                    {isHidden?"🔴":"🟢"}
-                  </button>
                 </div>
               );
             })}
@@ -894,6 +904,9 @@ function App() {
             const matbahIds = ["matbah","matbah_boker","matbah_tzaharayim","matbah_new"];
             const counts = {};
             allMembers.forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
+            // נתונים ידניים — תורני מטבח מכוח חץ דרוך
+            const manualMatbah = ["יעקב נרי","אברהם גולדשטיין","יאיר ספיר","ירדן גיאת"];
+            manualMatbah.forEach(name => { if (counts[name] !== undefined) counts[name].count += 1; });
             DAY_IDS.forEach(dayId => {
               const da = allAss[dayId] || {};
               matbahIds.forEach(mid => {
@@ -975,7 +988,9 @@ function App() {
                   const isAss=assignedThisDay.has(name), isSel=selPeople.some(p=>p.name===name);
                   const isAllowBlk=mission.allowedNames&&!mission.allowedNames.includes(name);
                   const isRestBlk=blocked.has(name);
-                  const isAftarBlk=aftarThisDay.includes(name) && mission.id!=="aftar_add" && mission.startH >= aftarSettings.startH;
+                  const AFTAR_EFFECTIVE_START = {"philbox_horsa": 14, "hetz": 14};
+                  const missionEffectiveStart = AFTAR_EFFECTIVE_START[mission.id] ?? mission.startH;
+                  const isAftarBlk=aftarThisDay.includes(name) && mission.id!=="aftar_add" && missionEffectiveStart >= aftarSettings.startH;
                   const dayOrder2=DAY_IDS, ti2=dayOrder2.indexOf(activeDay);
                   const prevAftar = ti2>0 ? (aftarByDay[dayOrder2[ti2-1]]||[]) : [];
                   const isAftarYesterdayBlk = prevAftar.includes(name) && mission.startH < aftarSettings.endH && mission.id!=="philbox_horsa" && mission.id!=="hetz";
@@ -1061,7 +1076,7 @@ function App() {
 
 
 
-  const SettingsView = () => {
+  const SettingsView = React.memo(() => {
     const [settingsTab, setSettingsTab] = useState("missions"); // missions | aftar | spontaneous | specials
     const inp = {display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13};
     const btn = (extra={}) => ({background:"var(--surface2)",border:"1px solid var(--border2)",borderRadius:7,color:"var(--text2)",cursor:"pointer",fontFamily:"Heebo,sans-serif",fontSize:12,padding:"4px 10px",...extra});
@@ -1122,9 +1137,9 @@ function App() {
                       <div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:4}}>
                         {DAYS.map(d=>{
                           const hidden = isMissionHiddenOnDay(d.id, m.id);
-                          return <button key={d.id} onClick={()=>toggleMissionDay(d.id,m.id)}
+                          return <button key={d.id} className="day-toggle-btn" onClick={()=>toggleMissionDay(d.id,m.id)}
                             title={d.date}
-                            style={{...btn(),background:hidden?"var(--surface2)":"#26c6da22",color:hidden?"var(--text3)":"#26c6da",fontSize:10,padding:"1px 5px",border:hidden?"1px solid var(--border)":"1px solid #26c6da44"}}>
+                            style={{...btn(),transition:"none",background:hidden?"var(--surface2)":"#26c6da22",color:hidden?"var(--text3)":"#26c6da",fontSize:10,padding:"1px 5px",border:hidden?"1px solid var(--border)":"1px solid #26c6da44"}}>
                             {hidden?"🔴":"🟢"} {d.date}
                           </button>;
                         })}
@@ -1327,7 +1342,7 @@ function App() {
         )}
       </div>
     );
-  };
+  });
 
 
   const SpecialsView = () => {
@@ -1497,7 +1512,7 @@ function App() {
           }}/>
         </label>
       </div>
-      {view==="display" ? <DisplayView key="display"/> : view==="settings" ? <SettingsView key="settings"/> : view==="specials" ? <SpecialsView key="specials"/> : <BuilderView key="builder"/>}
+      {view==="display" ? <DisplayView visibleMissions={visibleMissions}/> : view==="settings" ? <SettingsView/> : view==="specials" ? <SpecialsView key="specials"/> : <BuilderView key="builder"/>}
     </div>
   );
 }

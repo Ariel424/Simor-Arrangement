@@ -494,6 +494,7 @@ function App() {
 
   // ═══ Firebase sync state ═══
   const [fbReady, setFbReady] = React.useState(!!window._firebaseReady);
+  const isSettingsLoaded = React.useRef(false);
   const [synced, setSynced] = React.useState(false);
 
   React.useEffect(() => {
@@ -579,7 +580,8 @@ function App() {
           });
         }
       }
-    }).catch(()=>{});
+      isSettingsLoaded.current = true;
+    }).catch(()=>{ isSettingsLoaded.current = true; });
 
     return () => { unsubAss(); unsubAftar(); };
   }, [fbReady, authed]);
@@ -615,9 +617,8 @@ function App() {
     if (!fbReady) return;
     clearTimeout(_settingsSaveTimer.current);
     _settingsSaveTimer.current = setTimeout(() => {
-      const db = window._firebaseDb;
-      window._firebaseSet(window._firebaseRef(db, 'shabzak/settings'), patch).catch(()=>{});
-    }, 800);
+      window._firebaseSet(window._firebaseRef(window._firebaseDb, 'shabzak/settings'), patch).catch(()=>{});
+    }, 600);
   }, [fbReady]);
 
   const [missionSettings, setMissionSettings] = useState(() => {
@@ -659,8 +660,14 @@ function App() {
   }, []);
 
   // שמירה אוטומטית של כל ההגדרות ל-Firebase
-  React.useEffect(() => { if(fbReady) saveSettingsToFb({missionSettings,aftarSettings,specials,spontMissions,hiddenMissionsByDay,deletedMissions,platoons:Object.fromEntries(Object.entries(platoons).map(([k,p])=>[k,p.members]))}); },
-    [missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, platoons, fbReady]);
+  React.useEffect(() => {
+    if (!fbReady || !isSettingsLoaded.current) return;
+    const patch = {missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, platoons: Object.fromEntries(Object.entries(platoons).map(([k,p])=>[k,p.members]))};
+    clearTimeout(_settingsSaveTimer.current);
+    _settingsSaveTimer.current = setTimeout(() => {
+      window._firebaseSet(window._firebaseRef(window._firebaseDb, 'shabzak/settings'), patch).catch(()=>{});
+    }, 600);
+  }, [missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, platoons, fbReady]);
 
   // מסך סיסמה — רק אחרי כל ה-hooks
   const [showAftarSelect,setShowAftarSelect] = useState(false);

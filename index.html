@@ -183,12 +183,10 @@ const MISSION_DEFS = [
   { id:"rachpan",     label:"קורס רחפנים",    icon:"🚁", slots:{commander:0,soldiers:1}, time:"",               border:"#80cbc4", col:6, startH:0,  endH:24, showOnDays:["2025_03_09","2025_03_10","2025_03_11","2025_03_12"] },
 
   // ═══ גזרה חדשה (מ-12/3) ═══
-  { id:"matbah_new",    label:"מטבח",           icon:"🍳", slots:{commander:0,soldiers:1}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA },
+  { id:"matbah_new",    label:"תורנות מטבח",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA },
   { id:"bimuy_oyev",   label:"בימוי אויב",  icon:"🎭", slots:{commander:0,soldiers:2}, time:"14:00 - 19:00 | לדבר עם אסוס בנוגע למידע מחר שמגיעים", border:"#ef5350", col:1, startH:14, endH:19, showOnDays:["2025_03_16"] },
   { id:"kurs_pritza",  label:"קורס פריצה", icon:"🔓", slots:{commander:0,soldiers:2}, time:"",             border:"#ff9800", col:1, startH:6,  endH:24, showOnDays:["2025_03_17","2025_03_18"] },
   { id:"amada_maaravit",  label:"עמדה מערבית",      icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 6:00",  border:"#7e57c2", col:1, startH:24, endH:30, showOnDays:NEW_GAZRA.filter(d=>d==="2025_03_13"||d==="2025_03_14") },
-  { id:"amada_maaravit_a",label:"עמדה מערבית א׳",   icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 3:00",  border:"#7e57c2", col:1, startH:24, endH:27, showOnDays:NEW_GAZRA.filter(d=>d!=="2025_03_13"&&d!=="2025_03_14") },
-  { id:"amada_maaravit_b",label:"עמדה מערבית ב׳",   icon:"🔭", slots:{commander:0,soldiers:1}, time:"3:00 - 6:00",   border:"#7e57c2", col:1, startH:27, endH:30, showOnDays:NEW_GAZRA.filter(d=>d!=="2025_03_13"&&d!=="2025_03_14") },
   { id:"sg1",           label:'ש"ג 6:00–10:00', icon:"🪖", slots:{commander:0,soldiers:1}, time:"6:00 - 10:00",   border:"#8d6e63", col:2, startH:6,  endH:10, showOnDays:NEW_GAZRA },
   { id:"sg2",           label:'ש"ג 10:00–14:00',icon:"🪖", slots:{commander:0,soldiers:1}, time:"10:00 - 14:00",  border:"#8d6e63", col:2, startH:10, endH:14, showOnDays:NEW_GAZRA },
   { id:"sg3",           label:'ש"ג 14:00–18:00',icon:"🪖", slots:{commander:0,soldiers:1}, time:"14:00 - 18:00",  border:"#8d6e63", col:2, startH:14, endH:18, showOnDays:NEW_GAZRA },
@@ -199,7 +197,10 @@ const MISSION_DEFS = [
   { id:"siyur_tzo2",    label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_layla2",  label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:3, startH:22, endH:30, isSiyur:true, isNightPatrol:true, showOnDays:NEW_GAZRA },
   { id:"hetz",          label:"חץ דרוך",        icon:"🏹", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA },
+  { id:"toren_rasp",    label:'תורן רס"פ',      icon:"🎖️", slots:{commander:0,soldiers:1}, time:"10:00 - 14:00",   border:"#78909c", col:4, startH:10, endH:14, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_17") },
   { id:"philbox_horsa", label:"פילבוקס חורסה",  icon:"🏠", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#f06292", col:5, startH:0,  endH:24, showOnDays:NEW_GAZRA },
+  { id:"amada_maaravit_a",label:"עמדה מערבית א׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 3:00",  border:"#7e57c2", col:5, startH:24, endH:27, showOnDays:NEW_GAZRA.filter(d=>d!=="2025_03_13"&&d!=="2025_03_14") },
+  { id:"amada_maaravit_b",label:"עמדה מערבית ב׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"3:00 - 6:00",   border:"#7e57c2", col:5, startH:27, endH:30, showOnDays:NEW_GAZRA.filter(d=>d!=="2025_03_13"&&d!=="2025_03_14") },
   { id:"karem_negoshot",label:"כרם נגוהות",     icon:"🌿", slots:{commander:1,soldiers:3}, time:"",               border:"#aed581", col:6, startH:0,  endH:24, showOnDays:[] },
 ];
 
@@ -335,9 +336,9 @@ function getBlockedNames(allAss, targetDayId, targetMission, missionSettings) {
     });
 
     // מנוחה אחרי ש"ג ועמדה מערבית — לפי missionSettings
-    MISSION_DEFS.filter(m => m.id.startsWith("sg") || m.id==="amada_maaravit" || m.id==="amada_maaravit_a" || m.id==="amada_maaravit_b").forEach(sm => {
+    MISSION_DEFS.filter(m => m.id.startsWith("sg") || m.id==="amada_maaravit" || m.id==="amada_maaravit_a" || m.id==="amada_maaravit_b" || m.id==="toren_rasp").forEach(sm => {
       const ass = da[sm.id]; if (!ass) return;
-      const restH = ms[sm.id]?.restHours ?? 12;
+      const restH = ms[sm.id]?.restHours ?? (sm.id==="toren_rasp" ? 8 : 12);
       if (restH === 0) return;
       const isSameSlot = (dayId===targetDayId && sm.id===targetMission.id);
       if (isSameSlot) return;
@@ -373,7 +374,7 @@ function DisplayCard({ mission, assignment, dayId }) {
   const filled = [...ass.commanders,...ass.soldiers].filter(Boolean).length;
   const total = mission.slots.commander + mission.slots.soldiers;
   const done = filled===total && total>0;
-  const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="amada_maaravit_a" || mission.id==="amada_maaravit_b" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2" || mission.id==="bimuy_oyev" || mission.id==="kurs_pritza";
+  const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="amada_maaravit_a" || mission.id==="amada_maaravit_b" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2" || mission.id==="bimuy_oyev" || mission.id==="kurs_pritza" || mission.id==="toren_rasp";
   const displayTime = (DAY_TIME_OVERRIDES[dayId]||{})[mission.id] || mission.time;
   return (
     <div className={`mcard${isCompact?" compact":""}`} style={{ borderColor: mission.border!=="#555" ? mission.border+"88" : undefined }}>
@@ -420,7 +421,7 @@ function DisplayCard({ mission, assignment, dayId }) {
               <div key={i} className={`ntag ${p?"filled":"empty"}`} style={p?getPlatoonStyle(p.platoon):{}}>{p?p.name:"חייל"}</div>
             ))}
           </div>
-        ) : mission.id==="matbah"||mission.id==="matbah_boker"||mission.id==="matbah_tzaharayim"||mission.id==="matbah_new"||mission.id.startsWith("sg")||mission.id==="amada_maaravit"||mission.id==="amada_maaravit_a"||mission.id==="amada_maaravit_b"||mission.id==="bimuy_oyev"||mission.id==="kurs_pritza" ? (
+        ) : mission.id==="matbah"||mission.id==="matbah_boker"||mission.id==="matbah_tzaharayim"||mission.id==="matbah_new"||mission.id.startsWith("sg")||mission.id==="amada_maaravit"||mission.id==="amada_maaravit_a"||mission.id==="amada_maaravit_b"||mission.id==="bimuy_oyev"||mission.id==="kurs_pritza"||mission.id==="toren_rasp" ? (
           /* מטבח / ש"ג / עמדה — חייל אחד על כל הרוחב */
           <div style={{display:"flex",flexDirection:"column",gap:4}}>
             {(mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16"||dayId==="2025_03_17") && (
@@ -625,7 +626,7 @@ function App() {
     const s = {};
     MISSION_DEFS.forEach(m => {
       s[m.id] = {
-        restHours: m.isSiyur ? 16 : (m.id.startsWith("sg")||m.id==="amada_maaravit"||m.id==="amada_maaravit_a"||m.id==="amada_maaravit_b") ? 12 : 0,
+        restHours: m.isSiyur ? 16 : (m.id.startsWith("sg")||m.id==="amada_maaravit"||m.id==="amada_maaravit_a"||m.id==="amada_maaravit_b") ? 12 : m.id==="toren_rasp" ? 8 : 0,
         startH: m.startH,
         endH: m.endH % 24 === 0 ? 24 : m.endH % 24,
         slots_commander: m.slots.commander,
@@ -951,6 +952,76 @@ function App() {
             );
           })()}
 
+          {/* PLUGA WEEKLY HOURS TRACKER */}
+          {(() => {
+            const WEEKLY_LIMIT = 32;
+            const plugaMembers = platoons["pluga"]?.members || [];
+            if (plugaMembers.length === 0) return null;
+
+            // שבוע קלנדרי: ראשון-שבת
+            const getWeekStart = (dayId) => {
+              const [y,m,d] = dayId.split('_').map(Number);
+              const date = new Date(y, m-1, d);
+              const dow = date.getDay(); // 0=ראשון
+              const sunday = new Date(date);
+              sunday.setDate(date.getDate() - dow);
+              const pad = n=>String(n).padStart(2,'0');
+              return `${sunday.getFullYear()}_${pad(sunday.getMonth()+1)}_${pad(sunday.getDate())}`;
+            };
+
+            // מציג את השבוע של היום הנבחר
+            const weekStartId = getWeekStart(activeDay);
+            const weekDays = DAY_IDS.filter(d => getWeekStart(d) === weekStartId);
+
+            const calcHours = (name, days) => {
+              let total = 0;
+              days.forEach(dayId => {
+                const da = allAss[dayId] || {};
+                MISSION_DEFS.forEach(m => {
+                  const ass = da[m.id]; if (!ass) return;
+                  const assigned = [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean);
+                  if (assigned.some(p=>p.name===name)) {
+                    const dur = m.endH - m.startH;
+                    total += Math.max(0, Math.min(dur, 24));
+                  }
+                });
+              });
+              return total;
+            };
+
+            const weekLabel = weekDays.length > 0
+              ? `${weekDays[0].replace(/\d{4}_(\d{2})_(\d{2})/,'$2/$1')} – ${weekDays[weekDays.length-1].replace(/\d{4}_(\d{2})_(\d{2})/,'$2/$1')}`
+              : '';
+
+            return (
+              <div style={{background:"var(--surface)",border:"1.5px solid #ffd54f44",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
+                <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:16}}>⏱️</span>
+                  <div style={{fontSize:14,fontWeight:700,flex:1}}>מעקב שעות מסופחים</div>
+                  <div style={{fontSize:11,color:"var(--text3)"}}>{weekLabel}</div>
+                </div>
+                <div style={{padding:"10px 12px",display:"flex",flexDirection:"column",gap:6}}>
+                  {plugaMembers.map(name => {
+                    const hours = calcHours(name, weekDays);
+                    const pct = Math.min(hours / WEEKLY_LIMIT * 100, 100);
+                    const over = hours >= WEEKLY_LIMIT;
+                    return (
+                      <div key={name}>
+                        <div style={{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:2}}>
+                          <span style={{color:over?"#ef5350":"var(--text)",fontWeight:over?700:400}}>{name}</span>
+                          <span style={{color:over?"#ef5350":"var(--text2)",fontWeight:700}}>{hours}/{WEEKLY_LIMIT} שע'</span>
+                        </div>
+                        <div style={{background:"var(--surface2)",borderRadius:4,height:6,overflow:"hidden"}}>
+                          <div style={{width:`${pct}%`,height:"100%",background:over?"#ef5350":pct>75?"#ff9800":"#26c6da",transition:"width .3s"}}/>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
           {/* AFTAR PANEL */}
           <div className="aftar-card" style={{marginBottom:20}}>
             <div className="aftar-header">
@@ -1003,10 +1074,34 @@ function App() {
                   const prevAftar = ti2>0 ? (aftarByDay[dayOrder2[ti2-1]]||[]) : [];
                   const isAftarYesterdayBlk = prevAftar.includes(name) && mission.startH < aftarSettings.endH && mission.id!=="philbox_horsa" && mission.id!=="hetz";
                   const isGimelBlk=gimelThisDay.has(name) && mission.id!=="gimel";
+                  // חסימת שעות שבועיות למסופחים
+                  const plugaMembers2 = platoons["pluga"]?.members||[];
+                  let isPlugaOverBlk = false;
+                  if (plugaMembers2.includes(name)) {
+                    const getWS = (id) => {
+                      const [y,mo,d] = id.split('_').map(Number);
+                      const dt = new Date(y,mo-1,d);
+                      dt.setDate(dt.getDate()-dt.getDay());
+                      const p=n=>String(n).padStart(2,'0');
+                      return `${dt.getFullYear()}_${p(dt.getMonth()+1)}_${p(dt.getDate())}`;
+                    };
+                    const ws = getWS(activeDay);
+                    const wdays = DAY_IDS.filter(d=>getWS(d)===ws);
+                    let hrs = 0;
+                    wdays.forEach(dayId => {
+                      const da2 = allAss[dayId]||{};
+                      MISSION_DEFS.forEach(m2 => {
+                        const a2=da2[m2.id]; if(!a2) return;
+                        if([...(a2.commanders||[]),...(a2.soldiers||[])].filter(Boolean).some(p2=>p2.name===name))
+                          hrs += Math.max(0, Math.min(m2.endH-m2.startH, 24));
+                      });
+                    });
+                    isPlugaOverBlk = hrs >= 32;
+                  }
                   const _sb=(dayAss["siyur_boker"]||{});
                   const isInSiyurBoker=[...(_sb.commanders||[]),...(_sb.soldiers||[])].filter(Boolean).some(p=>p.name===name);
                   const isMaatzar = mission.id==="maatzar";
-                  const isBlk=!isMaatzar&&(isAllowBlk||isRestBlk||isAftarBlk||isAftarYesterdayBlk||isGimelBlk);
+                  const isBlk=!isMaatzar&&(isAllowBlk||isRestBlk||isAftarBlk||isAftarYesterdayBlk||isGimelBlk||isPlugaOverBlk);
                   const clickable = !isBlk;
                   let cls="chip";
                   if(isSel) cls+=" selected";
@@ -1018,7 +1113,7 @@ function App() {
                   else if(isRestBlk) cls+=" resting";
                   return (
                     <button key={name} className={cls} style={getPlatoonStyle(key)}
-                      title={isBlk?(isAftarBlk?"באפטר":isAftarYesterdayBlk?"אפטר אתמול":isGimelBlk?"בגימל":blockedReasons[name]||"לא מורשה"):""}
+                      title={isBlk?(isAftarBlk?"באפטר":isAftarYesterdayBlk?"אפטר אתמול":isGimelBlk?"בגימל":isPlugaOverBlk?"עבר 32 שע' שבועיות":blockedReasons[name]||"לא מורשה"):""}
                       onClick={()=>{
                         if(!clickable) return;
                         if(isSel) setSelPeople(prev=>prev.filter(p=>p.name!==name));

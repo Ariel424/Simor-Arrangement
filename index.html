@@ -525,12 +525,12 @@ function App() {
         const base = freshAss();
         DAY_IDS.forEach(day => {
           if (!saved[day]) return;
-          // טען גם משימות שלא ב-base (כמו showOnDays)
-          const allMids = new Set([...Object.keys(base[day]), ...Object.keys(saved[day])]);
-          allMids.forEach(mid => {
+          // טען גם משימות שלא ב-base (כמו showOnDays ומשימות ספונטניות)
+          const allMids2 = new Set([...Object.keys(base[day]), ...Object.keys(saved[day])]);
+          allMids2.forEach(mid => {
             const s = saved[day][mid];
             if (!s) return;
-            const m = MISSION_DEFS.find(x=>x.id===mid);
+            const m = MISSION_DEFS.find(x=>x.id===mid) || (window._spontMissions||[]).find(x=>x.id===mid);
             if (!m) return;
             if (m.showOnDays && !m.showOnDays.includes(day)) return;
             if (m.hideOnDays && m.hideOnDays.includes(day)) return;
@@ -648,6 +648,7 @@ function App() {
   const [deletedMissions, setDeletedMissions] = useState([]);
   const [platoons, setPlatoons] = useState(() => JSON.parse(JSON.stringify(PLATOONS_DEFAULT)));
   React.useEffect(() => { window._platoons = platoons; }, [platoons]);
+  React.useEffect(() => { window._spontMissions = spontMissions.map(m=>({...m,slots:{commander:m.slots_commander||0,soldiers:m.slots_soldiers||1}})); }, [spontMissions]);
 
   const getPlatoonStyle = (platoon) => {
     const p = platoons[platoon];
@@ -679,9 +680,19 @@ function App() {
   const dayAss = allAss[activeDay] || initDayAssignments();
   const mission = MISSION_DEFS.find(m=>m.id===activeMission);
 
+  const spontMissionDefs = React.useMemo(() => spontMissions.map(m => ({
+    ...m,
+    slots: { commander: m.slots_commander||0, soldiers: m.slots_soldiers||1 },
+    showOnDays: m.days && m.days.length > 0 ? m.days : null,
+    border: m.border || "#7e57c2",
+    col: m.col || 1,
+    isSpont: true,
+  })), [spontMissions]);
+  const allMissionDefs = React.useMemo(() => [...MISSION_DEFS, ...spontMissionDefs], [spontMissionDefs]);
+
   const assignedThisDay = useMemo(() => {
     const visibleIds = new Set(
-      MISSION_DEFS.filter(m => {
+      allMissionDefs.filter(m => {
         if (m.showOnDays && !m.showOnDays.includes(activeDay)) return false;
         if (m.hideOnDays && m.hideOnDays.includes(activeDay)) return false;
         return true;
@@ -695,7 +706,7 @@ function App() {
         .filter(p => !MULTI_MISSION_OFFICERS.has(p.name))
         .map(p=>p.name)
     );
-  }, [dayAss, activeDay]);
+  }, [dayAss, activeDay, allMissionDefs]);
 
   const { blocked, blockedReasons } = useMemo(() => {
     if (!mission) return { blocked: new Set(), blockedReasons: {} };
@@ -729,7 +740,7 @@ function App() {
 
   const personMissions = useMemo(() => {
     const map = {};
-    MISSION_DEFS.filter(m => m.col !== 5).forEach(m => {
+    allMissionDefs.filter(m => m.col !== 5).forEach(m => {
       const a = dayAss[m.id]; if (!a) return;
       [...(a.commanders||[]),...(a.soldiers||[])].filter(Boolean).forEach(p => {
         if (!map[p.name]) map[p.name] = [];
@@ -741,14 +752,19 @@ function App() {
       map[name].push("אפטר");
     });
     return map;
-  }, [dayAss, aftarByDay, activeDay]);
+  }, [dayAss, aftarByDay, activeDay, allMissionDefs]);
 
   function slotClick(type, idx) {
     if (selPeople.length === 0) return;
+    const activeMissionDef = allMissionDefs.find(m=>m.id===activeMission);
     setAllAssAndSave(prev => {
       const c = JSON.parse(JSON.stringify(prev));
+      if (!c[activeDay]) c[activeDay] = {};
+      if (!c[activeDay][activeMission]) c[activeDay][activeMission] = {
+        commanders: Array(activeMissionDef?.slots?.commander||0).fill(null),
+        soldiers: Array(activeMissionDef?.slots?.soldiers||1).fill(null),
+      };
       const slots = c[activeDay][activeMission][type];
-      // fill empty slots starting from idx, using queued people in order
       let qi = 0;
       for (let i = idx; i < slots.length && qi < selPeople.length; i++) {
         if (!slots[i]) { slots[i] = selPeople[qi++]; }
@@ -775,7 +791,7 @@ function App() {
   const assigned = assignedThisDay.size;
 
   // filter missions by day visibility
-  const visibleMissions = MISSION_DEFS.filter(m => {
+  const visibleMissions = allMissionDefs.filter(m => {
     if (deletedMissions.includes(m.id)) return false;
     if (m.showOnDays && !m.showOnDays.includes(activeDay)) return false;
     if (m.hideOnDays && m.hideOnDays.includes(activeDay)) return false;
@@ -837,7 +853,7 @@ function App() {
       <div className="builder-layout">
         <div className="builder-left">
           <div className="mpicker">
-            {MISSION_DEFS.filter(m => {
+            {allMissionDefs.filter(m => {
               if (deletedMissions.includes(m.id)) return false;
               if (m.showOnDays && !m.showOnDays.includes(activeDay)) return false;
               if (m.hideOnDays && m.hideOnDays.includes(activeDay)) return false;
@@ -917,7 +933,7 @@ function App() {
             const counts = {};
             allMembers.forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
             // נתונים ידניים — תורני מטבח מכוח חץ דרוך
-            const manualMatbah = ["יעקב נרי","אברהם גולדשטיין","יאיר ספיר","ישי אדרי"];
+            const manualMatbah = ["יעקב נרי","אברהם גולדשטיין","יאיר ספיר","ישי אדרי","ניב לאופר","ניב לאופר","ניב לאופר"];
             manualMatbah.forEach(name => { if (counts[name] !== undefined) counts[name].count += 1; });
             DAY_IDS.forEach(dayId => {
               const da = allAss[dayId] || {};
@@ -1191,7 +1207,7 @@ function App() {
     // ── MISSIONS TAB ──
     const [editId, setEditId] = useState(null);
     const [draft, setDraft] = useState({});
-    const HIDE_FROM_SETTINGS = new Set(["agamim","hilton","konnut","rachpan","siyur_boker","siyur_tzo","siyur_layla","maatzar"]);
+    const HIDE_FROM_SETTINGS = new Set(["agamim","hilton","konnut","rachpan","siyur_boker","siyur_tzo","siyur_layla","maatzar","matbah_boker","matbah_tzaharayim","bimuy_oyev","amada_maaravit","amada_maaravit_a","amada_maaravit_b"]);
     const visibleForSettings = MISSION_DEFS.filter(m => !m.hideFromDisplay && !HIDE_FROM_SETTINGS.has(m.id) && !deletedMissions.includes(m.id));
     const startEdit = (m) => { setEditId(m.id); setDraft({...missionSettings[m.id]}); };
     const saveEdit = () => { setMissionSettings(prev=>({...prev,[editId]:{...draft}})); setEditId(null); };
@@ -1225,39 +1241,42 @@ function App() {
         {settingsTab==="missions" && (
           <div>
             <div style={{fontSize:16,fontWeight:800,marginBottom:14,color:"var(--text)"}}>⚙️ הגדרות משימות</div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))",gap:10}}>
+            <div style={{display:"flex",flexDirection:"column",gap:6}}>
               {visibleForSettings.map(m => {
-                const s = missionSettings[m.id];
+                const s = missionSettings[m.id] || {};
                 const isEditing = editId === m.id;
                 const hiddenCount = DAY_IDS.filter(d => isMissionHiddenOnDay(d, m.id)).length;
                 return (
-                  <div key={m.id} style={{background:"var(--surface)",border:`1.5px solid ${isEditing?"var(--accent)":m.border+"66"}`,borderRadius:14,padding:"12px 14px",display:"flex",flexDirection:"column",gap:8}}>
-                    <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <div key={m.id} style={{background:"var(--surface)",border:`1.5px solid ${isEditing?"var(--accent)":m.border+"66"}`,borderRadius:12,overflow:"hidden"}}>
+                    {/* שורה ראשית */}
+                    <div style={{display:"flex",alignItems:"center",gap:8,padding:"10px 14px"}}>
                       <span style={{fontSize:10}}>{hiddenCount===0?"🟢":hiddenCount===DAY_IDS.length?"🔴":"🟡"}</span>
-                      <span style={{fontSize:16}}>{m.icon}</span>
+                      <span style={{fontSize:15}}>{m.icon}</span>
                       <span style={{fontWeight:700,fontSize:13,color:"var(--text)",flex:1}}>{s.label||m.label}</span>
-                      {!isEditing && <button onClick={()=>startEdit(m)} style={btn()}>✏️ ערוך</button>}
+                      {!isEditing && <span style={{fontSize:11,color:"var(--text3)"}}>🕐 {s.startH}:00–{s.endH>24?(s.endH-24)+":00+":s.endH+":00"} | 😴 {s.restHours}ש׳ | ⭐{s.slots_commander} 🪖{s.slots_soldiers}</span>}
+                      {!isEditing && <button onClick={()=>startEdit(m)} style={btn()}>✏️</button>}
                       {!isEditing && <button onClick={()=>{if(confirm(`למחוק את "${m.label}"?`)) setDeletedMissions(p=>[...p,m.id]);}} style={btn({color:"#ef5350"})}>🗑</button>}
                     </div>
+                    {/* כפתורי ימים */}
                     {!isEditing && (
-                      <div style={{display:"flex",flexWrap:"wrap",gap:3,marginTop:4}}>
+                      <div style={{display:"flex",flexWrap:"wrap",gap:2,padding:"0 14px 8px"}}>
                         {DAYS.map(d=>{
                           const hidden = isMissionHiddenOnDay(d.id, m.id);
                           return <button key={d.id} className="day-toggle-btn" onClick={()=>toggleMissionDay(d.id,m.id)}
-                            title={d.date}
-                            style={{...btn(),transition:"none",background:hidden?"var(--surface2)":"#26c6da22",color:hidden?"var(--text3)":"#26c6da",fontSize:10,padding:"1px 5px",border:hidden?"1px solid var(--border)":"1px solid #26c6da44"}}>
+                            style={{...btn(),transition:"none",background:hidden?"var(--surface2)":"#26c6da22",color:hidden?"var(--text3)":"#26c6da",fontSize:9,padding:"1px 4px",border:hidden?"1px solid var(--border)":"1px solid #26c6da44"}}>
                             {hidden?"🔴":"🟢"} {d.date}
                           </button>;
                         })}
                       </div>
                     )}
-                    {isEditing ? (
-                      <>
-                        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7}}>
-                          <label style={{fontSize:11,color:"var(--text2)"}}>שם משימה<input style={inp} value={draft.label||""} onChange={e=>setDraft(d=>({...d,label:e.target.value}))}/></label>
+                    {/* עריכה */}
+                    {isEditing && (
+                      <div style={{padding:"0 14px 14px",display:"flex",flexDirection:"column",gap:8}}>
+                        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:7}}>
+                          <label style={{fontSize:11,color:"var(--text2)"}}>שם<input style={inp} value={draft.label||""} onChange={e=>setDraft(d=>({...d,label:e.target.value}))}/></label>
                           <label style={{fontSize:11,color:"var(--text2)"}}>שעת התחלה<input type="number" min={0} max={30} style={inp} value={draft.startH} onChange={e=>setDraft(d=>({...d,startH:+e.target.value}))}/></label>
                           <label style={{fontSize:11,color:"var(--text2)"}}>שעת סיום<input type="number" min={0} max={30} style={inp} value={draft.endH} onChange={e=>setDraft(d=>({...d,endH:+e.target.value}))}/></label>
-                          <label style={{fontSize:11,color:"var(--text2)"}}>מנוחה אחרי (שעות)<input type="number" min={0} max={24} style={inp} value={draft.restHours} onChange={e=>setDraft(d=>({...d,restHours:+e.target.value}))}/></label>
+                          <label style={{fontSize:11,color:"var(--text2)"}}>מנוחה (שעות)<input type="number" min={0} max={24} style={inp} value={draft.restHours} onChange={e=>setDraft(d=>({...d,restHours:+e.target.value}))}/></label>
                           <label style={{fontSize:11,color:"var(--text2)"}}>מפקדים<input type="number" min={0} max={10} style={inp} value={draft.slots_commander} onChange={e=>setDraft(d=>({...d,slots_commander:+e.target.value}))}/></label>
                           <label style={{fontSize:11,color:"var(--text2)"}}>חיילים<input type="number" min={0} max={20} style={inp} value={draft.slots_soldiers} onChange={e=>setDraft(d=>({...d,slots_soldiers:+e.target.value}))}/></label>
                         </div>
@@ -1276,26 +1295,18 @@ function App() {
                           <button onClick={saveEdit} style={btn({background:"var(--accent)",color:"#fff",flex:1,fontWeight:700})}>✓ שמור</button>
                           <button onClick={()=>setEditId(null)} style={btn({flex:1})}>ביטול</button>
                         </div>
-                        <div style={{marginTop:8}}>
-                          <div style={{fontSize:11,color:"var(--text2)",marginBottom:4}}>ימים שהמשימה פעילה בהם:</div>
+                        <div>
+                          <div style={{fontSize:11,color:"var(--text2)",marginBottom:4}}>ימים פעילים:</div>
                           <div style={{display:"flex",flexWrap:"wrap",gap:3}}>
                             {DAYS.map(d=>{
                               const hidden = isMissionHiddenOnDay(d.id, m.id);
-                              return <button key={d.id} onClick={()=>toggleMissionDay(d.id,m.id)}
-                                style={{...btn(),background:hidden?"var(--surface2)":"var(--accent)",color:hidden?"var(--text3)":"#fff",fontSize:10,padding:"2px 6px",textDecoration:hidden?"line-through":"none"}}>
+                              return <button key={d.id} className="day-toggle-btn" onClick={()=>toggleMissionDay(d.id,m.id)}
+                                style={{...btn(),transition:"none",background:hidden?"var(--surface2)":"var(--accent)",color:hidden?"var(--text3)":"#fff",fontSize:10,padding:"2px 6px"}}>
                                 {d.date}
                               </button>;
                             })}
                           </div>
                         </div>
-                      </>
-                    ) : (
-                      <div style={{fontSize:11,color:"var(--text2)",display:"grid",gridTemplateColumns:"1fr 1fr",gap:3}}>
-                        <div>🕐 {s.startH}:00 – {s.endH>24?(s.endH-24)+":00 למחרת":s.endH+":00"}</div>
-                        <div>😴 {s.restHours} שעות מנוחה</div>
-                        <div>⭐ {s.slots_commander} מפקדים</div>
-                        <div>🪖 {s.slots_soldiers} חיילים</div>
-                        {s.allowedNames?.length>0 && <div style={{gridColumn:"1/-1",color:"var(--text3)",fontSize:10}}>מורשים: {s.allowedNames.join(", ")}</div>}
                       </div>
                     )}
                   </div>

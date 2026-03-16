@@ -160,6 +160,7 @@ const DAY_TIME_OVERRIDES = {
   "2025_03_13": {
     "matbah_new":    "שעה 12:00",
     "hetz":          "שעה 12:00",
+    "hetz2":         "שעה 12:00",
     "philbox_horsa": "שעה 12:00",
     "siyur_boker2":  "12:00 - 22:00",
     "siyur_tzo2":    "12:00 - 22:00",
@@ -195,10 +196,12 @@ const MISSION_DEFS = [
   { id:"sg4",           label:'ש"ג 18:00–22:00',icon:"🪖", slots:{commander:0,soldiers:1}, time:"18:00 - 22:00",  border:"#8d6e63", col:2, startH:18, endH:22, showOnDays:NEW_GAZRA },
   { id:"sg5",           label:'ש"ג 22:00–2:00', icon:"🪖", slots:{commander:0,soldiers:1}, time:"22:00 - 2:00",   border:"#8d6e63", col:2, startH:22, endH:26, showOnDays:NEW_GAZRA },
   { id:"sg6",           label:'ש"ג 2:00–6:00',  icon:"🪖", slots:{commander:0,soldiers:1}, time:"2:00 - 6:00",    border:"#8d6e63", col:2, startH:26, endH:30, showOnDays:NEW_GAZRA },
+  { id:"avt_ugda",      label:"אבטחת אוגדה",   icon:"🛡️", slots:{commander:0,soldiers:2}, time:"החל מ-8:00",    border:"#ef5350", col:3, startH:8,  endH:20, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_19") },
   { id:"siyur_boker2",  label:"סיור בוקר",      icon:"🚗", slots:{commander:1,soldiers:2}, time:"6:00 - 14:00",   border:"#26c6da", col:3, startH:6,  endH:14, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_tzo2",    label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_layla2",  label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:3, startH:22, endH:30, isSiyur:true, isNightPatrol:true, showOnDays:NEW_GAZRA },
-  { id:"hetz",          label:"חץ דרוך",        icon:"🏹", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA },
+  { id:"hetz",          label:"חץ דרוך",        icon:"🏹", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA.filter(d=>d<"2025_03_18") },
+  { id:"hetz2",         label:"חץ דרוך",        icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_18") },
   { id:"toren_rasp",    label:'תורן רס"פ',      icon:"🎖️", slots:{commander:0,soldiers:1}, time:"10:00 - 14:00",   border:"#78909c", col:4, startH:10, endH:14, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_17") },
   { id:"philbox_horsa", label:"פילבוקס חורסה",  icon:"🏠", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#f06292", col:5, startH:0,  endH:24, showOnDays:NEW_GAZRA },
   { id:"amada_maaravit_a",label:"עמדה מערבית א׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 3:00",  border:"#7e57c2", col:5, startH:24, endH:27, showOnDays:NEW_GAZRA.filter(d=>d!=="2025_03_13"&&d!=="2025_03_14") },
@@ -347,8 +350,11 @@ function getBlockedNames(allAss, targetDayId, targetMission, missionSettings) {
       [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).forEach(person => {
         if (SG_REST_EXEMPT.has(person.name)) return;
         const sEnd = di*24 + sm.endH;
-        let tStart = ti*24 + targetMission.startH;
-        if (ti === di && targetMission.startH <= (sm.endH % 24) && targetMission.startH < 12) tStart += 24;
+        // פילבוקס וחץ דרוך עולים ב-14:00 למרות startH:0
+        const EFFECTIVE_START = {"philbox_horsa":14,"hetz":14,"hetz2":14};
+        const targetEffectiveStart = EFFECTIVE_START[targetMission.id] ?? targetMission.startH;
+        let tStart = ti*24 + targetEffectiveStart;
+        if (ti === di && targetEffectiveStart <= (sm.endH % 24) && targetEffectiveStart < 12) tStart += 24;
         if (tStart >= sEnd && tStart < sEnd + restH) {
           if (!blocked.has(person.name)) {
             blocked.add(person.name); reasons[person.name] = `במנוחה לאחר ${sm.label}`;
@@ -1041,6 +1047,37 @@ function App() {
             );
           })()}
 
+          {/* חיילים פנויים */}
+          {(() => {
+            const assignedNames = new Set(
+              Object.values(dayAss).flatMap(a=>[...(a.commanders||[]),...(a.soldiers||[])]).filter(Boolean).map(p=>p.name)
+            );
+            const aftarNames = new Set(aftarByDay[activeDay]||[]);
+            const gimelNames = new Set([...(dayAss["gimel"]?.soldiers||[])].filter(Boolean).map(p=>p.name));
+            const free = allMembers.filter(({name}) => !assignedNames.has(name) && !aftarNames.has(name) && !gimelNames.has(name));
+            return (
+              <div style={{background:"var(--surface)",border:"1.5px solid var(--border)",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
+                <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:16}}>🕊️</span>
+                  <div style={{fontSize:14,fontWeight:700,flex:1}}>חיילים פנויים</div>
+                  <div style={{fontSize:11,color:"var(--text3)"}}>{free.length} חיילים</div>
+                </div>
+                <div style={{padding:"10px 12px"}}>
+                  {free.length === 0
+                    ? <div style={{fontSize:12,color:"var(--text3)"}}>כולם משובצים 🎉</div>
+                    : <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                        {free.map(({name,platoon})=>(
+                          <div key={name} style={{...getPlatoonStyle(platoon),borderRadius:8,padding:"4px 10px",fontSize:12,fontWeight:600}}>
+                            {name}
+                          </div>
+                        ))}
+                      </div>
+                  }
+                </div>
+              </div>
+            );
+          })()}
+
           {/* AFTAR PANEL */}
           <div className="aftar-card" style={{marginBottom:20}}>
             <div className="aftar-header">
@@ -1086,12 +1123,12 @@ function App() {
                   const isAss=assignedThisDay.has(name), isSel=selPeople.some(p=>p.name===name);
                   const isAllowBlk=mission.allowedNames&&!mission.allowedNames.includes(name);
                   const isRestBlk=blocked.has(name);
-                  const AFTAR_EFFECTIVE_START = {"philbox_horsa": 14, "hetz": 14};
+                  const AFTAR_EFFECTIVE_START = {"philbox_horsa": 14, "hetz": 14, "hetz2": 14};
                   const missionEffectiveStart = AFTAR_EFFECTIVE_START[mission.id] ?? mission.startH;
                   const isAftarBlk=aftarThisDay.includes(name) && mission.id!=="aftar_add" && missionEffectiveStart >= aftarSettings.startH;
                   const dayOrder2=DAY_IDS, ti2=dayOrder2.indexOf(activeDay);
                   const prevAftar = ti2>0 ? (aftarByDay[dayOrder2[ti2-1]]||[]) : [];
-                  const isAftarYesterdayBlk = prevAftar.includes(name) && mission.startH < aftarSettings.endH && mission.id!=="philbox_horsa" && mission.id!=="hetz";
+                  const isAftarYesterdayBlk = prevAftar.includes(name) && mission.startH < aftarSettings.endH && mission.id!=="philbox_horsa" && mission.id!=="hetz" && mission.id!=="hetz2";
                   const isGimelBlk=gimelThisDay.has(name) && mission.id!=="gimel";
                   // חסימת שעות שבועיות למסופחים
                   const plugaMembers2 = platoons["pluga"]?.members||[];
@@ -1207,7 +1244,7 @@ function App() {
     // ── MISSIONS TAB ──
     const [editId, setEditId] = useState(null);
     const [draft, setDraft] = useState({});
-    const HIDE_FROM_SETTINGS = new Set(["agamim","hilton","konnut","rachpan","siyur_boker","siyur_tzo","siyur_layla","maatzar","matbah_boker","matbah_tzaharayim","bimuy_oyev","amada_maaravit","amada_maaravit_a","amada_maaravit_b"]);
+    const HIDE_FROM_SETTINGS = new Set(["agamim","hilton","konnut","rachpan","siyur_boker","siyur_tzo","siyur_layla","maatzor","matbah_boker","matbah_tzaharayim","bimuy_oyev","amada_maaravit"]);
     const visibleForSettings = MISSION_DEFS.filter(m => !m.hideFromDisplay && !HIDE_FROM_SETTINGS.has(m.id) && !deletedMissions.includes(m.id));
     const startEdit = (m) => { setEditId(m.id); setDraft({...missionSettings[m.id]}); };
     const saveEdit = () => { setMissionSettings(prev=>({...prev,[editId]:{...draft}})); setEditId(null); };

@@ -140,9 +140,10 @@ const PLATOONS_DEFAULT = {
   cmd3:     { label:"מפקדי מחלקה 3", color:"#66bb6a", textColor:"#0a0f1a", members:["אריאל טופז","דורון בוכהולץ","חנן שטיין","רפאל מבשר"] },
   soldiers3:{ label:"חיילי מחלקה 3",  color:"#a5d6a7", textColor:"#0a0f1a", members:["ישי אדרי","אביב אוחנה","אברהם גולדשטיין","ירדן גיאת","אביחן לוי","אהרון נתניא","יאיר ספיר","נאור עזרא","יעקב נרי","נעם קפלנסקי","רועי שאג","יצחק שטטמן"] },
   pluga:    { label:"מחלקת המסופחים", color:"#ffd54f", textColor:"#0a0f1a", members:["ידידיה אבולעפיה","שמואל ברגלס","איתן שוורץ","משה חדד"] },
+  pluga2:   { label:"מפקדת פלוגה",    color:"#ff9800", textColor:"#0a0f1a", members:[] },
 };
 
-const CMD_PLATOONS = new Set(["cmd1","cmd2","cmd3","pluga"]);
+const CMD_PLATOONS = new Set(["cmd1","cmd2","cmd3","pluga","pluga2"]);
 // רק אלה יכולים לבצע כמה משימות במקביל וללא מנוחה
 const MULTI_MISSION_OFFICERS = new Set(["אריאל טופז","ידידיה שמואליאן","חזי דיין"]);
 // פטור ממנוחה בין ש"גים לחיילים ספציפיים
@@ -186,7 +187,8 @@ const MISSION_DEFS = [
   { id:"rachpan",     label:"קורס רחפנים",    icon:"🚁", slots:{commander:0,soldiers:1}, time:"",               border:"#80cbc4", col:6, startH:0,  endH:24, showOnDays:["2025_03_09","2025_03_10","2025_03_11","2025_03_12"] },
 
   // ═══ גזרה חדשה (מ-12/3) ═══
-  { id:"matbah_new",    label:"תורנות מטבח",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA },
+  { id:"matbah_new",    label:"תורנות מטבח",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA.filter(d=>d<"2025_03_19"||d>"2025_03_23") },
+  { id:"matbah_new2",   label:"תורנות מטבח",     icon:"🍳", slots:{commander:0,soldiers:2}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:["2025_03_19","2025_03_20","2025_03_21","2025_03_22","2025_03_23"] },
   { id:"bimuy_oyev",   label:"בימוי אויב",  icon:"🎭", slots:{commander:0,soldiers:2}, time:"14:00 - 19:00 | לדבר עם אסוס בנוגע למידע מחר שמגיעים", border:"#ef5350", col:1, startH:14, endH:19, showOnDays:["2025_03_16"] },
   { id:"kurs_pritza",  label:"קורס פריצה", icon:"🔓", slots:{commander:0,soldiers:2}, time:"",             border:"#ff9800", col:1, startH:6,  endH:24, showOnDays:["2025_03_17","2025_03_18"] },
   { id:"amada_maaravit",  label:"עמדה מערבית",      icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 6:00",  border:"#7e57c2", col:1, startH:24, endH:30, showOnDays:NEW_GAZRA.filter(d=>d==="2025_03_13"||d==="2025_03_14") },
@@ -433,10 +435,10 @@ function DisplayCard({ mission, assignment, dayId }) {
         ) : mission.id==="matbah"||mission.id==="matbah_boker"||mission.id==="matbah_tzaharayim"||mission.id==="matbah_new"||mission.id.startsWith("sg")||mission.id==="amada_maaravit"||mission.id==="amada_maaravit_a"||mission.id==="amada_maaravit_b"||mission.id==="bimuy_oyev"||mission.id==="kurs_pritza"||mission.id==="toren_rasp" ? (
           /* מטבח / ש"ג / עמדה — חייל אחד על כל הרוחב */
           <div style={{display:"flex",flexDirection:"column",gap:4}}>
-            {(mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16"||dayId==="2025_03_17") && (
+            {(mission.id==="matbah"||mission.id==="matbah_new"||mission.id==="matbah_new2") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16"||dayId==="2025_03_17") && (
               <div style={{fontSize:10,color:"#ffcc80",background:"#ff980022",borderRadius:6,padding:"3px 7px",textAlign:"center",marginBottom:2}}>כוח חץ דרוך 🏹{dayId==="2025_03_15" ? " — אבי גולדשטיין" : dayId==="2025_03_16" ? " — יאיר ספיר" : dayId==="2025_03_17" ? " — ישי אדרי" : ""}</div>
             )}
-            {!((mission.id==="matbah"||mission.id==="matbah_new") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16"||dayId==="2025_03_17")) && ass.soldiers.map((p,i)=>(
+            {!((mission.id==="matbah"||mission.id==="matbah_new"||mission.id==="matbah_new2") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16"||dayId==="2025_03_17")) && ass.soldiers.map((p,i)=>(
               <div key={i} className={`ntag ${p?"filled":"empty"}`} style={{...(p?getPlatoonStyle(p.platoon):{}),width:"100%",textAlign:"center",fontSize:13,fontWeight:700,padding:"6px 8px"}}>{p?p.name:"חייל"}</div>
             ))}
           </div>
@@ -935,7 +937,7 @@ function App() {
 
           {/* MATBAH TRACKER */}
           {(() => {
-            const matbahIds = ["matbah","matbah_boker","matbah_tzaharayim","matbah_new"];
+            const matbahIds = ["matbah","matbah_boker","matbah_tzaharayim","matbah_new","matbah_new2"];
             const counts = {};
             allMembers.forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
             // נתונים ידניים — תורני מטבח מכוח חץ דרוך
@@ -1121,7 +1123,10 @@ function App() {
               <div className="pool-chips">
                 {p.members.map(name=>{
                   const isAss=assignedThisDay.has(name), isSel=selPeople.some(p=>p.name===name);
-                  const isAllowBlk=mission.allowedNames&&!mission.allowedNames.includes(name);
+                  const katzinAllowed = mission.id==="katzin"
+                    ? [...(mission.allowedNames||[]), ...(platoons["pluga2"]?.members||[])]
+                    : mission.allowedNames;
+                  const isAllowBlk=katzinAllowed&&!katzinAllowed.includes(name);
                   const isRestBlk=blocked.has(name);
                   const AFTAR_EFFECTIVE_START = {"philbox_horsa": 14, "hetz": 14, "hetz2": 14};
                   const missionEffectiveStart = AFTAR_EFFECTIVE_START[mission.id] ?? mission.startH;

@@ -198,13 +198,13 @@ const MISSION_DEFS = [
   { id:"sg4",           label:'ש"ג 18:00–22:00',icon:"🪖", slots:{commander:0,soldiers:1}, time:"18:00 - 22:00",  border:"#8d6e63", col:2, startH:18, endH:22, showOnDays:NEW_GAZRA },
   { id:"sg5",           label:'ש"ג 22:00–2:00', icon:"🪖", slots:{commander:0,soldiers:1}, time:"22:00 - 2:00",   border:"#8d6e63", col:2, startH:22, endH:26, showOnDays:NEW_GAZRA },
   { id:"sg6",           label:'ש"ג 2:00–6:00',  icon:"🪖", slots:{commander:0,soldiers:1}, time:"2:00 - 6:00",    border:"#8d6e63", col:2, startH:26, endH:30, showOnDays:NEW_GAZRA },
-  { id:"avt_ugda",      label:"אבטחת אוגדה",   icon:"🛡️", slots:{commander:0,soldiers:2}, time:"החל מ-8:00",    border:"#ef5350", col:3, startH:8,  endH:20, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_19") },
+  { id:"toren_rasp",    label:'תורן רס"פ',      icon:"🎖️", slots:{commander:0,soldiers:1}, time:"10:00 - 14:00",   border:"#78909c", col:1, startH:10, endH:14, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_17") },
+  { id:"avt_ugda",      label:"אבטחת אוגדה",   icon:"🛡️", slots:{commander:0,soldiers:2}, time:"החל מ-8:00",    border:"#ef5350", col:1, startH:8,  endH:20, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_19") },
   { id:"siyur_boker2",  label:"סיור בוקר",      icon:"🚗", slots:{commander:1,soldiers:2}, time:"6:00 - 14:00",   border:"#26c6da", col:3, startH:6,  endH:14, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_tzo2",    label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_layla2",  label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:3, startH:22, endH:30, isSiyur:true, isNightPatrol:true, showOnDays:NEW_GAZRA },
   { id:"hetz",          label:"חץ דרוך",        icon:"🏹", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA.filter(d=>d<"2025_03_18") },
   { id:"hetz2",         label:"חץ דרוך",        icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_18") },
-  { id:"toren_rasp",    label:'תורן רס"פ',      icon:"🎖️", slots:{commander:0,soldiers:1}, time:"10:00 - 14:00",   border:"#78909c", col:4, startH:10, endH:14, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_17") },
   { id:"philbox_horsa", label:"פילבוקס חורסה",  icon:"🏠", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#f06292", col:5, startH:0,  endH:24, showOnDays:NEW_GAZRA },
   { id:"amada_maaravit_a",label:"עמדה מערבית א׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 3:00",  border:"#7e57c2", col:5, startH:24, endH:27, showOnDays:NEW_GAZRA.filter(d=>d!=="2025_03_13"&&d!=="2025_03_14") },
   { id:"amada_maaravit_b",label:"עמדה מערבית ב׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"3:00 - 6:00",   border:"#7e57c2", col:5, startH:27, endH:30, showOnDays:NEW_GAZRA.filter(d=>d!=="2025_03_13"&&d!=="2025_03_14") },
@@ -825,7 +825,7 @@ function App() {
           </div>
         )}
         
-        <div className="display-grid" style={{gridTemplateColumns:`repeat(${numCols},1fr)`,zoom:1}}>
+        <div className="display-grid" style={{gridTemplateColumns:`repeat(${numCols},1fr)`,zoom:0.90}}>
           {/* באנר תאריך — מתפרס על כל העמודות */}
           <div style={{gridColumn:"1 / -1",display:"grid",placeItems:"center",marginBottom:4}}>
             <div style={{

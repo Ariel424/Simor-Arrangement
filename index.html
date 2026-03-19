@@ -707,7 +707,7 @@ function App() {
         return true;
       }).map(m=>m.id)
     );
-    const excludedIds = new Set(["katzin","maatzar","gimel","rachpan"]);
+    const excludedIds = new Set(["katzin","maatzar","gimel","rachpan","hetz","hetz2","philbox_horsa"]);
     return new Set(
       Object.entries(dayAss)
         .filter(([mid]) => visibleIds.has(mid) && !excludedIds.has(mid))

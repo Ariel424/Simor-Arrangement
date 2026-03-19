@@ -145,9 +145,9 @@ const PLATOONS_DEFAULT = {
 
 const CMD_PLATOONS = new Set(["cmd1","cmd2","cmd3","pluga","pluga2"]);
 // רק אלה יכולים לבצע כמה משימות במקביל וללא מנוחה
-const MULTI_MISSION_OFFICERS = new Set(["אריאל טופז","ידידיה שמואליאן","חזי דיין"]);
+const MULTI_MISSION_OFFICERS = new Set(["אריאל טופז","ידידיה שמואליאן","חזי דיין","ידידיה אבולעפיה","שמואל ברגלס","איתן שוורץ","משה חדד"]);
 // פטור ממנוחה בין ש"גים לחיילים ספציפיים
-const SG_REST_EXEMPT = new Set(["איתן שוורץ"]);
+const SG_REST_EXEMPT = new Set(["איתן שוורץ","ידידיה אבולעפיה","שמואל ברגלס","משה חדד"]);
 
 // חריגים ממנוחה לפי יום ומשימה
 const REST_EXEMPTIONS = {
@@ -279,8 +279,9 @@ function initDayAssignments() {
   return init;
 }
 
-function getBlockedNames(allAss, targetDayId, targetMission, missionSettings) {
+function getBlockedNames(allAss, targetDayId, targetMission, missionSettings, platoons) {
   const ms = missionSettings || {};
+  const plugaMembers = new Set([...(platoons?.pluga?.members||[]), ...(platoons?.pluga2?.members||[])]);
   const blocked = new Set(), reasons = {};
   const dayOrder = DAY_IDS;
   const ti = dayOrder.indexOf(targetDayId);
@@ -326,7 +327,7 @@ function getBlockedNames(allAss, targetDayId, targetMission, missionSettings) {
       const restH = ms[sm.id]?.restHours ?? 16;
       if (restH === 0) return;
       [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).forEach(person => {
-        if (MULTI_MISSION_OFFICERS.has(person.name)) return;
+        if (MULTI_MISSION_OFFICERS.has(person.name) || plugaMembers.has(person.name)) return;
         const sEnd = di*24 + sm.endH, tStart = ti*24 + targetMission.startH;
         const isSameSlot = (dayId===targetDayId && sm.id===targetMission.id);
         const targetIsAfterPatrolStart = tStart >= di*24 + sm.startH;
@@ -350,7 +351,7 @@ function getBlockedNames(allAss, targetDayId, targetMission, missionSettings) {
       const isSameSlot = (dayId===targetDayId && sm.id===targetMission.id);
       if (isSameSlot) return;
       [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).forEach(person => {
-        if (SG_REST_EXEMPT.has(person.name)) return;
+        if (SG_REST_EXEMPT.has(person.name) || plugaMembers.has(person.name)) return;
         const sEnd = di*24 + sm.endH;
         // פילבוקס וחץ דרוך עולים ב-14:00 למרות startH:0
         const EFFECTIVE_START = {"philbox_horsa":14,"hetz":14,"hetz2":14};
@@ -718,7 +719,7 @@ function App() {
 
   const { blocked, blockedReasons } = useMemo(() => {
     if (!mission) return { blocked: new Set(), blockedReasons: {} };
-    return getBlockedNames(allAss, activeDay, mission, missionSettings);
+    return getBlockedNames(allAss, activeDay, mission, missionSettings, platoons);
   }, [allAss, activeDay, activeMission]);
 
   const gimelThisDay = useMemo(() => new Set(
@@ -1136,7 +1137,7 @@ function App() {
                   const isAftarYesterdayBlk = prevAftar.includes(name) && mission.startH < aftarSettings.endH && mission.id!=="philbox_horsa" && mission.id!=="hetz" && mission.id!=="hetz2";
                   const isGimelBlk=gimelThisDay.has(name) && mission.id!=="gimel";
                   // חסימת שעות שבועיות למסופחים
-                  const plugaMembers2 = platoons["pluga"]?.members||[];
+                  const plugaMembers2 = [...(platoons["pluga"]?.members||[]),...(platoons["pluga2"]?.members||[])];
                   let isPlugaOverBlk = false;
                   if (plugaMembers2.includes(name)) {
                     const getWS = (id) => {

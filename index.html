@@ -104,8 +104,8 @@ body{background:var(--bg);color:var(--text);font-family:'Heebo',sans-serif;font-
 .chip{border-radius:8px;padding:6px 11px;font-size:13px;font-weight:600;cursor:pointer;border:2px solid transparent;font-family:'Heebo',sans-serif;transition:all .12s;position:relative;}
 .chip:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.3);}
 .chip.selected{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.2);transform:translateY(-1px);}
-.chip.assigned{opacity:.35;cursor:not-allowed;}
-.chip.assigned:hover{transform:none;box-shadow:none;}
+.chip.assigned{opacity:.6;}
+.chip.assigned:hover{transform:none;}
 .chip.blocked{opacity:.15;cursor:not-allowed;}
 .chip.blocked:hover{transform:none;box-shadow:none;}
 .chip.resting{opacity:.4;cursor:not-allowed;filter:grayscale(.5);}
@@ -187,8 +187,8 @@ const MISSION_DEFS = [
   { id:"rachpan",     label:"קורס רחפנים",    icon:"🚁", slots:{commander:0,soldiers:1}, time:"",               border:"#80cbc4", col:6, startH:0,  endH:24, showOnDays:["2025_03_09","2025_03_10","2025_03_11","2025_03_12"] },
 
   // ═══ גזרה חדשה (מ-12/3) ═══
-  { id:"matbah_new",    label:"תורנות מטבח",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA.filter(d=>d<"2025_03_19"||d>"2025_03_23") },
-  { id:"matbah_new2",   label:"תורנות מטבח",     icon:"🍳", slots:{commander:0,soldiers:2}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:["2025_03_19","2025_03_20","2025_03_21","2025_03_22","2025_03_23"] },
+  { id:"matbah_new",    label:"תורנות מטבח",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA.filter(d=>d<"2025_03_19"||d==="2025_03_22") },
+  { id:"matbah_new2",   label:"תורנות מטבח",     icon:"🍳", slots:{commander:0,soldiers:2}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_19"&&d!=="2025_03_22") },
   { id:"bimuy_oyev",   label:"בימוי אויב",  icon:"🎭", slots:{commander:0,soldiers:2}, time:"14:00 - 19:00 | לדבר עם אסוס בנוגע למידע מחר שמגיעים", border:"#ef5350", col:1, startH:14, endH:19, showOnDays:["2025_03_16"] },
   { id:"kurs_pritza",  label:"קורס פריצה", icon:"🔓", slots:{commander:0,soldiers:2}, time:"",             border:"#ff9800", col:1, startH:6,  endH:24, showOnDays:["2025_03_17","2025_03_18"] },
   { id:"amada_maaravit",  label:"עמדה מערבית",      icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 6:00",  border:"#7e57c2", col:1, startH:24, endH:30, showOnDays:NEW_GAZRA.filter(d=>d==="2025_03_13"||d==="2025_03_14") },
@@ -287,6 +287,7 @@ function getBlockedNames(allAss, targetDayId, targetMission, missionSettings, pl
   const ti = dayOrder.indexOf(targetDayId);
   const isMorningDutyNextDay = (targetMission.id==="matbah" || targetMission.id==="matbah_boker");
   const isPilboxNextDay = (targetMission.id==="hilton" || targetMission.id==="agamim");
+  const isHetz = (targetMission.id==="hetz" || targetMission.id==="hetz2");
 
   // פעילות מבצעית — ללא מנוחה וללא חסימה
   if (targetMission.id==="maatzar") return { blocked, blockedReasons: reasons };
@@ -326,6 +327,7 @@ function getBlockedNames(allAss, targetDayId, targetMission, missionSettings, pl
       const ass = da[sm.id]; if (!ass) return;
       const restH = ms[sm.id]?.restHours ?? 16;
       if (restH === 0) return;
+      if (isHetz) return; // חץ דרוך לא נחסם מסיור יום קודם
       [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).forEach(person => {
         if (MULTI_MISSION_OFFICERS.has(person.name) || plugaMembers.has(person.name)) return;
         const sEnd = di*24 + sm.endH, tStart = ti*24 + targetMission.startH;
@@ -707,7 +709,7 @@ function App() {
         return true;
       }).map(m=>m.id)
     );
-    const excludedIds = new Set(["katzin","maatzar","gimel","rachpan","hetz","hetz2","philbox_horsa"]);
+    const excludedIds = new Set(["katzin","maatzar","gimel","rachpan","hetz","hetz2","philbox_horsa","amada_maaravit","amada_maaravit_a","amada_maaravit_b","toren_rasp","matbah_new","matbah_new2"]);
     return new Set(
       Object.entries(dayAss)
         .filter(([mid]) => visibleIds.has(mid) && !excludedIds.has(mid))
@@ -869,7 +871,7 @@ function App() {
               return true;
             }).map(m=>{
               const isHidden = isMissionHiddenOnDay(activeDay, m.id);
-              const a=dayAss[m.id], f=[...(a?.commanders||[]),...(a?.soldiers||[])].filter(Boolean).length, t=m.slots.commander+m.slots.soldiers, done=f===t;
+              const a=dayAss[m.id], assignedPeople=[...(a?.commanders||[]),...(a?.soldiers||[])].filter(Boolean), f=assignedPeople.length, t=m.slots.commander+m.slots.soldiers, done=f===t;
               return (
                 <div key={m.id} style={{display:"flex",alignItems:"center",gap:2}}>
                   <button className={`mpick-btn ${activeMission===m.id&&!isHidden?"active":""}`}
@@ -879,6 +881,11 @@ function App() {
                     <div className="mpick-icon">{m.icon}</div>
                     <div>{m.label}</div>
                     <div className={`mpick-prog ${done?"done":"partial"}`}>{m.noCount||isHidden ? "" : done?"✓ הושלם":`${f}/${t}`}</div>
+                    {assignedPeople.length>0 && (
+                      <div style={{fontSize:9,color:"var(--text3)",marginTop:2,lineHeight:1.3}}>
+                        {assignedPeople.map(p=>p.name).join(", ")}
+                      </div>
+                    )}
                   </button>
                 </div>
               );
@@ -936,119 +943,8 @@ function App() {
         <div className="builder-right">
           <div style={{fontSize:12,color:"var(--text2)",marginBottom:14}}>סמן אנשים ואז לחץ על תא פנוי במשימה — ניתן לבחור כמה בבת אחת</div>
 
-          {/* MATBAH TRACKER */}
-          {(() => {
-            const matbahIds = ["matbah","matbah_boker","matbah_tzaharayim","matbah_new","matbah_new2"];
-            const counts = {};
-            allMembers.forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
-            // נתונים ידניים — תורני מטבח מכוח חץ דרוך
-            const manualMatbah = ["יעקב נרי","אברהם גולדשטיין","יאיר ספיר","ישי אדרי","ניב לאופר","ניב לאופר","ניב לאופר"];
-            manualMatbah.forEach(name => { if (counts[name] !== undefined) counts[name].count += 1; });
-            DAY_IDS.forEach(dayId => {
-              const da = allAss[dayId] || {};
-              matbahIds.forEach(mid => {
-                const ass = da[mid];
-                if (!ass) return;
-                const isHalf = mid==="matbah_boker" || mid==="matbah_tzaharayim";
-                [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).forEach(p => {
-                  if (counts[p.name] !== undefined) counts[p.name].count += isHalf ? 0.5 : 1;
-                });
-              });
-            });
-            const sorted = Object.entries(counts).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
-            return (
-              <div style={{background:"var(--surface)",border:"1.5px solid #ff980044",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
-                <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
-                  <span style={{fontSize:16}}>🍳</span>
-                  <div style={{fontSize:14,fontWeight:700,flex:1}}>מעקב תורנות מטבח</div>
-                  <div style={{fontSize:11,color:"var(--text3)"}}>כל הימים</div>
-                </div>
-                <div style={{padding:"10px 12px"}}>
-                  {sorted.length === 0
-                    ? <div style={{fontSize:12,color:"var(--text3)"}}>אין תורנויות מטבח עדיין</div>
-                    : <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-                        {sorted.map(([name,{count,platoon}]) => (
-                          <div key={name} style={{...getPlatoonStyle(platoon),borderRadius:8,padding:"4px 10px",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
-                            <span>{name}</span>
-                            <span style={{background:"rgba(0,0,0,0.25)",borderRadius:5,padding:"1px 6px",fontSize:11,fontWeight:800}}>{Number.isInteger(count)?count:(Math.floor(count)>0?Math.floor(count)+"½":"½")}</span>
-                          </div>
-                        ))}
-                      </div>
-                  }
-                </div>
-              </div>
-            );
-          })()}
 
-          {/* PLUGA WEEKLY HOURS TRACKER */}
-          {(() => {
-            const WEEKLY_LIMIT = 32;
-            const plugaMembers = platoons["pluga"]?.members || [];
-            if (plugaMembers.length === 0) return null;
 
-            // שבוע קלנדרי: ראשון-שבת
-            const getWeekStart = (dayId) => {
-              const [y,m,d] = dayId.split('_').map(Number);
-              const date = new Date(y, m-1, d);
-              const dow = date.getDay(); // 0=ראשון
-              const sunday = new Date(date);
-              sunday.setDate(date.getDate() - dow);
-              const pad = n=>String(n).padStart(2,'0');
-              return `${sunday.getFullYear()}_${pad(sunday.getMonth()+1)}_${pad(sunday.getDate())}`;
-            };
-
-            // מציג את השבוע של היום הנבחר
-            const weekStartId = getWeekStart(activeDay);
-            const weekDays = DAY_IDS.filter(d => getWeekStart(d) === weekStartId);
-
-            const calcHours = (name, days) => {
-              let total = 0;
-              days.forEach(dayId => {
-                const da = allAss[dayId] || {};
-                MISSION_DEFS.forEach(m => {
-                  const ass = da[m.id]; if (!ass) return;
-                  const assigned = [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean);
-                  if (assigned.some(p=>p.name===name)) {
-                    const dur = m.endH - m.startH;
-                    total += Math.max(0, Math.min(dur, 24));
-                  }
-                });
-              });
-              return total;
-            };
-
-            const weekLabel = weekDays.length > 0
-              ? `${weekDays[0].replace(/\d{4}_(\d{2})_(\d{2})/,'$2/$1')} – ${weekDays[weekDays.length-1].replace(/\d{4}_(\d{2})_(\d{2})/,'$2/$1')}`
-              : '';
-
-            return (
-              <div style={{background:"var(--surface)",border:"1.5px solid #ffd54f44",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
-                <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
-                  <span style={{fontSize:16}}>⏱️</span>
-                  <div style={{fontSize:14,fontWeight:700,flex:1}}>מעקב שעות מסופחים</div>
-                  <div style={{fontSize:11,color:"var(--text3)"}}>{weekLabel}</div>
-                </div>
-                <div style={{padding:"10px 12px",display:"flex",flexDirection:"column",gap:6}}>
-                  {plugaMembers.map(name => {
-                    const hours = calcHours(name, weekDays);
-                    const pct = Math.min(hours / WEEKLY_LIMIT * 100, 100);
-                    const over = hours >= WEEKLY_LIMIT;
-                    return (
-                      <div key={name}>
-                        <div style={{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:2}}>
-                          <span style={{color:over?"#ef5350":"var(--text)",fontWeight:over?700:400}}>{name}</span>
-                          <span style={{color:over?"#ef5350":"var(--text2)",fontWeight:700}}>{hours}/{WEEKLY_LIMIT} שע'</span>
-                        </div>
-                        <div style={{background:"var(--surface2)",borderRadius:4,height:6,overflow:"hidden"}}>
-                          <div style={{width:`${pct}%`,height:"100%",background:over?"#ef5350":pct>75?"#ff9800":"#26c6da",transition:"width .3s"}}/>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })()}
 
           {/* חיילים פנויים */}
           {(() => {
@@ -1080,7 +976,6 @@ function App() {
               </div>
             );
           })()}
-
           {/* AFTAR PANEL */}
           <div className="aftar-card" style={{marginBottom:20}}>
             <div className="aftar-header">
@@ -1505,6 +1400,160 @@ function App() {
   });
 
 
+
+  const TrackingView = () => (
+    <div className="main" style={{maxWidth:960,margin:"0 auto",padding:"20px 16px"}}>
+      <div style={{fontSize:18,fontWeight:800,marginBottom:16,color:"var(--text)"}}>📊 מעקבים</div>
+      {/* AFTAR TRACKER */}
+          {(() => {
+            const aftarCounts = {};
+            allMembers.forEach(m => { aftarCounts[m.name] = { count: 0, platoon: m.platoon }; });
+            DAY_IDS.forEach(dayId => {
+              (aftarByDay[dayId]||[]).forEach(name => {
+                if (aftarCounts[name] !== undefined) aftarCounts[name].count++;
+              });
+            });
+            const sorted = Object.entries(aftarCounts).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
+            return (
+              <div style={{background:"var(--surface)",border:"1.5px solid #26c6da44",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
+                <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:16}}>🏠</span>
+                  <div style={{fontSize:14,fontWeight:700,flex:1}}>מעקב אפטרים</div>
+                  <div style={{fontSize:11,color:"var(--text3)"}}>כל הימים</div>
+                </div>
+                <div style={{padding:"10px 12px"}}>
+                  {sorted.length === 0
+                    ? <div style={{fontSize:12,color:"var(--text3)"}}>אין אפטרים עדיין</div>
+                    : <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                        {sorted.map(([name,{count,platoon}]) => (
+                          <div key={name} style={{...getPlatoonStyle(platoon),borderRadius:8,padding:"4px 10px",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+                            <span>{name}</span>
+                            <span style={{background:"rgba(0,0,0,0.25)",borderRadius:5,padding:"1px 6px",fontSize:11,fontWeight:800}}>{count}</span>
+                          </div>
+                        ))}
+                      </div>
+                  }
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* MATBAH TRACKER */}
+          {(() => {
+            const matbahIds = ["matbah","matbah_boker","matbah_tzaharayim","matbah_new","matbah_new2"];
+            const counts = {};
+            allMembers.forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
+            // נתונים ידניים — תורני מטבח מכוח חץ דרוך
+            const manualMatbah = ["יעקב נרי","אברהם גולדשטיין","יאיר ספיר","ישי אדרי","ניב לאופר","ניב לאופר","ניב לאופר"];
+            manualMatbah.forEach(name => { if (counts[name] !== undefined) counts[name].count += 1; });
+            DAY_IDS.forEach(dayId => {
+              const da = allAss[dayId] || {};
+              matbahIds.forEach(mid => {
+                const ass = da[mid];
+                if (!ass) return;
+                const isHalf = mid==="matbah_boker" || mid==="matbah_tzaharayim";
+                [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).forEach(p => {
+                  if (counts[p.name] !== undefined) counts[p.name].count += isHalf ? 0.5 : 1;
+                });
+              });
+            });
+            const sorted = Object.entries(counts).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
+            return (
+              <div style={{background:"var(--surface)",border:"1.5px solid #ff980044",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
+                <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:16}}>🍳</span>
+                  <div style={{fontSize:14,fontWeight:700,flex:1}}>מעקב תורנות מטבח</div>
+                  <div style={{fontSize:11,color:"var(--text3)"}}>כל הימים</div>
+                </div>
+                <div style={{padding:"10px 12px"}}>
+                  {sorted.length === 0
+                    ? <div style={{fontSize:12,color:"var(--text3)"}}>אין תורנויות מטבח עדיין</div>
+                    : <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                        {sorted.map(([name,{count,platoon}]) => (
+                          <div key={name} style={{...getPlatoonStyle(platoon),borderRadius:8,padding:"4px 10px",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+                            <span>{name}</span>
+                            <span style={{background:"rgba(0,0,0,0.25)",borderRadius:5,padding:"1px 6px",fontSize:11,fontWeight:800}}>{Number.isInteger(count)?count:(Math.floor(count)>0?Math.floor(count)+"½":"½")}</span>
+                          </div>
+                        ))}
+                      </div>
+                  }
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* PLUGA WEEKLY HOURS TRACKER */}
+          {(() => {
+            const WEEKLY_LIMIT = 32;
+            const plugaMembers = platoons["pluga"]?.members || [];
+            if (plugaMembers.length === 0) return null;
+
+            // שבוע קלנדרי: ראשון-שבת
+            const getWeekStart = (dayId) => {
+              const [y,m,d] = dayId.split('_').map(Number);
+              const date = new Date(y, m-1, d);
+              const dow = date.getDay(); // 0=ראשון
+              const sunday = new Date(date);
+              sunday.setDate(date.getDate() - dow);
+              const pad = n=>String(n).padStart(2,'0');
+              return `${sunday.getFullYear()}_${pad(sunday.getMonth()+1)}_${pad(sunday.getDate())}`;
+            };
+
+            // מציג את השבוע של היום הנבחר
+            const weekStartId = getWeekStart(activeDay);
+            const weekDays = DAY_IDS.filter(d => getWeekStart(d) === weekStartId);
+
+            const calcHours = (name, days) => {
+              let total = 0;
+              days.forEach(dayId => {
+                const da = allAss[dayId] || {};
+                MISSION_DEFS.forEach(m => {
+                  const ass = da[m.id]; if (!ass) return;
+                  const assigned = [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean);
+                  if (assigned.some(p=>p.name===name)) {
+                    const dur = m.endH - m.startH;
+                    total += Math.max(0, Math.min(dur, 24));
+                  }
+                });
+              });
+              return total;
+            };
+
+            const weekLabel = weekDays.length > 0
+              ? `${weekDays[0].replace(/\d{4}_(\d{2})_(\d{2})/,'$2/$1')} – ${weekDays[weekDays.length-1].replace(/\d{4}_(\d{2})_(\d{2})/,'$2/$1')}`
+              : '';
+
+            return (
+              <div style={{background:"var(--surface)",border:"1.5px solid #ffd54f44",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
+                <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:16}}>⏱️</span>
+                  <div style={{fontSize:14,fontWeight:700,flex:1}}>מעקב שעות מסופחים</div>
+                  <div style={{fontSize:11,color:"var(--text3)"}}>{weekLabel}</div>
+                </div>
+                <div style={{padding:"10px 12px",display:"flex",flexDirection:"column",gap:6}}>
+                  {plugaMembers.map(name => {
+                    const hours = calcHours(name, weekDays);
+                    const pct = Math.min(hours / WEEKLY_LIMIT * 100, 100);
+                    const over = hours >= WEEKLY_LIMIT;
+                    return (
+                      <div key={name}>
+                        <div style={{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:2}}>
+                          <span style={{color:over?"#ef5350":"var(--text)",fontWeight:over?700:400}}>{name}</span>
+                          <span style={{color:over?"#ef5350":"var(--text2)",fontWeight:700}}>{hours}/{WEEKLY_LIMIT} שע'</span>
+                        </div>
+                        <div style={{background:"var(--surface2)",borderRadius:4,height:6,overflow:"hidden"}}>
+                          <div style={{width:`${pct}%`,height:"100%",background:over?"#ef5350":pct>75?"#ff9800":"#26c6da",transition:"width .3s"}}/>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+    </div>
+  );
+
   const SpecialsView = () => {
     const inp = {display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13};
     const btn = (extra={}) => ({background:"var(--surface2)",border:"1px solid var(--border2)",borderRadius:7,color:"var(--text2)",cursor:"pointer",fontFamily:"Heebo,sans-serif",fontSize:12,padding:"4px 10px",...extra});
@@ -1642,6 +1691,7 @@ function App() {
         <div className="view-toggle">
           <button className={`view-btn ${view==="display"?"active":""}`} onClick={()=>setView("display")}>👁 תצוגה</button>
           <button className={`view-btn ${view==="builder"?"active":""}`} onClick={()=>setView("builder")}>🛠 בנייה</button>
+          <button className={`view-btn ${view==="tracking"?"active":""}`} onClick={()=>setView("tracking")}>📊 מעקבים</button>
           <button className={`view-btn ${view==="settings"?"active":""}`} onClick={()=>setView("settings")}>⚙️ הגדרות</button>
           <button className={`view-btn ${view==="specials"?"active":""}`} onClick={()=>setView("specials")}>⭐ מיוחדים</button>
         </div>
@@ -1672,7 +1722,7 @@ function App() {
           }}/>
         </label>
       </div>
-      {view==="display" ? <DisplayView visibleMissions={visibleMissions}/> : view==="settings" ? <SettingsView/> : view==="specials" ? <SpecialsView key="specials"/> : <BuilderView key="builder"/>}
+      {view==="display" ? <DisplayView visibleMissions={visibleMissions}/> : view==="settings" ? <SettingsView/> : view==="specials" ? <SpecialsView key="specials"/> : view==="tracking" ? <TrackingView/> : <BuilderView key="builder"/>}
     </div>
   );
 }

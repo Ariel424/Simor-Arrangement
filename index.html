@@ -825,7 +825,7 @@ function App() {
   const DisplayView = ({ visibleMissions }) => {
     const f = visibleMissions.filter(m => !m.hideFromDisplay);
     const col1=f.filter(m=>m.col===1), col2=f.filter(m=>m.col===2), col3=f.filter(m=>m.col===3), col4=f.filter(m=>m.col===4), col5=f.filter(m=>m.col===5), col6=f.filter(m=>m.col===6);
-    const numCols = [col1,col2,col3,col4,col5,col6].filter(c=>c.length>0).length;
+    const numCols = [col1,col2,col3,col4,col5,col6].filter(c=>c.length>0).length + (aftarThisDay.length>0 ? 1 : 0);
     return (
       <div className="main">
         <div style={{position:"relative"}}>
@@ -840,7 +840,7 @@ function App() {
           </div>
         )}
         
-        <div className="display-grid" style={{gridTemplateColumns:`repeat(${numCols},1fr)`,zoom:0.90}}>
+        <div className="display-grid" style={{gridTemplateColumns:`repeat(${numCols},1fr)`,zoom:0.80}}>
           {/* באנר תאריך — מתפרס על כל העמודות */}
           <div style={{gridColumn:"1 / -1",display:"grid",placeItems:"center",marginBottom:4}}>
             <div style={{
@@ -859,6 +859,33 @@ function App() {
               </div>
             </div>
           </div>
+          {/* עמודת אפטר — שמאל קיצוני */}
+          {aftarThisDay.length>0 && (
+            <div className="display-col">
+              <div className="mcard" style={{borderColor:"#e67e2244",flex:1}}>
+                <div className="mcard-header">
+                  <span className="mcard-icon">🏠</span>
+                  <div style={{flex:1}}>
+                    <div className="mcard-title">אפטר</div>
+                    <div className="mcard-time">{aftarSettings.startH}:00 – {aftarSettings.endH}:00 למחרת</div>
+                  </div>
+                  <div style={{fontSize:11,fontWeight:700,color:"var(--text3)"}}>{aftarThisDay.length}</div>
+                </div>
+                <div className="mcard-body">
+                  <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                    {aftarThisDay.map(name => {
+                      const member = allMembers.find(m=>m.name===name);
+                      return (
+                        <div key={name} className="ntag filled" style={{...(member?getPlatoonStyle(member.platoon):{background:"#555",color:"#fff"}),width:"100%",textAlign:"center",fontSize:12,fontWeight:700,padding:"5px 8px"}}>
+                          {name}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           {col1.length>0 && <div className="display-col">{col1.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
           {col2.length>0 && <div className="display-col">{col2.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
           {col3.length>0 && <div className="display-col">{col3.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
@@ -1119,7 +1146,7 @@ function App() {
                           hrs += Math.max(0, Math.min(m2.endH-m2.startH, 24));
                       });
                     });
-                    isPlugaOverBlk = hrs >= 32;
+                    isPlugaOverBlk = false; // ללא הגבלת שעות
                   }
                   const _sb=(dayAss["siyur_boker"]||{});
                   const isInSiyurBoker=[...(_sb.commanders||[]),...(_sb.soldiers||[])].filter(Boolean).some(p=>p.name===name);
@@ -1211,7 +1238,7 @@ function App() {
     // ── MISSIONS TAB ──
     const [editId, setEditId] = useState(null);
     const [draft, setDraft] = useState({});
-    const HIDE_FROM_SETTINGS = new Set(["agamim","hilton","konnut","rachpan","siyur_boker","siyur_tzo","siyur_layla","maatzor","matbah_boker","matbah_tzaharayim","bimuy_oyev","amada_maaravit"]);
+    const HIDE_FROM_SETTINGS = new Set(["agamim","hilton","konnut","rachpan","siyur_boker","siyur_tzo","siyur_layla","maatzor","bimuy_oyev","amada_maaravit"]);
     const visibleForSettings = MISSION_DEFS.filter(m => !m.hideFromDisplay && !HIDE_FROM_SETTINGS.has(m.id) && !deletedMissions.includes(m.id));
     const startEdit = (m) => { setEditId(m.id); setDraft({...missionSettings[m.id]}); };
     const saveEdit = () => { setMissionSettings(prev=>({...prev,[editId]:{...draft}})); setEditId(null); };
@@ -1510,7 +1537,7 @@ function App() {
             const counts = {};
             allMembers.forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
             // נתונים ידניים — תורני מטבח מכוח חץ דרוך
-            const manualMatbahMap = {"יעקב נרי":1,"אברהם גולדשטיין":1,"יאיר ספיר":1,"ישי אדרי":1,"ניב לאופר":3,"דימה":1,"רועי שאג":1.5};
+            const manualMatbahMap = {"יעקב נרי":1,"אברהם גולדשטיין":1,"יאיר ספיר":1,"ישי אדרי":1,"ניב לאופר":3,"דימה":1,"רועי שאג":1.5,"נאור גזולי":-0.5,"דניאל ברדריק":0.5};
             Object.entries(manualMatbahMap).forEach(([name, count]) => {
               if (counts[name] !== undefined) counts[name].count += count;
             });
@@ -1552,7 +1579,7 @@ function App() {
 
           {/* PLUGA WEEKLY HOURS TRACKER */}
           {(() => {
-            const WEEKLY_LIMIT = 32;
+            const WEEKLY_LIMIT = 999; // ללא הגבלה
             const plugaMembers = platoons["pluga"]?.members || [];
             if (plugaMembers.length === 0) return null;
 
@@ -1601,17 +1628,63 @@ function App() {
                 <div style={{padding:"10px 12px",display:"flex",flexDirection:"column",gap:6}}>
                   {plugaMembers.map(name => {
                     const hours = calcHours(name, weekDays);
-                    const pct = Math.min(hours / WEEKLY_LIMIT * 100, 100);
-                    const over = hours >= WEEKLY_LIMIT;
+                    const pct = Math.min(hours / 32 * 100, 100);
+                    const over = hours >= 32;
                     return (
                       <div key={name}>
                         <div style={{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:2}}>
-                          <span style={{color:over?"#ef5350":"var(--text)",fontWeight:over?700:400}}>{name}</span>
-                          <span style={{color:over?"#ef5350":"var(--text2)",fontWeight:700}}>{hours}/{WEEKLY_LIMIT} שע'</span>
+                          <span style={{color:"var(--text)"}}>{name}</span>
+                          <span style={{color:"var(--text2)",fontWeight:700}}>{hours} שע'</span>
                         </div>
                         <div style={{background:"var(--surface2)",borderRadius:4,height:6,overflow:"hidden"}}>
-                          <div style={{width:`${pct}%`,height:"100%",background:over?"#ef5350":pct>75?"#ff9800":"#26c6da",transition:"width .3s"}}/>
+                          <div style={{width:`${pct}%`,height:"100%",background:over?"#ff9800":pct>50?"#26c6da":"#66bb6a",transition:"width .3s"}}/>
                         </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* NIGHT WATCH TRACKER */}
+          {(() => {
+            const nightMissions = [
+              { id:"sg6",              label:'ש"ג 2:00–6:00',       icon:"🪖" },
+              { id:"amada_maaravit_a", label:"עמדה מערבית א׳ 00:00–3:00", icon:"🔭" },
+              { id:"amada_maaravit_b", label:"עמדה מערבית ב׳ 3:00–6:00",  icon:"🔭" },
+            ];
+            return (
+              <div style={{background:"var(--surface)",border:"1.5px solid #7e57c244",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
+                <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:16}}>🌙</span>
+                  <div style={{fontSize:14,fontWeight:700,flex:1}}>מעקב שמירות לילה</div>
+                </div>
+                <div style={{padding:"10px 12px",display:"flex",flexDirection:"column",gap:12}}>
+                  {nightMissions.map(nm => {
+                    const counts = {};
+                    allMembers.forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
+                    DAY_IDS.forEach(dayId => {
+                      const ass = (allAss[dayId]||{})[nm.id]; if (!ass) return;
+                      [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).forEach(p => {
+                        if (counts[p.name] !== undefined) counts[p.name].count++;
+                      });
+                    });
+                    const sorted = Object.entries(counts).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
+                    return (
+                      <div key={nm.id}>
+                        <div style={{fontSize:11,fontWeight:700,color:"var(--text2)",marginBottom:6}}>{nm.icon} {nm.label}</div>
+                        {sorted.length === 0
+                          ? <div style={{fontSize:11,color:"var(--text3)"}}>—</div>
+                          : <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
+                              {sorted.map(([name,{count,platoon}]) => (
+                                <div key={name} style={{...getPlatoonStyle(platoon),borderRadius:8,padding:"3px 9px",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:4}}>
+                                  <span>{name}</span>
+                                  <span style={{background:"rgba(0,0,0,0.25)",borderRadius:5,padding:"1px 5px",fontSize:11,fontWeight:800}}>{count}</span>
+                                </div>
+                              ))}
+                            </div>
+                        }
                       </div>
                     );
                   })}

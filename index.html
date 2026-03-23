@@ -151,14 +151,14 @@ const SG_REST_EXEMPT = new Set(["איתן שוורץ","ידידיה אבולעפ
 
 // חריגים ממנוחה לפי יום ומשימה
 const REST_EXEMPTIONS = {
-  "2025_03_10": { siyur_tzo: new Set(["מרדכי אלפרסי","ישי לשם","אלי ברץ"]) }
+  "2026_03_10": { siyur_tzo: new Set(["מרדכי אלפרסי","ישי לשם","אלי ברץ"]) }
 };
 
-const NEW_GAZRA = ["2025_03_13","2025_03_14","2025_03_15","2025_03_16","2025_03_17","2025_03_18","2025_03_19","2025_03_20","2025_03_21","2025_03_22","2025_03_23","2025_03_24","2025_03_25","2025_03_26","2025_03_27","2025_03_28","2025_03_29","2025_03_30","2025_03_31","2025_04_01","2025_04_02","2025_04_03","2025_04_04","2025_04_05","2025_04_06","2025_04_07","2025_04_08","2025_04_09","2025_04_10","2025_04_11","2025_04_12","2025_04_13","2025_04_14","2025_04_15","2025_04_16","2025_04_17"];
+const NEW_GAZRA = ["2026_03_13","2026_03_14","2026_03_15","2026_03_16","2026_03_17","2026_03_18","2026_03_19","2026_03_20","2026_03_21","2026_03_22","2026_03_23","2026_03_24","2026_03_25","2026_03_26","2026_03_27","2026_03_28","2026_03_29","2026_03_30","2026_03_31","2026_04_01","2026_04_02","2026_04_03","2026_04_04","2026_04_05","2026_04_06","2026_04_07","2026_04_08","2026_04_09","2026_04_10","2026_04_11","2026_04_12","2026_04_13","2026_04_14","2026_04_15","2026_04_16","2026_04_17"];
 
 // שעות מיוחדות ליום הראשון של הגזרה (12/3)
 const DAY_TIME_OVERRIDES = {
-  "2025_03_13": {
+  "2026_03_13": {
     "matbah_new":    "שעה 12:00",
     "hetz":          "שעה 12:00",
     "hetz2":         "שעה 12:00",
@@ -173,93 +173,93 @@ const OLD_GAZRA_HIDE = NEW_GAZRA; // המשימות הישנות נסתרות ב
 const MISSION_DEFS = [
   // ═══ גזרה ישנה (עד 11/3) ═══
   { id:"agamim",      label:"אגמים",          icon:"🏊", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#f06292", col:1, startH:0,  endH:24, hideOnDays:OLD_GAZRA_HIDE },
-  { id:"matbah",      label:"מטבח",           icon:"🍳", slots:{commander:0,soldiers:1}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#555",    col:2, startH:8,  endH:14, hideOnDays:[...OLD_GAZRA_HIDE,"2025_03_12"], hideFromDisplay:true },
+  { id:"matbah",      label:"מטבח",           icon:"🍳", slots:{commander:0,soldiers:1}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#555",    col:2, startH:8,  endH:14, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"], hideFromDisplay:true },
   { id:"matbah_boker", label:"מטבח בוקר",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"8:30 - 14:00",    border:"#555",    col:2, startH:8,  endH:14, showOnDays:[] },
   { id:"matbah_tzaharayim", label:"מטבח צהריים", icon:"🍳", slots:{commander:0,soldiers:1}, time:"14:00 - סוף יום", border:"#555", col:2, startH:14, endH:20, showOnDays:[] },
   { id:"hilton",      label:"פילבוקס ביתילו", icon:"🏠", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#f06292", col:1, startH:0,  endH:24, hideOnDays:OLD_GAZRA_HIDE },
   { id:"konnut",      label:"כוננות (חץ)",    icon:"🤜", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#26c6da", col:2, startH:14, endH:24, hideOnDays:OLD_GAZRA_HIDE },
   { id:"siyur_boker", label:"סיור בוקר",      icon:"🚗", slots:{commander:1,soldiers:2}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#26c6da", col:3, startH:6,  endH:14, isSiyur:true, hideOnDays:OLD_GAZRA_HIDE },
-  { id:"siyur_tzo",   label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, hideOnDays:[...OLD_GAZRA_HIDE,"2025_03_12"] },
-  { id:"siyur_layla", label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:6, startH:22, endH:30, isSiyur:true, isNightPatrol:true, hideOnDays:[...OLD_GAZRA_HIDE,"2025_03_12"] },
-  { id:"maatzar",     label:"פעילות מבצעית",  icon:"🔒", slots:{commander:0,soldiers:10},time:"",               border:"#ef5350", col:4, startH:0,  endH:24, hideOnDays:[...OLD_GAZRA_HIDE,"2025_03_12"] },
+  { id:"siyur_tzo",   label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
+  { id:"siyur_layla", label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:6, startH:22, endH:30, isSiyur:true, isNightPatrol:true, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
+  { id:"maatzar",     label:"פעילות מבצעית",  icon:"🔒", slots:{commander:0,soldiers:10},time:"",               border:"#ef5350", col:4, startH:0,  endH:24, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
   { id:"katzin",      label:"קצין מוצב",      icon:"🟡", slots:{commander:1,soldiers:0}, time:"החל מ-6:00",     border:"#555",    col:1, startH:0,  endH:24, noLabel:true, allowedNames:["אריאל טופז","חזי דיין","ידידיה שמואליאן","איתי דרייר"] },
   { id:"gimel",       label:"גימל",           icon:"🤒", slots:{commander:0,soldiers:2}, time:"",               border:"#78909c", col:6, startH:0,  endH:24, noCount:true, hideFromDisplay:true },
-  { id:"rachpan",     label:"קורס רחפנים",    icon:"🚁", slots:{commander:0,soldiers:1}, time:"",               border:"#80cbc4", col:6, startH:0,  endH:24, showOnDays:["2025_03_09","2025_03_10","2025_03_11","2025_03_12"] },
+  { id:"rachpan",     label:"קורס רחפנים",    icon:"🚁", slots:{commander:0,soldiers:1}, time:"",               border:"#80cbc4", col:6, startH:0,  endH:24, showOnDays:["2026_03_09","2026_03_10","2026_03_11","2026_03_12"] },
 
   // ═══ גזרה חדשה (מ-12/3) ═══
-  { id:"matbah_new",    label:"תורנות מטבח",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA.filter(d=>d<"2025_03_19"||d==="2025_03_22") },
-  { id:"matbah_new2",   label:"תורנות מטבח",     icon:"🍳", slots:{commander:0,soldiers:2}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_19"&&d!=="2025_03_22") },
-  { id:"bimuy_oyev",   label:"בימוי אויב",  icon:"🎭", slots:{commander:0,soldiers:2}, time:"14:00 - 19:00 | לדבר עם אסוס בנוגע למידע מחר שמגיעים", border:"#ef5350", col:1, startH:14, endH:19, showOnDays:["2025_03_16"] },
-  { id:"kurs_pritza",  label:"קורס פריצה", icon:"🔓", slots:{commander:0,soldiers:2}, time:"",             border:"#ff9800", col:1, startH:6,  endH:24, showOnDays:["2025_03_17","2025_03_18"] },
-  { id:"amada_maaravit",  label:"עמדה מערבית",      icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 6:00",  border:"#7e57c2", col:1, startH:24, endH:30, showOnDays:NEW_GAZRA.filter(d=>d==="2025_03_13"||d==="2025_03_14") },
+  { id:"matbah_new",    label:"תורנות מטבח",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA.filter(d=>d<"2026_03_19"||d==="2026_03_22") },
+  { id:"matbah_new2",   label:"תורנות מטבח",     icon:"🍳", slots:{commander:0,soldiers:2}, time:"שעה 8:30",        border:"#555",    col:1, startH:8,  endH:14, showOnDays:NEW_GAZRA.filter(d=>d>="2026_03_19"&&d!=="2026_03_22") },
+  { id:"bimuy_oyev",   label:"בימוי אויב",  icon:"🎭", slots:{commander:0,soldiers:2}, time:"14:00 - 19:00 | לדבר עם אסוס בנוגע למידע מחר שמגיעים", border:"#ef5350", col:1, startH:14, endH:19, showOnDays:["2026_03_16"] },
+  { id:"kurs_pritza",  label:"קורס פריצה", icon:"🔓", slots:{commander:0,soldiers:2}, time:"",             border:"#ff9800", col:1, startH:6,  endH:24, showOnDays:["2026_03_17","2026_03_18"] },
+  { id:"amada_maaravit",  label:"עמדה מערבית",      icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 6:00",  border:"#7e57c2", col:1, startH:24, endH:30, showOnDays:NEW_GAZRA.filter(d=>d==="2026_03_13"||d==="2026_03_14") },
   { id:"sg1",           label:'ש"ג 6:00–10:00', icon:"🪖", slots:{commander:0,soldiers:1}, time:"6:00 - 10:00",   border:"#8d6e63", col:2, startH:6,  endH:10, showOnDays:NEW_GAZRA },
   { id:"sg2",           label:'ש"ג 10:00–14:00',icon:"🪖", slots:{commander:0,soldiers:1}, time:"10:00 - 14:00",  border:"#8d6e63", col:2, startH:10, endH:14, showOnDays:NEW_GAZRA },
   { id:"sg3",           label:'ש"ג 14:00–18:00',icon:"🪖", slots:{commander:0,soldiers:1}, time:"14:00 - 18:00",  border:"#8d6e63", col:2, startH:14, endH:18, showOnDays:NEW_GAZRA },
   { id:"sg4",           label:'ש"ג 18:00–22:00',icon:"🪖", slots:{commander:0,soldiers:1}, time:"18:00 - 22:00",  border:"#8d6e63", col:2, startH:18, endH:22, showOnDays:NEW_GAZRA },
   { id:"sg5",           label:'ש"ג 22:00–2:00', icon:"🪖", slots:{commander:0,soldiers:1}, time:"22:00 - 2:00",   border:"#8d6e63", col:2, startH:22, endH:26, showOnDays:NEW_GAZRA },
   { id:"sg6",           label:'ש"ג 2:00–6:00',  icon:"🪖", slots:{commander:0,soldiers:1}, time:"2:00 - 6:00",    border:"#8d6e63", col:2, startH:26, endH:30, showOnDays:NEW_GAZRA },
-  { id:"toren_rasp",    label:'תורן רס"פ',      icon:"🎖️", slots:{commander:0,soldiers:1}, time:"10:00 - 14:00",   border:"#78909c", col:1, startH:10, endH:14, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_17") },
-  { id:"avt_ugda",      label:"אבטחת אוגדה",   icon:"🛡️", slots:{commander:0,soldiers:2}, time:"החל מ-8:00",    border:"#ef5350", col:1, startH:8,  endH:20, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_19") },
+  { id:"toren_rasp",    label:'תורן רס"פ',      icon:"🎖️", slots:{commander:0,soldiers:1}, time:"10:00 - 14:00",   border:"#78909c", col:1, startH:10, endH:14, showOnDays:NEW_GAZRA.filter(d=>d>="2026_03_17") },
+  { id:"avt_ugda",      label:"אבטחת אוגדה",   icon:"🛡️", slots:{commander:0,soldiers:2}, time:"החל מ-8:00",    border:"#ef5350", col:1, startH:8,  endH:20, showOnDays:NEW_GAZRA.filter(d=>d>="2026_03_19") },
   { id:"siyur_boker2",  label:"סיור בוקר",      icon:"🚗", slots:{commander:1,soldiers:2}, time:"6:00 - 14:00",   border:"#26c6da", col:3, startH:6,  endH:14, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_tzo2",    label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_layla2",  label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:3, startH:22, endH:30, isSiyur:true, isNightPatrol:true, showOnDays:NEW_GAZRA },
-  { id:"hetz",          label:"חץ דרוך",        icon:"🏹", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA.filter(d=>d<"2025_03_18") },
-  { id:"hetz2",         label:"חץ דרוך",        icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA.filter(d=>d>="2025_03_18") },
-  { id:"philbox_horsa", label:"פילבוקס חורסה",  icon:"🏠", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#f06292", col:5, startH:0,  endH:24, showOnDays:NEW_GAZRA },
-  { id:"amada_maaravit_a",label:"עמדה מערבית א׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 3:00",  border:"#7e57c2", col:5, startH:24, endH:27, showOnDays:NEW_GAZRA.filter(d=>d!=="2025_03_13"&&d!=="2025_03_14") },
-  { id:"amada_maaravit_b",label:"עמדה מערבית ב׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"3:00 - 6:00",   border:"#7e57c2", col:5, startH:27, endH:30, showOnDays:NEW_GAZRA.filter(d=>d!=="2025_03_13"&&d!=="2025_03_14") },
+  { id:"hetz",          label:"חץ דרוך",        icon:"🏹", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA.filter(d=>d<"2026_03_18") },
+  { id:"hetz2",         label:"חץ דרוך",        icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA.filter(d=>d>="2026_03_18") },
+  { id:"philbox_horsa", label:"פילבוקס חורסה",  icon:"🏠", slots:{commander:2,soldiers:6}, time:"החל מ-14:00",    border:"#f06292", col:5, startH:0,  endH:24, showOnDays:NEW_GAZRA },
+  { id:"amada_maaravit_a",label:"עמדה מערבית א׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 3:00",  border:"#7e57c2", col:5, startH:24, endH:27, showOnDays:NEW_GAZRA.filter(d=>d!=="2026_03_13"&&d!=="2026_03_14") },
+  { id:"amada_maaravit_b",label:"עמדה מערבית ב׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"3:00 - 6:00",   border:"#7e57c2", col:5, startH:27, endH:30, showOnDays:NEW_GAZRA.filter(d=>d!=="2026_03_13"&&d!=="2026_03_14") },
   { id:"karem_negoshot",label:"כרם נגוהות",     icon:"🌿", slots:{commander:1,soldiers:3}, time:"",               border:"#aed581", col:6, startH:0,  endH:24, showOnDays:[] },
 ];
 
 const DAYS = [
-  { id:"2025_03_01", label:"שבת", date:"28/2" },
-  { id:"2025_03_02", label:"ראשון", date:"1/3" },
-  { id:"2025_03_03", label:"שני", date:"2/3" },
-  { id:"2025_03_04", label:"שלישי", date:"3/3" },
-  { id:"2025_03_05", label:"רביעי", date:"4/3" },
-  { id:"2025_03_06", label:"חמישי", date:"5/3" },
-  { id:"2025_03_07", label:"שישי", date:"6/3" },
-  { id:"2025_03_08", label:"שבת", date:"7/3" },
-  { id:"2025_03_09", label:"ראשון", date:"8/3" },
-  { id:"2025_03_10", label:"שני", date:"9/3" },
-  { id:"2025_03_11", label:"שלישי", date:"10/3" },
-  { id:"2025_03_12", label:"רביעי", date:"11/3" },
-  { id:"2025_03_13", label:"חמישי", date:"12/3" },
-  { id:"2025_03_14", label:"שישי", date:"13/3" },
-  { id:"2025_03_15", label:"שבת", date:"14/3" },
-  { id:"2025_03_16", label:"ראשון", date:"15/3" },
-  { id:"2025_03_17", label:"שני", date:"16/3" },
-  { id:"2025_03_18", label:"שלישי", date:"17/3" },
-  { id:"2025_03_19", label:"רביעי", date:"18/3" },
-  { id:"2025_03_20", label:"חמישי", date:"19/3" },
-  { id:"2025_03_21", label:"שישי", date:"20/3" },
-  { id:"2025_03_22", label:"שבת", date:"21/3" },
-  { id:"2025_03_23", label:"ראשון", date:"22/3" },
-  { id:"2025_03_24", label:"שני", date:"23/3" },
-  { id:"2025_03_25", label:"שלישי", date:"24/3" },
-  { id:"2025_03_26", label:"רביעי", date:"25/3" },
-  { id:"2025_03_27", label:"חמישי", date:"26/3" },
-  { id:"2025_03_28", label:"שישי", date:"27/3" },
-  { id:"2025_03_29", label:"שבת", date:"28/3" },
-  { id:"2025_03_30", label:"ראשון", date:"29/3" },
-  { id:"2025_03_31", label:"שני", date:"30/3" },
-  { id:"2025_04_01", label:"שלישי", date:"31/3" },
-  { id:"2025_04_02", label:"רביעי", date:"1/4" },
-  { id:"2025_04_03", label:"חמישי", date:"2/4" },
-  { id:"2025_04_04", label:"שישי", date:"3/4" },
-  { id:"2025_04_05", label:"שבת", date:"4/4" },
-  { id:"2025_04_06", label:"ראשון", date:"5/4" },
-  { id:"2025_04_07", label:"שני", date:"6/4" },
-  { id:"2025_04_08", label:"שלישי", date:"7/4" },
-  { id:"2025_04_09", label:"רביעי", date:"8/4" },
-  { id:"2025_04_10", label:"חמישי", date:"9/4" },
-  { id:"2025_04_11", label:"שישי", date:"10/4" },
-  { id:"2025_04_12", label:"שבת", date:"11/4" },
-  { id:"2025_04_13", label:"ראשון", date:"12/4" },
-  { id:"2025_04_14", label:"שני", date:"13/4" },
-  { id:"2025_04_15", label:"שלישי", date:"14/4" },
-  { id:"2025_04_16", label:"רביעי", date:"15/4" },
-  { id:"2025_04_17", label:"חמישי", date:"16/4" },
+  { id:"2026_03_01", label:"שבת", date:"28/2" },
+  { id:"2026_03_02", label:"ראשון", date:"1/3" },
+  { id:"2026_03_03", label:"שני", date:"2/3" },
+  { id:"2026_03_04", label:"שלישי", date:"3/3" },
+  { id:"2026_03_05", label:"רביעי", date:"4/3" },
+  { id:"2026_03_06", label:"חמישי", date:"5/3" },
+  { id:"2026_03_07", label:"שישי", date:"6/3" },
+  { id:"2026_03_08", label:"שבת", date:"7/3" },
+  { id:"2026_03_09", label:"ראשון", date:"8/3" },
+  { id:"2026_03_10", label:"שני", date:"9/3" },
+  { id:"2026_03_11", label:"שלישי", date:"10/3" },
+  { id:"2026_03_12", label:"רביעי", date:"11/3" },
+  { id:"2026_03_13", label:"חמישי", date:"12/3" },
+  { id:"2026_03_14", label:"שישי", date:"13/3" },
+  { id:"2026_03_15", label:"שבת", date:"14/3" },
+  { id:"2026_03_16", label:"ראשון", date:"15/3" },
+  { id:"2026_03_17", label:"שני", date:"16/3" },
+  { id:"2026_03_18", label:"שלישי", date:"17/3" },
+  { id:"2026_03_19", label:"רביעי", date:"18/3" },
+  { id:"2026_03_20", label:"חמישי", date:"19/3" },
+  { id:"2026_03_21", label:"שישי", date:"20/3" },
+  { id:"2026_03_22", label:"שבת", date:"21/3" },
+  { id:"2026_03_23", label:"ראשון", date:"22/3" },
+  { id:"2026_03_24", label:"שני", date:"23/3" },
+  { id:"2026_03_25", label:"שלישי", date:"24/3" },
+  { id:"2026_03_26", label:"רביעי", date:"25/3" },
+  { id:"2026_03_27", label:"חמישי", date:"26/3" },
+  { id:"2026_03_28", label:"שישי", date:"27/3" },
+  { id:"2026_03_29", label:"שבת", date:"28/3" },
+  { id:"2026_03_30", label:"ראשון", date:"29/3" },
+  { id:"2026_03_31", label:"שני", date:"30/3" },
+  { id:"2026_04_01", label:"שלישי", date:"31/3" },
+  { id:"2026_04_02", label:"רביעי", date:"1/4" },
+  { id:"2026_04_03", label:"חמישי", date:"2/4" },
+  { id:"2026_04_04", label:"שישי", date:"3/4" },
+  { id:"2026_04_05", label:"שבת", date:"4/4" },
+  { id:"2026_04_06", label:"ראשון", date:"5/4" },
+  { id:"2026_04_07", label:"שני", date:"6/4" },
+  { id:"2026_04_08", label:"שלישי", date:"7/4" },
+  { id:"2026_04_09", label:"רביעי", date:"8/4" },
+  { id:"2026_04_10", label:"חמישי", date:"9/4" },
+  { id:"2026_04_11", label:"שישי", date:"10/4" },
+  { id:"2026_04_12", label:"שבת", date:"11/4" },
+  { id:"2026_04_13", label:"ראשון", date:"12/4" },
+  { id:"2026_04_14", label:"שני", date:"13/4" },
+  { id:"2026_04_15", label:"שלישי", date:"14/4" },
+  { id:"2026_04_16", label:"רביעי", date:"15/4" },
+  { id:"2026_04_17", label:"חמישי", date:"16/4" },
 ];
 
 const DAY_IDS = DAYS.map(d=>d.id);
@@ -346,9 +346,9 @@ function getBlockedNames(allAss, targetDayId, targetMission, missionSettings, pl
     });
 
     // מנוחה אחרי ש"ג ועמדה מערבית — לפי missionSettings
-    MISSION_DEFS.filter(m => m.id.startsWith("sg") || m.id==="amada_maaravit" || m.id==="amada_maaravit_a" || m.id==="amada_maaravit_b" || m.id==="toren_rasp").forEach(sm => {
+    MISSION_DEFS.filter(m => m.id.startsWith("sg") || m.id==="amada_maaravit" || m.id==="amada_maaravit_a" || m.id==="amada_maaravit_b" || m.id==="toren_rasp" || m.id==="hetz" || m.id==="hetz2").forEach(sm => {
       const ass = da[sm.id]; if (!ass) return;
-      const restH = ms[sm.id]?.restHours ?? (sm.id==="toren_rasp" ? 8 : 12);
+      const restH = ms[sm.id]?.restHours ?? (sm.id==="toren_rasp" ? 8 : (sm.id==="hetz"||sm.id==="hetz2") ? 12 : 12);
       if (restH === 0) return;
       const isSameSlot = (dayId===targetDayId && sm.id===targetMission.id);
       if (isSameSlot) return;
@@ -417,13 +417,13 @@ function DisplayCard({ mission, assignment, dayId }) {
         ) : mission.id==="katzin" ? (
           /* קצין מוצב — קוביה אחת צמודה */
           <div style={{display:"flex",flexDirection:"column",gap:4}}>
-            {dayId==="2025_03_14" && (
+            {dayId==="2026_03_14" && (
               <div style={{fontSize:10,color:"#a5d6a7",background:"#66bb6a22",borderRadius:6,padding:"3px 7px",textAlign:"center",marginBottom:2}}>אריאל טופז החל מ-6:00 🟡</div>
             )}
-            {dayId==="2025_03_14" && (
+            {dayId==="2026_03_14" && (
               <div style={{fontSize:10,color:"#ce93d8",background:"#ab47bc22",borderRadius:6,padding:"3px 7px",textAlign:"center",marginBottom:2}}>ידידיה שמואליאן החל מ-14:00 🟡</div>
             )}
-            {!(dayId==="2025_03_14") && ass.commanders.map((p,i)=>(
+            {!(dayId==="2026_03_14") && ass.commanders.map((p,i)=>(
                 <div key={i} className={`ntag ${p?"filled":"empty"}`} style={p?getPlatoonStyle(p.platoon):{}}>{p?p.name:"קצין"}</div>
               ))
             }
@@ -438,10 +438,10 @@ function DisplayCard({ mission, assignment, dayId }) {
         ) : mission.id==="matbah"||mission.id==="matbah_boker"||mission.id==="matbah_tzaharayim"||mission.id==="matbah_new"||mission.id.startsWith("sg")||mission.id==="amada_maaravit"||mission.id==="amada_maaravit_a"||mission.id==="amada_maaravit_b"||mission.id==="bimuy_oyev"||mission.id==="kurs_pritza"||mission.id==="toren_rasp" ? (
           /* מטבח / ש"ג / עמדה — חייל אחד על כל הרוחב */
           <div style={{display:"flex",flexDirection:"column",gap:4}}>
-            {(mission.id==="matbah"||mission.id==="matbah_new"||mission.id==="matbah_new2") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16"||dayId==="2025_03_17") && (
-              <div style={{fontSize:10,color:"#ffcc80",background:"#ff980022",borderRadius:6,padding:"3px 7px",textAlign:"center",marginBottom:2}}>כוח חץ דרוך 🏹{dayId==="2025_03_15" ? " — אבי גולדשטיין" : dayId==="2025_03_16" ? " — יאיר ספיר" : dayId==="2025_03_17" ? " — ישי אדרי" : ""}</div>
+            {(mission.id==="matbah"||mission.id==="matbah_new"||mission.id==="matbah_new2") && (dayId==="2026_03_14"||dayId==="2026_03_15"||dayId==="2026_03_16"||dayId==="2026_03_17") && (
+              <div style={{fontSize:10,color:"#ffcc80",background:"#ff980022",borderRadius:6,padding:"3px 7px",textAlign:"center",marginBottom:2}}>כוח חץ דרוך 🏹{dayId==="2026_03_15" ? " — אבי גולדשטיין" : dayId==="2026_03_16" ? " — יאיר ספיר" : dayId==="2026_03_17" ? " — ישי אדרי" : ""}</div>
             )}
-            {!((mission.id==="matbah"||mission.id==="matbah_new"||mission.id==="matbah_new2") && (dayId==="2025_03_14"||dayId==="2025_03_15"||dayId==="2025_03_16"||dayId==="2025_03_17")) && ass.soldiers.map((p,i)=>(
+            {!((mission.id==="matbah"||mission.id==="matbah_new"||mission.id==="matbah_new2") && (dayId==="2026_03_14"||dayId==="2026_03_15"||dayId==="2026_03_16"||dayId==="2026_03_17")) && ass.soldiers.map((p,i)=>(
               <div key={i} className={`ntag ${p?"filled":"empty"}`} style={{...(p?getPlatoonStyle(p.platoon):{}),width:"100%",textAlign:"center",fontSize:13,fontWeight:700,padding:"6px 8px"}}>{p?p.name:"חייל"}</div>
             ))}
           </div>
@@ -488,10 +488,17 @@ function SlotBox({ label, assigned, onRemove, onClick, highlight }) {
 
 function App() {
   const [activeDay,setActiveDay] = useState(() => {
-    const today = new Date();
+    const now = new Date();
     const pad = n => String(n).padStart(2,'0');
-    const todayId = `${today.getFullYear()}_${pad(today.getMonth()+1)}_${pad(today.getDate())}`;
-    return DAY_IDS.includes(todayId) ? todayId : (DAY_IDS.find(d=>d>=todayId) || DAY_IDS[DAY_IDS.length-1]);
+    const todayStr = `${+now.getDate()}/${+now.getMonth()+1}`;
+    // חפש לפי date המוצג
+    const match = DAYS.find(d => d.date === todayStr);
+    if (match) return match.id;
+    // fallback: חפש לפי id
+    const todayId = `${now.getFullYear()}_${pad(now.getMonth()+1)}_${pad(now.getDate())}`;
+    if (DAY_IDS.includes(todayId)) return todayId;
+    const future = DAY_IDS.find(d=>d>=todayId);
+    return future || DAY_IDS[DAY_IDS.length-1];
   });
   const activeDayObj = DAYS.find(d=>d.id===activeDay);
   const [activeMission,setActiveMission] = useState(MISSION_DEFS[0].id);
@@ -640,7 +647,7 @@ function App() {
     const s = {};
     MISSION_DEFS.forEach(m => {
       s[m.id] = {
-        restHours: m.isSiyur ? 16 : (m.id.startsWith("sg")||m.id==="amada_maaravit"||m.id==="amada_maaravit_a"||m.id==="amada_maaravit_b") ? 12 : m.id==="toren_rasp" ? 8 : 0,
+        restHours: m.isSiyur ? 16 : (m.id.startsWith("sg")||m.id==="amada_maaravit"||m.id==="amada_maaravit_a"||m.id==="amada_maaravit_b") ? 12 : m.id==="toren_rasp" ? 8 : (m.id==="hetz"||m.id==="hetz2") ? 12 : 0,
         startH: m.startH,
         endH: m.endH % 24 === 0 ? 24 : m.endH % 24,
         slots_commander: m.slots.commander,
@@ -681,8 +688,12 @@ function App() {
     const patch = {missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, platoons: Object.fromEntries(Object.entries(platoons).map(([k,p])=>[k,p.members]))};
     clearTimeout(_settingsSaveTimer.current);
     _settingsSaveTimer.current = setTimeout(() => {
-      window._firebaseSet(window._firebaseRef(window._firebaseDb, 'shabzak/settings'), patch).catch(()=>{});
-    }, 600);
+      // סמן כ-local write כדי למנוע overwrite של שיבוצים
+      isLocalWrite.current = true;
+      window._firebaseSet(window._firebaseRef(window._firebaseDb, 'shabzak/settings'), patch)
+        .catch(()=>{})
+        .finally(()=>{ setTimeout(()=>{ isLocalWrite.current = false; }, 1000); });
+    }, 1000);
   }, [missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, platoons, fbReady]);
 
   // מסך סיסמה — רק אחרי כל ה-hooks
@@ -710,7 +721,7 @@ function App() {
         return true;
       }).map(m=>m.id)
     );
-    const excludedIds = new Set(["katzin","maatzar","gimel","rachpan","hetz","hetz2","philbox_horsa","amada_maaravit","amada_maaravit_a","amada_maaravit_b","toren_rasp","matbah_new","matbah_new2"]);
+    const excludedIds = new Set(["katzin","maatzar","gimel","rachpan","hetz","hetz2","amada_maaravit","amada_maaravit_a","amada_maaravit_b","toren_rasp","matbah_new","matbah_new2"]);
     return new Set(
       Object.entries(dayAss)
         .filter(([mid]) => visibleIds.has(mid) && !excludedIds.has(mid))
@@ -818,7 +829,7 @@ function App() {
     return (
       <div className="main">
         <div style={{position:"relative"}}>
-        {activeDay==="2025_03_10" && (
+        {activeDay==="2026_03_10" && (
           <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}}>
             <div style={{background:"#1a2a1a",border:"1px solid #4caf5066",borderRadius:10,padding:"8px 14px",fontSize:12,color:"#a5d6a7",display:"flex",gap:6,alignItems:"center"}}>
               <span>📡</span><span><strong>חמ"ל מחר:</strong> שילה דוד תפוס 6:00–18:00</span>
@@ -943,6 +954,22 @@ function App() {
 
         <div className="builder-right">
           <div style={{fontSize:12,color:"var(--text2)",marginBottom:14}}>סמן אנשים ואז לחץ על תא פנוי במשימה — ניתן לבחור כמה בבת אחת</div>
+          {/* סד"כ כללי */}
+          {(() => {
+            const cmdKeys = [...CMD_PLATOONS];
+            const solKeys = Object.keys(platoons).filter(k => !CMD_PLATOONS.has(k));
+            const totalCmd = cmdKeys.reduce((s,k)=>s+(platoons[k]?.members.length||0),0);
+            const totalSol = solKeys.reduce((s,k)=>s+(platoons[k]?.members.length||0),0);
+            const totalAll = totalCmd + totalSol;
+            return (
+              <div style={{background:"var(--surface)",border:"1.5px solid var(--border)",borderRadius:10,padding:"8px 14px",marginBottom:14,display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}}>
+                <span style={{fontSize:11,fontWeight:700,color:"var(--text2)"}}>סד"כ:</span>
+                <span style={{fontSize:11,color:"#ff9800"}}>⭐ מפקדים: {totalCmd}</span>
+                <span style={{fontSize:11,color:"#4db6e8"}}>🪖 חיילים: {totalSol}</span>
+                <span style={{fontSize:11,color:"var(--text)",fontWeight:700}}>👥 כללי: {totalAll}</span>
+              </div>
+            );
+          })()}
 
 
 
@@ -954,24 +981,46 @@ function App() {
             );
             const aftarNames = new Set(aftarByDay[activeDay]||[]);
             const gimelNames = new Set([...(dayAss["gimel"]?.soldiers||[])].filter(Boolean).map(p=>p.name));
-            const free = allMembers.filter(({name}) => !assignedNames.has(name) && !aftarNames.has(name) && !gimelNames.has(name));
+            // מי שמאפטר היום — חוזר ב-14:00, פנוי מ-14:00
+            const prevDayIdx = DAY_IDS.indexOf(activeDay) - 1;
+            const prevAftar = new Set(prevDayIdx >= 0 ? (aftarByDay[DAY_IDS[prevDayIdx]]||[]) : []);
+            // פנוי לגמרי
+            const trulyFree = allMembers.filter(({name}) => !assignedNames.has(name) && !aftarNames.has(name) && !gimelNames.has(name) && !prevAftar.has(name));
+            // חוזר מאפטר היום ב-14:00 (לא משובץ)
+            const returningAftar = allMembers.filter(({name}) => !assignedNames.has(name) && !aftarNames.has(name) && !gimelNames.has(name) && prevAftar.has(name));
+            const total = trulyFree.length + returningAftar.length;
             return (
               <div style={{background:"var(--surface)",border:"1.5px solid var(--border)",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
                 <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
                   <span style={{fontSize:16}}>🕊️</span>
                   <div style={{fontSize:14,fontWeight:700,flex:1}}>חיילים פנויים</div>
-                  <div style={{fontSize:11,color:"var(--text3)"}}>{free.length} חיילים</div>
+                  <div style={{fontSize:11,color:"var(--text3)"}}>{total} חיילים</div>
                 </div>
-                <div style={{padding:"10px 12px"}}>
-                  {free.length === 0
+                <div style={{padding:"10px 12px",display:"flex",flexDirection:"column",gap:10}}>
+                  {total === 0
                     ? <div style={{fontSize:12,color:"var(--text3)"}}>כולם משובצים 🎉</div>
-                    : <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-                        {free.map(({name,platoon})=>(
-                          <div key={name} style={{...getPlatoonStyle(platoon),borderRadius:8,padding:"4px 10px",fontSize:12,fontWeight:600}}>
-                            {name}
+                    : <>
+                        {trulyFree.length > 0 && (
+                          <div>
+                            <div style={{fontSize:11,color:"var(--text3)",marginBottom:5}}>✅ פנויים לגמרי ({trulyFree.length})</div>
+                            <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
+                              {trulyFree.map(({name,platoon})=>(
+                                <div key={name} style={{...getPlatoonStyle(platoon),borderRadius:8,padding:"4px 10px",fontSize:12,fontWeight:600}}>{name}</div>
+                              ))}
+                            </div>
                           </div>
-                        ))}
-                      </div>
+                        )}
+                        {returningAftar.length > 0 && (
+                          <div>
+                            <div style={{fontSize:11,color:"#ff9800",marginBottom:5}}>🏠 חוזרים מאפטר ב-{aftarSettings.endH}:00 ({returningAftar.length})</div>
+                            <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
+                              {returningAftar.map(({name,platoon})=>(
+                                <div key={name} style={{...getPlatoonStyle(platoon),borderRadius:8,padding:"4px 10px",fontSize:12,fontWeight:600,opacity:0.75}}>{name}</div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
                   }
                 </div>
               </div>
@@ -982,11 +1031,11 @@ function App() {
             <div className="aftar-header">
               <span style={{fontSize:16}}>🏠</span>
               <div className="aftar-title" style={{fontSize:14}}>אפטר</div>
-              <div style={{fontSize:11,color:"var(--text3)"}}>{aftarThisDay.length}/20</div>
+              <div style={{fontSize:11,color:"var(--text3)"}}>{aftarThisDay.length}/25</div>
               {selPeople.length>0 && (
                 <button onClick={()=>{
                   const toAdd=selPeople.map(p=>p.name).filter(n=>!aftarThisDay.includes(n));
-                  if(aftarThisDay.length+toAdd.length<=20){
+                  if(aftarThisDay.length+toAdd.length<=25){
                     setAftarByDayAndSave(prev=>({...prev,[activeDay]:[...(prev[activeDay]||[]),...toAdd]}));
                     setSelPeople([]);
                   }
@@ -1016,6 +1065,22 @@ function App() {
               <div className="pool-lbl" style={{color:p.color,borderColor:p.color+"33"}}>
                 <div style={{width:8,height:8,borderRadius:"50%",background:p.color,flexShrink:0}}/>
                 {p.label}
+                {(() => {
+                  const total = p.members.length;
+                  const inAftar = p.members.filter(n => aftarThisDay.includes(n)).length;
+                  const assigned = p.members.filter(n => assignedThisDay.has(n)).length;
+                  const free = p.members.filter(n => !assignedThisDay.has(n) && !aftarThisDay.includes(n) && !(dayAss["gimel"]?.soldiers||[]).filter(Boolean).some(s=>s.name===n)).length;
+                  const isCmdPlatoon = CMD_PLATOONS.has(key);
+                  const cmdLabel = isCmdPlatoon ? `מפקדים: ${total}` : `חיילים: ${total}`;
+                  return (
+                    <span style={{marginRight:"auto",fontSize:10,color:"var(--text3)",display:"flex",gap:6,flexWrap:"wrap"}}>
+                      <span title="סד״כ" style={{color:p.color,fontWeight:700}}>{total}</span>
+                      <span title="משובצים" style={{color:"#26c6da"}}>✓ {assigned}</span>
+                      <span title="אפטר" style={{color:"#ff9800"}}>🏠 {inAftar}</span>
+                      <span title="פנויים" style={{color:"#66bb6a"}}>🕊️ {free}</span>
+                    </span>
+                  );
+                })()}
               </div>
               <div className="pool-chips">
                 {p.members.map(name=>{
@@ -1445,8 +1510,10 @@ function App() {
             const counts = {};
             allMembers.forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
             // נתונים ידניים — תורני מטבח מכוח חץ דרוך
-            const manualMatbah = ["יעקב נרי","אברהם גולדשטיין","יאיר ספיר","ישי אדרי","ניב לאופר","ניב לאופר","ניב לאופר"];
-            manualMatbah.forEach(name => { if (counts[name] !== undefined) counts[name].count += 1; });
+            const manualMatbahMap = {"יעקב נרי":1,"אברהם גולדשטיין":1,"יאיר ספיר":1,"ישי אדרי":1,"ניב לאופר":3,"דימה":1,"רועי שאג":1.5};
+            Object.entries(manualMatbahMap).forEach(([name, count]) => {
+              if (counts[name] !== undefined) counts[name].count += count;
+            });
             DAY_IDS.forEach(dayId => {
               const da = allAss[dayId] || {};
               matbahIds.forEach(mid => {
@@ -1716,8 +1783,18 @@ function App() {
             reader.onload=(ev)=>{
               try {
                 const data=JSON.parse(ev.target.result);
-                if(data.ass) setAllAssAndSave(data.ass);
-                if(data.aftar) setAftarByDayAndSave(data.aftar);
+                // המרת תאריכים ישנים 2025 ל-2026
+                const fixDates = (obj) => {
+                  if (!obj) return obj;
+                  const fixed = {};
+                  Object.entries(obj).forEach(([k,v]) => {
+                    const newK = k.startsWith('2025_') ? k.replace('2025_','2026_') : k;
+                    fixed[newK] = v;
+                  });
+                  return fixed;
+                };
+                if(data.ass) setAllAssAndSave(fixDates(data.ass));
+                if(data.aftar) setAftarByDayAndSave(fixDates(data.aftar));
                 alert("השיבוצים נטענו בהצלחה ✓");
               } catch(err){ alert("שגיאה בקריאת הקובץ"); }
             };

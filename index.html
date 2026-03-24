@@ -174,8 +174,8 @@ const MISSION_DEFS = [
   // ═══ גזרה ישנה (עד 11/3) ═══
   { id:"agamim",      label:"אגמים",          icon:"🏊", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#f06292", col:1, startH:0,  endH:24, hideOnDays:OLD_GAZRA_HIDE },
   { id:"matbah",      label:"מטבח",           icon:"🍳", slots:{commander:0,soldiers:1}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#555",    col:2, startH:8,  endH:14, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"], hideFromDisplay:true },
-  { id:"matbah_boker", label:"מטבח בוקר",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"8:30 - 14:00",    border:"#555",    col:2, startH:8,  endH:14, showOnDays:[] },
-  { id:"matbah_tzaharayim", label:"מטבח צהריים", icon:"🍳", slots:{commander:0,soldiers:1}, time:"14:00 - סוף יום", border:"#555", col:2, startH:14, endH:20, showOnDays:[] },
+  { id:"matbah_boker", label:"תורנות מטבח א׳ (עד 14:00)",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"8:30 - 14:00",    border:"#555",    col:1, startH:8,  endH:14, showOnDays:null, hideFromDisplay:false },
+  { id:"matbah_tzaharayim", label:"תורנות מטבח ב׳ (14:00+)", icon:"🍳", slots:{commander:0,soldiers:1}, time:"14:00 - סוף יום", border:"#555", col:1, startH:14, endH:20, showOnDays:null, hideFromDisplay:false },
   { id:"hilton",      label:"פילבוקס ביתילו", icon:"🏠", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#f06292", col:1, startH:0,  endH:24, hideOnDays:OLD_GAZRA_HIDE },
   { id:"konnut",      label:"כוננות (חץ)",    icon:"🤜", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#26c6da", col:2, startH:14, endH:24, hideOnDays:OLD_GAZRA_HIDE },
   { id:"siyur_boker", label:"סיור בוקר",      icon:"🚗", slots:{commander:1,soldiers:2}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#26c6da", col:3, startH:6,  endH:14, isSiyur:true, hideOnDays:OLD_GAZRA_HIDE },
@@ -662,7 +662,11 @@ function App() {
   const [aftarSettings, setAftarSettings] = useState({ startH: 14, endH: 14 });
   const [specials, setSpecials] = useState([]);
   const [spontMissions, setSpontMissions] = useState([]);
-  const [hiddenMissionsByDay, setHiddenMissionsByDay] = useState({});
+  const [hiddenMissionsByDay, setHiddenMissionsByDay] = useState(() => {
+    const init = {};
+    DAY_IDS.forEach(d => { init[d] = ["matbah_boker","matbah_tzaharayim"]; });
+    return init;
+  });
   const [deletedMissions, setDeletedMissions] = useState([]);
   const [platoons, setPlatoons] = useState(() => JSON.parse(JSON.stringify(PLATOONS_DEFAULT)));
   React.useEffect(() => { window._platoons = platoons; }, [platoons]);
@@ -1647,21 +1651,20 @@ function App() {
             );
           })()}
 
-          {/* NIGHT WATCH TRACKER */}
+          {/* ALL MISSIONS TRACKER */}
           {(() => {
-            const nightMissions = [
-              { id:"sg6",              label:'ש"ג 2:00–6:00',       icon:"🪖" },
-              { id:"amada_maaravit_a", label:"עמדה מערבית א׳ 00:00–3:00", icon:"🔭" },
-              { id:"amada_maaravit_b", label:"עמדה מערבית ב׳ 3:00–6:00",  icon:"🔭" },
-            ];
+            const trackMissions = MISSION_DEFS.filter(m =>
+              !m.hideFromDisplay &&
+              !["maatzar","gimel","rachpan","katzin","matbah","hilton","agamim","konnut","siyur_boker","siyur_tzo","siyur_layla"].includes(m.id)
+            );
             return (
-              <div style={{background:"var(--surface)",border:"1.5px solid #7e57c244",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
+              <div style={{background:"var(--surface)",border:"1.5px solid var(--border)",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
                 <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
-                  <span style={{fontSize:16}}>🌙</span>
-                  <div style={{fontSize:14,fontWeight:700,flex:1}}>מעקב שמירות לילה</div>
+                  <span style={{fontSize:16}}>📋</span>
+                  <div style={{fontSize:14,fontWeight:700,flex:1}}>מעקב כל המשימות</div>
                 </div>
-                <div style={{padding:"10px 12px",display:"flex",flexDirection:"column",gap:12}}>
-                  {nightMissions.map(nm => {
+                <div style={{padding:"10px 12px",display:"flex",flexDirection:"column",gap:10}}>
+                  {trackMissions.map(nm => {
                     const counts = {};
                     allMembers.forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
                     DAY_IDS.forEach(dayId => {
@@ -1671,20 +1674,18 @@ function App() {
                       });
                     });
                     const sorted = Object.entries(counts).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
+                    if (sorted.length === 0) return null;
                     return (
                       <div key={nm.id}>
-                        <div style={{fontSize:11,fontWeight:700,color:"var(--text2)",marginBottom:6}}>{nm.icon} {nm.label}</div>
-                        {sorted.length === 0
-                          ? <div style={{fontSize:11,color:"var(--text3)"}}>—</div>
-                          : <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
-                              {sorted.map(([name,{count,platoon}]) => (
-                                <div key={name} style={{...getPlatoonStyle(platoon),borderRadius:8,padding:"3px 9px",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:4}}>
-                                  <span>{name}</span>
-                                  <span style={{background:"rgba(0,0,0,0.25)",borderRadius:5,padding:"1px 5px",fontSize:11,fontWeight:800}}>{count}</span>
-                                </div>
-                              ))}
+                        <div style={{fontSize:11,fontWeight:700,color:"var(--text2)",marginBottom:5}}>{nm.icon} {nm.label} <span style={{fontWeight:400,color:"var(--text3)"}}>{nm.time}</span></div>
+                        <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
+                          {sorted.map(([name,{count,platoon}]) => (
+                            <div key={name} style={{...getPlatoonStyle(platoon),borderRadius:8,padding:"3px 9px",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:4}}>
+                              <span>{name}</span>
+                              <span style={{background:"rgba(0,0,0,0.25)",borderRadius:5,padding:"1px 5px",fontSize:11,fontWeight:800}}>{count}</span>
                             </div>
-                        }
+                          ))}
+                        </div>
                       </div>
                     );
                   })}

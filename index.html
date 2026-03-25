@@ -144,6 +144,8 @@ const PLATOONS_DEFAULT = {
 };
 
 const CMD_PLATOONS = new Set(["cmd1","cmd2","cmd3","pluga","pluga2"]);
+// סדר קבוע של פלטונים בתצוגה
+const PLATOON_ORDER = ["cmd1","soldiers1","cmd2","soldiers2","cmd3","soldiers3","pluga","pluga2"];
 // רק אלה יכולים לבצע כמה משימות במקביל וללא מנוחה
 const MULTI_MISSION_OFFICERS = new Set(["אריאל טופז","ידידיה שמואליאן","חזי דיין","ידידיה אבולעפיה","שמואל ברגלס","איתן שוורץ","משה חדד"]);
 // פטור ממנוחה בין ש"גים לחיילים ספציפיים
@@ -203,12 +205,10 @@ const MISSION_DEFS = [
   { id:"siyur_boker2",  label:"סיור בוקר",      icon:"🚗", slots:{commander:1,soldiers:2}, time:"6:00 - 14:00",   border:"#26c6da", col:3, startH:6,  endH:14, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_tzo2",    label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_layla2",  label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:3, startH:22, endH:30, isSiyur:true, isNightPatrol:true, showOnDays:NEW_GAZRA },
-  { id:"hetz",          label:"חץ דרוך",        icon:"🏹", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA.filter(d=>d<"2026_03_18") },
-  { id:"hetz2",         label:"חץ דרוך",        icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA.filter(d=>d>="2026_03_18") },
+  { id:"hetz2",         label:"חץ דרוך",        icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA },
   { id:"philbox_horsa", label:"פילבוקס חורסה",  icon:"🏠", slots:{commander:2,soldiers:6}, time:"החל מ-14:00",    border:"#f06292", col:5, startH:0,  endH:24, showOnDays:NEW_GAZRA },
   { id:"amada_maaravit_a",label:"עמדה מערבית א׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 3:00",  border:"#7e57c2", col:5, startH:24, endH:27, showOnDays:NEW_GAZRA.filter(d=>d!=="2026_03_13"&&d!=="2026_03_14") },
   { id:"amada_maaravit_b",label:"עמדה מערבית ב׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"3:00 - 6:00",   border:"#7e57c2", col:5, startH:27, endH:30, showOnDays:NEW_GAZRA.filter(d=>d!=="2026_03_13"&&d!=="2026_03_14") },
-  { id:"karem_negoshot",label:"כרם נגוהות",     icon:"🌿", slots:{commander:1,soldiers:3}, time:"",               border:"#aed581", col:6, startH:0,  endH:24, showOnDays:[] },
 ];
 
 const DAYS = [
@@ -260,6 +260,20 @@ const DAYS = [
   { id:"2026_04_15", label:"שלישי", date:"14/4" },
   { id:"2026_04_16", label:"רביעי", date:"15/4" },
   { id:"2026_04_17", label:"חמישי", date:"16/4" },
+  { id:"2026_04_18", label:"שישי", date:"17/4" },
+  { id:"2026_04_19", label:"שבת", date:"18/4" },
+  { id:"2026_04_20", label:"ראשון", date:"19/4" },
+  { id:"2026_04_21", label:"שני", date:"20/4" },
+  { id:"2026_04_22", label:"שלישי", date:"21/4" },
+  { id:"2026_04_23", label:"רביעי", date:"22/4" },
+  { id:"2026_04_24", label:"חמישי", date:"23/4" },
+  { id:"2026_04_25", label:"שישי", date:"24/4" },
+  { id:"2026_04_26", label:"שבת", date:"25/4" },
+  { id:"2026_04_27", label:"ראשון", date:"26/4" },
+  { id:"2026_04_28", label:"שני", date:"27/4" },
+  { id:"2026_04_29", label:"שלישי", date:"28/4" },
+  { id:"2026_04_30", label:"רביעי", date:"29/4" },
+  { id:"2026_05_01", label:"חמישי", date:"30/4" },
 ];
 
 const DAY_IDS = DAYS.map(d=>d.id);
@@ -1312,8 +1326,8 @@ function App() {
                           <label style={{fontSize:11,color:"var(--text2)"}}>שעת התחלה<input type="number" min={0} max={30} style={inp} value={draft.startH} onChange={e=>setDraft(d=>({...d,startH:+e.target.value}))}/></label>
                           <label style={{fontSize:11,color:"var(--text2)"}}>שעת סיום<input type="number" min={0} max={30} style={inp} value={draft.endH} onChange={e=>setDraft(d=>({...d,endH:+e.target.value}))}/></label>
                           <label style={{fontSize:11,color:"var(--text2)"}}>מנוחה (שעות)<input type="number" min={0} max={24} style={inp} value={draft.restHours} onChange={e=>setDraft(d=>({...d,restHours:+e.target.value}))}/></label>
-                          <label style={{fontSize:11,color:"var(--text2)"}}>מפקדים<input type="number" min={0} max={10} style={inp} value={draft.slots_commander} onChange={e=>setDraft(d=>({...d,slots_commander:+e.target.value}))}/></label>
-                          <label style={{fontSize:11,color:"var(--text2)"}}>חיילים<input type="number" min={0} max={20} style={inp} value={draft.slots_soldiers} onChange={e=>setDraft(d=>({...d,slots_soldiers:+e.target.value}))}/></label>
+                          <label style={{fontSize:11,color:"var(--text2)"}}>מפקדים<input type="number" min={0} max={10} style={inp} value={String(draft.slots_commander||0)} onChange={e=>setDraft(d=>({...d,slots_commander:Math.max(0,parseInt(e.target.value)||0)}))}/></label>
+                          <label style={{fontSize:11,color:"var(--text2)"}}>חיילים<input type="number" min={0} max={20} style={inp} value={String(draft.slots_soldiers||0)} onChange={e=>setDraft(d=>({...d,slots_soldiers:Math.max(0,parseInt(e.target.value)||0)}))}/></label>
                         </div>
                         <label style={{fontSize:11,color:"var(--text2)"}}>
                           חיילים מורשים (ריק = כולם)
@@ -1510,7 +1524,15 @@ function App() {
                 if (aftarCounts[name] !== undefined) aftarCounts[name].count++;
               });
             });
-            const sorted = Object.entries(aftarCounts).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
+            // סדר לפי מחלקות תחילה, אחר כך לפי שם עולה
+            const sorted = Object.entries(aftarCounts)
+              .filter(([,v])=>v.count>0)
+              .sort((a,b)=>{
+                const platoonOrderA = PLATOON_ORDER.indexOf(a[1].platoon);
+                const platoonOrderB = PLATOON_ORDER.indexOf(b[1].platoon);
+                if (platoonOrderA !== platoonOrderB) return platoonOrderA - platoonOrderB;
+                return a[0].localeCompare(b[0],"he");
+              });
             return (
               <div style={{background:"var(--surface)",border:"1.5px solid #26c6da44",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
                 <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
@@ -1556,7 +1578,12 @@ function App() {
                 });
               });
             });
-            const sorted = Object.entries(counts).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
+            const sorted = Object.entries(counts).filter(([,v])=>v.count>0).sort((a,b)=>{
+                const platoonOrderA = PLATOON_ORDER.indexOf(a[1].platoon);
+                const platoonOrderB = PLATOON_ORDER.indexOf(b[1].platoon);
+                if (platoonOrderA !== platoonOrderB) return platoonOrderA - platoonOrderB;
+                return a[0].localeCompare(b[0],"he");
+              });
             return (
               <div style={{background:"var(--surface)",border:"1.5px solid #ff980044",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
                 <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
@@ -1673,7 +1700,12 @@ function App() {
                         if (counts[p.name] !== undefined) counts[p.name].count++;
                       });
                     });
-                    const sorted = Object.entries(counts).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
+                    const sorted = Object.entries(counts).filter(([,v])=>v.count>0).sort((a,b)=>{
+                      const platoonOrderA = PLATOON_ORDER.indexOf(a[1].platoon);
+                      const platoonOrderB = PLATOON_ORDER.indexOf(b[1].platoon);
+                      if (platoonOrderA !== platoonOrderB) return platoonOrderA - platoonOrderB;
+                      return a[0].localeCompare(b[0],"he");
+                    });
                     if (sorted.length === 0) return null;
                     return (
                       <div key={nm.id}>

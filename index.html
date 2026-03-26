@@ -144,8 +144,6 @@ const PLATOONS_DEFAULT = {
 };
 
 const CMD_PLATOONS = new Set(["cmd1","cmd2","cmd3","pluga","pluga2"]);
-// סדר קבוע של פלטונים בתצוגה
-const PLATOON_ORDER = ["cmd1","soldiers1","cmd2","soldiers2","cmd3","soldiers3","pluga","pluga2"];
 // רק אלה יכולים לבצע כמה משימות במקביל וללא מנוחה
 const MULTI_MISSION_OFFICERS = new Set(["אריאל טופז","ידידיה שמואליאן","חזי דיין","ידידיה אבולעפיה","שמואל ברגלס","איתן שוורץ","משה חדד"]);
 // פטור ממנוחה בין ש"גים לחיילים ספציפיים
@@ -156,7 +154,7 @@ const REST_EXEMPTIONS = {
   "2026_03_10": { siyur_tzo: new Set(["מרדכי אלפרסי","ישי לשם","אלי ברץ"]) }
 };
 
-const NEW_GAZRA = ["2026_03_13","2026_03_14","2026_03_15","2026_03_16","2026_03_17","2026_03_18","2026_03_19","2026_03_20","2026_03_21","2026_03_22","2026_03_23","2026_03_24","2026_03_25","2026_03_26","2026_03_27","2026_03_28","2026_03_29","2026_03_30","2026_03_31","2026_04_01","2026_04_02","2026_04_03","2026_04_04","2026_04_05","2026_04_06","2026_04_07","2026_04_08","2026_04_09","2026_04_10","2026_04_11","2026_04_12","2026_04_13","2026_04_14","2026_04_15","2026_04_16","2026_04_17"];
+const NEW_GAZRA = ["2026_03_13","2026_03_14","2026_03_15","2026_03_16","2026_03_17","2026_03_18","2026_03_19","2026_03_20","2026_03_21","2026_03_22","2026_03_23","2026_03_24","2026_03_25","2026_03_26","2026_03_27","2026_03_28","2026_03_29","2026_03_30","2026_03_31","2026_04_01","2026_04_02","2026_04_03","2026_04_04","2026_04_05","2026_04_06","2026_04_07","2026_04_08","2026_04_09","2026_04_10","2026_04_11","2026_04_12","2026_04_13","2026_04_14","2026_04_15","2026_04_16","2026_04_17","2026_04_18","2026_04_19","2026_04_20","2026_04_21","2026_04_22","2026_04_23","2026_04_24","2026_04_25","2026_04_26","2026_04_27","2026_04_28","2026_04_29","2026_04_30"];
 
 // שעות מיוחדות ליום הראשון של הגזרה (12/3)
 const DAY_TIME_OVERRIDES = {
@@ -164,6 +162,8 @@ const DAY_TIME_OVERRIDES = {
     "matbah_new":    "שעה 12:00",
     "hetz":          "שעה 12:00",
     "hetz2":         "שעה 12:00",
+    "hetz3":         "שעה 12:00",
+    "hetz4":         "שעה 12:00",
     "philbox_horsa": "שעה 12:00",
     "siyur_boker2":  "12:00 - 22:00",
     "siyur_tzo2":    "12:00 - 22:00",
@@ -205,10 +205,14 @@ const MISSION_DEFS = [
   { id:"siyur_boker2",  label:"סיור בוקר",      icon:"🚗", slots:{commander:1,soldiers:2}, time:"6:00 - 14:00",   border:"#26c6da", col:3, startH:6,  endH:14, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_tzo2",    label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_layla2",  label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:3, startH:22, endH:30, isSiyur:true, isNightPatrol:true, showOnDays:NEW_GAZRA },
-  { id:"hetz2",         label:"חץ דרוך",        icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00",    border:"#26c6da", col:4, startH:0,  endH:24, showOnDays:NEW_GAZRA },
+  { id:"hetz",  label:"חץ דרוך", icon:"🏹", slots:{commander:1,soldiers:7}, time:"החל מ-14:00", border:"#26c6da", col:4, startH:0, endH:24, showOnDays:NEW_GAZRA.filter(d=>d<"2026_03_18") },
+  { id:"hetz2", label:"חץ דרוך", icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00", border:"#26c6da", col:4, startH:0, endH:24, showOnDays:NEW_GAZRA.filter(d=>d>="2026_03_18"&&d<="2026_03_26") },
+  { id:"hetz3", label:"חץ דרוך", icon:"🏹", slots:{commander:3,soldiers:5}, time:"החל מ-14:00", border:"#26c6da", col:4, startH:0, endH:24, showOnDays:NEW_GAZRA.filter(d=>d>="2026_03_27"&&d<="2026_03_28") },
+  { id:"hetz4", label:"חץ דרוך", icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00", border:"#26c6da", col:4, startH:0, endH:24, showOnDays:NEW_GAZRA.filter(d=>d>"2026_03_28") },
   { id:"philbox_horsa", label:"פילבוקס חורסה",  icon:"🏠", slots:{commander:2,soldiers:6}, time:"החל מ-14:00",    border:"#f06292", col:5, startH:0,  endH:24, showOnDays:NEW_GAZRA },
   { id:"amada_maaravit_a",label:"עמדה מערבית א׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 3:00",  border:"#7e57c2", col:5, startH:24, endH:27, showOnDays:NEW_GAZRA.filter(d=>d!=="2026_03_13"&&d!=="2026_03_14") },
   { id:"amada_maaravit_b",label:"עמדה מערבית ב׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"3:00 - 6:00",   border:"#7e57c2", col:5, startH:27, endH:30, showOnDays:NEW_GAZRA.filter(d=>d!=="2026_03_13"&&d!=="2026_03_14") },
+  { id:"karem_negoshot",label:"כרם נגוהות",     icon:"🌿", slots:{commander:1,soldiers:3}, time:"",               border:"#aed581", col:6, startH:0,  endH:24, showOnDays:[] },
 ];
 
 const DAYS = [
@@ -273,7 +277,6 @@ const DAYS = [
   { id:"2026_04_28", label:"שני", date:"27/4" },
   { id:"2026_04_29", label:"שלישי", date:"28/4" },
   { id:"2026_04_30", label:"רביעי", date:"29/4" },
-  { id:"2026_05_01", label:"חמישי", date:"30/4" },
 ];
 
 const DAY_IDS = DAYS.map(d=>d.id);
@@ -301,7 +304,7 @@ function getBlockedNames(allAss, targetDayId, targetMission, missionSettings, pl
   const ti = dayOrder.indexOf(targetDayId);
   const isMorningDutyNextDay = (targetMission.id==="matbah" || targetMission.id==="matbah_boker");
   const isPilboxNextDay = (targetMission.id==="hilton" || targetMission.id==="agamim");
-  const isHetz = (targetMission.id==="hetz" || targetMission.id==="hetz2");
+  const isHetz = (targetMission.id==="hetz" || targetMission.id==="hetz2" || targetMission.id==="hetz3" || targetMission.id==="hetz4");
 
   // פעילות מבצעית — ללא מנוחה וללא חסימה
   if (targetMission.id==="maatzar") return { blocked, blockedReasons: reasons };
@@ -370,7 +373,7 @@ function getBlockedNames(allAss, targetDayId, targetMission, missionSettings, pl
         if (SG_REST_EXEMPT.has(person.name) || plugaMembers.has(person.name)) return;
         const sEnd = di*24 + sm.endH;
         // פילבוקס וחץ דרוך עולים ב-14:00 למרות startH:0
-        const EFFECTIVE_START = {"philbox_horsa":14,"hetz":14,"hetz2":14};
+        const EFFECTIVE_START = {"philbox_horsa":14,"hetz":14,"hetz2":14,"hetz3":14,"hetz4":14};
         const targetEffectiveStart = EFFECTIVE_START[targetMission.id] ?? targetMission.startH;
         let tStart = ti*24 + targetEffectiveStart;
         if (ti === di && targetEffectiveStart <= (sm.endH % 24) && targetEffectiveStart < 12) tStart += 24;
@@ -584,6 +587,12 @@ function App() {
             };
           });
         });
+        // ניקוי: hetz2 לא אמור להיות ב-27/3 ו-28/3
+        ["2026_03_27","2026_03_28"].forEach(day => {
+          if (base[day] && base[day]["hetz2"]) {
+            base[day]["hetz2"] = { commanders:[], soldiers:[] };
+          }
+        });
         setAllAss(base);
       }
       setSynced(true);
@@ -739,7 +748,7 @@ function App() {
         return true;
       }).map(m=>m.id)
     );
-    const excludedIds = new Set(["katzin","maatzar","gimel","rachpan","hetz","hetz2","amada_maaravit","amada_maaravit_a","amada_maaravit_b","toren_rasp","matbah_new","matbah_new2"]);
+    const excludedIds = new Set(["katzin","maatzar","gimel","rachpan","hetz","hetz2","hetz3","hetz4","amada_maaravit","amada_maaravit_a","amada_maaravit_b","toren_rasp","matbah_new","matbah_new2"]);
     return new Set(
       Object.entries(dayAss)
         .filter(([mid]) => visibleIds.has(mid) && !excludedIds.has(mid))
@@ -1135,12 +1144,12 @@ function App() {
                     : mission.allowedNames;
                   const isAllowBlk=katzinAllowed&&!katzinAllowed.includes(name);
                   const isRestBlk=blocked.has(name);
-                  const AFTAR_EFFECTIVE_START = {"philbox_horsa": 14, "hetz": 14, "hetz2": 14};
+                  const AFTAR_EFFECTIVE_START = {"philbox_horsa": 14, "hetz": 14, "hetz2": 14, "hetz3": 14, "hetz4": 14};
                   const missionEffectiveStart = AFTAR_EFFECTIVE_START[mission.id] ?? mission.startH;
                   const isAftarBlk=aftarThisDay.includes(name) && mission.id!=="aftar_add" && missionEffectiveStart >= aftarSettings.startH;
                   const dayOrder2=DAY_IDS, ti2=dayOrder2.indexOf(activeDay);
                   const prevAftar = ti2>0 ? (aftarByDay[dayOrder2[ti2-1]]||[]) : [];
-                  const isAftarYesterdayBlk = prevAftar.includes(name) && mission.startH < aftarSettings.endH && mission.id!=="philbox_horsa" && mission.id!=="hetz" && mission.id!=="hetz2";
+                  const isAftarYesterdayBlk = prevAftar.includes(name) && mission.startH < aftarSettings.endH && mission.id!=="philbox_horsa" && mission.id!=="hetz" && mission.id!=="hetz2" && mission.id!=="hetz3" && mission.id!=="hetz4";
                   const isGimelBlk=gimelThisDay.has(name) && mission.id!=="gimel";
                   // חסימת שעות שבועיות למסופחים
                   const plugaMembers2 = [...(platoons["pluga"]?.members||[]),...(platoons["pluga2"]?.members||[])];
@@ -1256,10 +1265,36 @@ function App() {
     // ── MISSIONS TAB ──
     const [editId, setEditId] = useState(null);
     const [draft, setDraft] = useState({});
-    const HIDE_FROM_SETTINGS = new Set(["agamim","hilton","konnut","rachpan","siyur_boker","siyur_tzo","siyur_layla","maatzor","bimuy_oyev","amada_maaravit"]);
+    const HIDE_FROM_SETTINGS = new Set(["agamim","hilton","konnut","rachpan","siyur_boker","siyur_tzo","siyur_layla","maatzor","bimuy_oyev","amada_maaravit","matbah","hetz","hetz3","hetz4","karem_negoshot"]);
     const visibleForSettings = MISSION_DEFS.filter(m => !m.hideFromDisplay && !HIDE_FROM_SETTINGS.has(m.id) && !deletedMissions.includes(m.id));
     const startEdit = (m) => { setEditId(m.id); setDraft({...missionSettings[m.id]}); };
-    const saveEdit = () => { setMissionSettings(prev=>({...prev,[editId]:{...draft}})); setEditId(null); };
+    const saveEdit = () => {
+      const prev_s = missionSettings[editId];
+      setMissionSettings(prev=>({...prev,[editId]:{...draft}}));
+      // עדכון גודל מערכי השיבוץ אם שינינו כמות slots
+      if (draft.slots_commander !== prev_s?.slots_commander || draft.slots_soldiers !== prev_s?.slots_soldiers) {
+        setAllAssAndSave(prev => {
+          const c = JSON.parse(JSON.stringify(prev));
+          DAY_IDS.forEach(dayId => {
+            if (!c[dayId] || !c[dayId][editId]) return;
+            const cur = c[dayId][editId];
+            const newCmd = draft.slots_commander || 0;
+            const newSol = draft.slots_soldiers || 1;
+            const resizeArr = (arr, size) => {
+              const a = Array(size).fill(null);
+              (arr||[]).forEach((v,i) => { if(i<size) a[i]=v; });
+              return a;
+            };
+            c[dayId][editId] = {
+              commanders: resizeArr(cur.commanders, newCmd),
+              soldiers: resizeArr(cur.soldiers, newSol),
+            };
+          });
+          return c;
+        });
+      }
+      setEditId(null);
+    };
 
     // ── SPONTANEOUS TAB ──
     const [spontDraft, setSpontDraft] = useState({label:"",icon:"🎯",startH:8,endH:16,slots_soldiers:1,slots_commander:0,restHours:0,days:[]});
@@ -1326,8 +1361,8 @@ function App() {
                           <label style={{fontSize:11,color:"var(--text2)"}}>שעת התחלה<input type="number" min={0} max={30} style={inp} value={draft.startH} onChange={e=>setDraft(d=>({...d,startH:+e.target.value}))}/></label>
                           <label style={{fontSize:11,color:"var(--text2)"}}>שעת סיום<input type="number" min={0} max={30} style={inp} value={draft.endH} onChange={e=>setDraft(d=>({...d,endH:+e.target.value}))}/></label>
                           <label style={{fontSize:11,color:"var(--text2)"}}>מנוחה (שעות)<input type="number" min={0} max={24} style={inp} value={draft.restHours} onChange={e=>setDraft(d=>({...d,restHours:+e.target.value}))}/></label>
-                          <label style={{fontSize:11,color:"var(--text2)"}}>מפקדים<input type="number" min={0} max={10} style={inp} value={String(draft.slots_commander||0)} onChange={e=>setDraft(d=>({...d,slots_commander:Math.max(0,parseInt(e.target.value)||0)}))}/></label>
-                          <label style={{fontSize:11,color:"var(--text2)"}}>חיילים<input type="number" min={0} max={20} style={inp} value={String(draft.slots_soldiers||0)} onChange={e=>setDraft(d=>({...d,slots_soldiers:Math.max(0,parseInt(e.target.value)||0)}))}/></label>
+                          <label style={{fontSize:11,color:"var(--text2)"}}>מפקדים<input type="number" min={0} max={10} style={inp} value={draft.slots_commander} onChange={e=>setDraft(d=>({...d,slots_commander:+e.target.value}))}/></label>
+                          <label style={{fontSize:11,color:"var(--text2)"}}>חיילים<input type="number" min={0} max={20} style={inp} value={draft.slots_soldiers} onChange={e=>setDraft(d=>({...d,slots_soldiers:+e.target.value}))}/></label>
                         </div>
                         <label style={{fontSize:11,color:"var(--text2)"}}>
                           חיילים מורשים (ריק = כולם)
@@ -1512,6 +1547,9 @@ function App() {
 
 
 
+  const PLATOON_ORDER = ["cmd1","soldiers1","cmd2","soldiers2","cmd3","soldiers3","pluga","pluga2"];
+  const platoonIdx = (pl) => { const i = PLATOON_ORDER.indexOf(pl); return i>=0?i:99; };
+
   const TrackingView = () => (
     <div className="main" style={{maxWidth:960,margin:"0 auto",padding:"20px 16px"}}>
       <div style={{fontSize:18,fontWeight:800,marginBottom:16,color:"var(--text)"}}>📊 מעקבים</div>
@@ -1524,15 +1562,7 @@ function App() {
                 if (aftarCounts[name] !== undefined) aftarCounts[name].count++;
               });
             });
-            // סדר לפי מחלקות תחילה, אחר כך לפי שם עולה
-            const sorted = Object.entries(aftarCounts)
-              .filter(([,v])=>v.count>0)
-              .sort((a,b)=>{
-                const platoonOrderA = PLATOON_ORDER.indexOf(a[1].platoon);
-                const platoonOrderB = PLATOON_ORDER.indexOf(b[1].platoon);
-                if (platoonOrderA !== platoonOrderB) return platoonOrderA - platoonOrderB;
-                return a[0].localeCompare(b[0],"he");
-              });
+            const sorted = Object.entries(aftarCounts).filter(([,v])=>v.count>0).sort((a,b) => { const pi = platoonIdx(a[1].platoon) - platoonIdx(b[1].platoon); return pi !== 0 ? pi : b[1].count - a[1].count; });
             return (
               <div style={{background:"var(--surface)",border:"1.5px solid #26c6da44",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
                 <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
@@ -1578,12 +1608,7 @@ function App() {
                 });
               });
             });
-            const sorted = Object.entries(counts).filter(([,v])=>v.count>0).sort((a,b)=>{
-                const platoonOrderA = PLATOON_ORDER.indexOf(a[1].platoon);
-                const platoonOrderB = PLATOON_ORDER.indexOf(b[1].platoon);
-                if (platoonOrderA !== platoonOrderB) return platoonOrderA - platoonOrderB;
-                return a[0].localeCompare(b[0],"he");
-              });
+            const sorted = Object.entries(counts).filter(([,v])=>v.count>0).sort((a,b) => { const pi = platoonIdx(a[1].platoon) - platoonIdx(b[1].platoon); return pi !== 0 ? pi : b[1].count - a[1].count; });
             return (
               <div style={{background:"var(--surface)",border:"1.5px solid #ff980044",borderRadius:14,marginBottom:20,overflow:"hidden"}}>
                 <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
@@ -1610,22 +1635,16 @@ function App() {
 
           {/* PLUGA WEEKLY HOURS TRACKER */}
           {(() => {
-            const WEEKLY_LIMIT = 999; // ללא הגבלה
-            const plugaMembers = platoons["pluga"]?.members || [];
+            const plugaMembers = [...(platoons["pluga"]?.members||[]),...(platoons["pluga2"]?.members||[])];
             if (plugaMembers.length === 0) return null;
 
-            // שבוע קלנדרי: ראשון-שבת
             const getWeekStart = (dayId) => {
               const [y,m,d] = dayId.split('_').map(Number);
-              const date = new Date(y, m-1, d);
-              const dow = date.getDay(); // 0=ראשון
-              const sunday = new Date(date);
-              sunday.setDate(date.getDate() - dow);
-              const pad = n=>String(n).padStart(2,'0');
-              return `${sunday.getFullYear()}_${pad(sunday.getMonth()+1)}_${pad(sunday.getDate())}`;
+              const dt = new Date(y, m-1, d);
+              dt.setDate(dt.getDate() - dt.getDay());
+              const p=n=>String(n).padStart(2,'0');
+              return `${dt.getFullYear()}_${p(dt.getMonth()+1)}_${p(dt.getDate())}`;
             };
-
-            // מציג את השבוע של היום הנבחר
             const weekStartId = getWeekStart(activeDay);
             const weekDays = DAY_IDS.filter(d => getWeekStart(d) === weekStartId);
 
@@ -1635,11 +1654,8 @@ function App() {
                 const da = allAss[dayId] || {};
                 MISSION_DEFS.forEach(m => {
                   const ass = da[m.id]; if (!ass) return;
-                  const assigned = [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean);
-                  if (assigned.some(p=>p.name===name)) {
-                    const dur = m.endH - m.startH;
-                    total += Math.max(0, Math.min(dur, 24));
-                  }
+                  if ([...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).some(p=>p.name===name))
+                    total += Math.max(0, Math.min(m.endH - m.startH, 24));
                 });
               });
               return total;
@@ -1654,21 +1670,45 @@ function App() {
                 <div style={{padding:"10px 14px 8px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",gap:8}}>
                   <span style={{fontSize:16}}>⏱️</span>
                   <div style={{fontSize:14,fontWeight:700,flex:1}}>מעקב שעות מסופחים</div>
-                  <div style={{fontSize:11,color:"var(--text3)"}}>{weekLabel}</div>
                 </div>
-                <div style={{padding:"10px 12px",display:"flex",flexDirection:"column",gap:6}}>
+                {/* שבועי */}
+                <div style={{padding:"8px 14px 4px",fontSize:11,fontWeight:700,color:"var(--text3)",borderBottom:"1px solid var(--border)"}}>
+                  📅 שבועי — {weekLabel}
+                </div>
+                <div style={{padding:"8px 12px",display:"flex",flexDirection:"column",gap:5}}>
                   {plugaMembers.map(name => {
                     const hours = calcHours(name, weekDays);
                     const pct = Math.min(hours / 32 * 100, 100);
-                    const over = hours >= 32;
                     return (
                       <div key={name}>
                         <div style={{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:2}}>
                           <span style={{color:"var(--text)"}}>{name}</span>
                           <span style={{color:"var(--text2)",fontWeight:700}}>{hours} שע'</span>
                         </div>
-                        <div style={{background:"var(--surface2)",borderRadius:4,height:6,overflow:"hidden"}}>
-                          <div style={{width:`${pct}%`,height:"100%",background:over?"#ff9800":pct>50?"#26c6da":"#66bb6a",transition:"width .3s"}}/>
+                        <div style={{background:"var(--surface2)",borderRadius:4,height:5,overflow:"hidden"}}>
+                          <div style={{width:`${pct}%`,height:"100%",background:pct>75?"#ff9800":"#26c6da",transition:"width .3s"}}/>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* כללי */}
+                <div style={{padding:"8px 14px 4px",fontSize:11,fontWeight:700,color:"var(--text3)",borderTop:"1px solid var(--border)",borderBottom:"1px solid var(--border)"}}>
+                  📊 כללי — כל הגזרה
+                </div>
+                <div style={{padding:"8px 12px",display:"flex",flexDirection:"column",gap:5}}>
+                  {plugaMembers.map(name => {
+                    const hours = calcHours(name, DAY_IDS);
+                    const maxH = Math.max(...plugaMembers.map(n=>calcHours(n,DAY_IDS)),1);
+                    const pct = Math.min(hours / maxH * 100, 100);
+                    return (
+                      <div key={name}>
+                        <div style={{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:2}}>
+                          <span style={{color:"var(--text)"}}>{name}</span>
+                          <span style={{color:"#ffd54f",fontWeight:700}}>{hours} שע'</span>
+                        </div>
+                        <div style={{background:"var(--surface2)",borderRadius:4,height:5,overflow:"hidden"}}>
+                          <div style={{width:`${pct}%`,height:"100%",background:"#ffd54f",transition:"width .3s"}}/>
                         </div>
                       </div>
                     );
@@ -1693,19 +1733,15 @@ function App() {
                 <div style={{padding:"10px 12px",display:"flex",flexDirection:"column",gap:10}}>
                   {trackMissions.map(nm => {
                     const counts = {};
-                    allMembers.forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
+                    const plugaSet = new Set([...(platoons["pluga"]?.members||[]),...(platoons["pluga2"]?.members||[])]);
+                    allMembers.filter(m=>!plugaSet.has(m.name)).forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
                     DAY_IDS.forEach(dayId => {
                       const ass = (allAss[dayId]||{})[nm.id]; if (!ass) return;
                       [...(ass.commanders||[]),...(ass.soldiers||[])].filter(Boolean).forEach(p => {
                         if (counts[p.name] !== undefined) counts[p.name].count++;
                       });
                     });
-                    const sorted = Object.entries(counts).filter(([,v])=>v.count>0).sort((a,b)=>{
-                      const platoonOrderA = PLATOON_ORDER.indexOf(a[1].platoon);
-                      const platoonOrderB = PLATOON_ORDER.indexOf(b[1].platoon);
-                      if (platoonOrderA !== platoonOrderB) return platoonOrderA - platoonOrderB;
-                      return a[0].localeCompare(b[0],"he");
-                    });
+                    const sorted = Object.entries(counts).filter(([,v])=>v.count>0).sort((a,b) => { const pi = platoonIdx(a[1].platoon) - platoonIdx(b[1].platoon); return pi !== 0 ? pi : b[1].count - a[1].count; });
                     if (sorted.length === 0) return null;
                     return (
                       <div key={nm.id}>
@@ -1841,7 +1877,18 @@ function App() {
             יום {activeDayObj.label} · {activeDayObj.date}
           </div>
         )}
-        <div className="day-tabs">
+        <div className="day-tabs" ref={el => {
+          if (el) {
+            const active = el.querySelector('.day-tab.active');
+            if (active) {
+              const tabsRect = el.getBoundingClientRect();
+              const activeRect = active.getBoundingClientRect();
+              const tabsCenter = tabsRect.width / 2;
+              const activeCenter = activeRect.left - tabsRect.left + activeRect.width / 2;
+              el.scrollLeft = el.scrollLeft + activeCenter - tabsCenter;
+            }
+          }
+        }}>
           {DAYS.map(d=>(
             <button key={d.id} className={`day-tab ${activeDay===d.id?"active":""}`}
               onClick={()=>{

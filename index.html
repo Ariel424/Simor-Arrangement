@@ -133,9 +133,9 @@ body{background:var(--bg);color:var(--text);font-family:'Heebo',sans-serif;font-
 const { useState, useMemo } = React;
 
 const PLATOONS_DEFAULT = {
-  cmd1:     { label:"מפקדי מחלקה 1", color:"#ff9800", textColor:"#0a0f1a", members:["חזי דיין","דניאל בר-שי","צבי ווגל","מרדכי אלפרסי"] },
-  soldiers1:{ label:"חיילי מחלקה 1",  color:"#4db6e8", textColor:"#0a0f1a", members:["ישי לשם","יהודה ישי","יהודה וויזר","שלמה לייבל","אלי ברץ","מקסים שמורקוב","רועי שמיר","דניס שחרוביץ","שילה דוד","דימה","תומר כנר","אולג"] },
-  cmd2:     { label:"מפקדי מחלקה 2", color:"#ab47bc", textColor:"#fff",    members:["ידידיה שמואליאן","אליאור מרטן","נאור גדמו","משה נחשון","ישי קבדה","ניב לאופר"] },
+  cmd1:     { label:"מפקדי מחלקה 1", color:"#ff9800", textColor:"#0a0f1a", members:["חזי דיין - מ״מ","דניאל בר-שי","צבי ווגל","מרדכי אלפרסי - סמל"] },
+  soldiers1:{ label:"חיילי מחלקה 1",  color:"#4db6e8", textColor:"#0a0f1a", members:["ישי לשם - מפקד","יהודה ישי","יהודה וויזר","שלמה לייבל","אלי ברץ","מקסים שמורקוב","רועי שמיר","דניס שחרוביץ","שילה דוד","דימה","תומר כנר","אולג"] },
+  cmd2:     { label:"מפקדי מחלקה 2", color:"#ab47bc", textColor:"#fff",    members:["ידידיה שמואליאן","אליאור מרטן","נאור גדמו","משה נחשון - מפקד","ישי קבדה - מפקד","ניב לאופר - מפקד"] },
   soldiers2:{ label:"חיילי מחלקה 2",  color:"#ce93d8", textColor:"#0a0f1a", members:["לזבניק","יוני אמרה","יוני אקנין","משה חזן","דניאל ברדריק","יוסי וורקו","אראל רחימי","נאור גזולי","גורדון","גיטלמן","שחר מרגלית","עזריאל סון","פנחס לניאדו"] },
   cmd3:     { label:"מפקדי מחלקה 3", color:"#66bb6a", textColor:"#0a0f1a", members:["אריאל טופז","דורון בוכהולץ","חנן שטיין","רפאל מבשר"] },
   soldiers3:{ label:"חיילי מחלקה 3",  color:"#a5d6a7", textColor:"#0a0f1a", members:["ישי אדרי","אביב אוחנה","אברהם גולדשטיין","ירדן גיאת","אביחן לוי","אהרון נתניא","יאיר ספיר","נאור עזרא","יעקב נרי","נעם קפלנסקי","רועי שאג","יצחק שטטמן"] },
@@ -145,13 +145,13 @@ const PLATOONS_DEFAULT = {
 
 const CMD_PLATOONS = new Set(["cmd1","cmd2","cmd3","pluga","pluga2"]);
 // רק אלה יכולים לבצע כמה משימות במקביל וללא מנוחה
-const MULTI_MISSION_OFFICERS = new Set(["אריאל טופז","ידידיה שמואליאן","חזי דיין","ידידיה אבולעפיה","שמואל ברגלס","איתן שוורץ","משה חדד"]);
+const MULTI_MISSION_OFFICERS = new Set(["אריאל טופז","ידידיה שמואליאן","חזי דיין - מ״מ","ידידיה אבולעפיה","שמואל ברגלס","איתן שוורץ","משה חדד"]);
 // פטור ממנוחה בין ש"גים לחיילים ספציפיים
 const SG_REST_EXEMPT = new Set(["איתן שוורץ","ידידיה אבולעפיה","שמואל ברגלס","משה חדד"]);
 
 // חריגים ממנוחה לפי יום ומשימה
 const REST_EXEMPTIONS = {
-  "2026_03_10": { siyur_tzo: new Set(["מרדכי אלפרסי","ישי לשם","אלי ברץ"]) }
+  "2026_03_10": { siyur_tzo: new Set(["מרדכי אלפרסי - סמל","ישי לשם - מפקד","אלי ברץ"]) }
 };
 
 const NEW_GAZRA = ["2026_03_13","2026_03_14","2026_03_15","2026_03_16","2026_03_17","2026_03_18","2026_03_19","2026_03_20","2026_03_21","2026_03_22","2026_03_23","2026_03_24","2026_03_25","2026_03_26","2026_03_27","2026_03_28","2026_03_29","2026_03_30","2026_03_31","2026_04_01","2026_04_02","2026_04_03","2026_04_04","2026_04_05","2026_04_06","2026_04_07","2026_04_08","2026_04_09","2026_04_10","2026_04_11","2026_04_12","2026_04_13","2026_04_14","2026_04_15","2026_04_16","2026_04_17","2026_04_18","2026_04_19","2026_04_20","2026_04_21","2026_04_22","2026_04_23","2026_04_24","2026_04_25","2026_04_26","2026_04_27","2026_04_28","2026_04_29","2026_04_30"];
@@ -184,7 +184,7 @@ const MISSION_DEFS = [
   { id:"siyur_tzo",   label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
   { id:"siyur_layla", label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:6, startH:22, endH:30, isSiyur:true, isNightPatrol:true, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
   { id:"maatzar",     label:"פעילות מבצעית",  icon:"🔒", slots:{commander:0,soldiers:10},time:"",               border:"#ef5350", col:4, startH:0,  endH:24, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
-  { id:"katzin",      label:"קצין מוצב",      icon:"🟡", slots:{commander:1,soldiers:0}, time:"החל מ-6:00",     border:"#555",    col:1, startH:0,  endH:24, noLabel:true, allowedNames:["אריאל טופז","חזי דיין","ידידיה שמואליאן","איתי דרייר"] },
+  { id:"katzin",      label:"קצין מוצב",      icon:"🟡", slots:{commander:1,soldiers:0}, time:"החל מ-6:00",     border:"#555",    col:1, startH:0,  endH:24, noLabel:true, allowedNames:["אריאל טופז","חזי דיין - מ״מ","ידידיה שמואליאן","איתי דרייר"] },
   { id:"gimel",       label:"גימל",           icon:"🤒", slots:{commander:0,soldiers:2}, time:"",               border:"#78909c", col:6, startH:0,  endH:24, noCount:true, hideFromDisplay:true },
   { id:"rachpan",     label:"קורס רחפנים",    icon:"🚁", slots:{commander:0,soldiers:1}, time:"",               border:"#80cbc4", col:6, startH:0,  endH:24, showOnDays:["2026_03_09","2026_03_10","2026_03_11","2026_03_12"] },
 
@@ -202,6 +202,7 @@ const MISSION_DEFS = [
   { id:"sg6",           label:'ש"ג 2:00–6:00',  icon:"🪖", slots:{commander:0,soldiers:1}, time:"2:00 - 6:00",    border:"#8d6e63", col:2, startH:26, endH:30, showOnDays:NEW_GAZRA },
   { id:"toren_rasp",    label:'תורן רס"פ',      icon:"🎖️", slots:{commander:0,soldiers:1}, time:"10:00 - 14:00",   border:"#78909c", col:1, startH:10, endH:14, showOnDays:NEW_GAZRA.filter(d=>d>="2026_03_17") },
   { id:"avt_ugda",      label:"אבטחת אוגדה",   icon:"🛡️", slots:{commander:0,soldiers:2}, time:"החל מ-8:00",    border:"#ef5350", col:1, startH:8,  endH:20, showOnDays:NEW_GAZRA.filter(d=>d>="2026_03_19") },
+  { id:"regel_mesayemet", label:"רגל מסיימת - מחנה עופר", icon:"🪖", slots:{commander:0,soldiers:2}, time:"החל מ-8:00", border:"#ff7043", col:1, startH:8, endH:20, showOnDays:["2026_03_30"] },
   { id:"siyur_boker2",  label:"סיור בוקר",      icon:"🚗", slots:{commander:1,soldiers:2}, time:"6:00 - 14:00",   border:"#26c6da", col:3, startH:6,  endH:14, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_tzo2",    label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_layla2",  label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:3, startH:22, endH:30, isSiyur:true, isNightPatrol:true, showOnDays:NEW_GAZRA },
@@ -398,12 +399,20 @@ function SafeDisplayCard(props) {
 
 function DisplayCard({ mission, assignment, dayId }) {
   if (!assignment) return null;
+  // השתמש בגודל הגדול יותר - מה-assignment שנשמר או מה-slots
+  const cmdSize = Math.max(mission.slots.commander, (assignment.commanders||[]).length);
+  const solSize = Math.max(mission.slots.soldiers,   (assignment.soldiers||[]).length);
+  const normalizeArr = (arr, size) => {
+    const a = Array(size).fill(null);
+    (arr||[]).forEach((v,i) => { if(i<size) a[i]=v; });
+    return a;
+  };
   const ass = {
-    commanders: Array.isArray(assignment.commanders) ? assignment.commanders : Array(mission.slots.commander).fill(null),
-    soldiers:   Array.isArray(assignment.soldiers)   ? assignment.soldiers   : Array(mission.slots.soldiers).fill(null),
+    commanders: normalizeArr(Array.isArray(assignment.commanders)?assignment.commanders:[], cmdSize),
+    soldiers:   normalizeArr(Array.isArray(assignment.soldiers)  ?assignment.soldiers:  [], solSize),
   };
   const filled = [...ass.commanders,...ass.soldiers].filter(Boolean).length;
-  const total = mission.slots.commander + mission.slots.soldiers;
+  const total = cmdSize + solSize;
   const done = filled===total && total>0;
   const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="amada_maaravit_a" || mission.id==="amada_maaravit_b" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2" || mission.id==="bimuy_oyev" || mission.id==="kurs_pritza" || mission.id==="toren_rasp";
   const displayTime = (DAY_TIME_OVERRIDES[dayId]||{})[mission.id] || mission.time;
@@ -557,6 +566,16 @@ function App() {
       if (isLocalWrite.current) return;
       if (snap.exists()) {
         const saved = snap.val();
+        // ניקוי מראש: מחק mission IDs שלא אמורים להיות ביום זה
+        DAY_IDS.forEach(day => {
+          if (!saved[day]) return;
+          Object.keys(saved[day]).forEach(mid => {
+            const m = MISSION_DEFS.find(x=>x.id===mid);
+            if (!m) return;
+            if (m.showOnDays && !m.showOnDays.includes(day)) delete saved[day][mid];
+            if (m.hideOnDays && m.hideOnDays.includes(day)) delete saved[day][mid];
+          });
+        });
         const base = freshAss();
         DAY_IDS.forEach(day => {
           if (!saved[day]) return;
@@ -569,11 +588,13 @@ function App() {
             if (!m) return;
             if (m.showOnDays && !m.showOnDays.includes(day)) return;
             if (m.hideOnDays && m.hideOnDays.includes(day)) return;
-            // נרמול: Firebase מוחק null מתוך arrays, משחזרים בגודל נכון
-            const normalize = (arr, size) => {
+            // נרמול: Firebase מוחק null מתוך arrays
+            // משתמשים בגודל הגדול יותר - מ-saved או מ-MISSION_DEFS (כדי לא לאבד שיבוצים מ-overrides)
+            const normalize = (arr, minSize) => {
+              const savedLen = Array.isArray(arr) ? arr.length : (arr ? Object.keys(arr).length : 0);
+              const size = Math.max(minSize, savedLen);
               const a = Array(size).fill(null);
               if (!arr) return a;
-              // Firebase מחזיר object עם keys מספריים אם יש nulls
               if (!Array.isArray(arr)) {
                 Object.entries(arr).forEach(([k,v]) => { if (parseInt(k)<size) a[parseInt(k)]=v; });
                 return a;
@@ -587,16 +608,32 @@ function App() {
             };
           });
         });
-        // ניקוי: hetz2 לא אמור להיות ב-27/3 ו-28/3
-        ["2026_03_27","2026_03_28"].forEach(day => {
-          if (base[day] && base[day]["hetz2"]) {
-            base[day]["hetz2"] = { commanders:[], soldiers:[] };
-          }
-        });
         setAllAss(base);
       }
       setSynced(true);
     });
+
+    // ניקוי שמות ישנים — מריץ פעם אחת אחרי טעינת settings
+    window._cleanOldNames = (platoons, allAss, setAllAssAndSave) => {
+      const allNames = new Set(Object.values(platoons).flatMap(p=>p.members));
+      setAllAssAndSave(prev => {
+        const c = JSON.parse(JSON.stringify(prev));
+        let changed = false;
+        Object.keys(c).forEach(dayId => {
+          Object.keys(c[dayId]||{}).forEach(mid => {
+            ['commanders','soldiers'].forEach(type => {
+              (c[dayId][mid][type]||[]).forEach((p,i) => {
+                if (p && !allNames.has(p.name)) {
+                  c[dayId][mid][type][i] = null;
+                  changed = true;
+                }
+              });
+            });
+          });
+        });
+        return changed ? c : prev;
+      });
+    };
 
     const unsubAftar = onValue(ref(db, 'shabzak/aftar'), snap => {
       if (snap.exists()) {
@@ -617,6 +654,7 @@ function App() {
         if (s.spontMissions) setSpontMissions(s.spontMissions);
         if (s.hiddenMissionsByDay) setHiddenMissionsByDay(s.hiddenMissionsByDay);
         if (s.deletedMissions) setDeletedMissions(s.deletedMissions);
+        if (s.dayMissionOverrides) setDayMissionOverrides(prev => ({...prev, ...s.dayMissionOverrides}));
         if (s.platoons) {
           setPlatoons(prev => {
             const next = JSON.parse(JSON.stringify(prev));
@@ -691,10 +729,101 @@ function App() {
     return init;
   });
   const [deletedMissions, setDeletedMissions] = useState([]);
+  const [dayMissionOverrides, setDayMissionOverrides] = useState({
+    "2026_03_30": {
+      "matbah_boker":       { slots_soldiers: 2 },
+      "matbah_tzaharayim":  { slots_soldiers: 2 },
+    }
+  }); // {dayId: {missionId: {slots_commander, slots_soldiers, restHours, startH, endH}}}
   const [platoons, setPlatoons] = useState(() => JSON.parse(JSON.stringify(PLATOONS_DEFAULT)));
   React.useEffect(() => { window._platoons = platoons; }, [platoons]);
   React.useEffect(() => { window._spontMissions = spontMissions.map(m=>({...m,slots:{commander:m.slots_commander||0,soldiers:m.slots_soldiers||1}})); }, [spontMissions]);
 
+  // Migration: החלפת שמות ישנים בשמות חדשים בשיבוצים
+  const runMigration = React.useCallback((currentAss) => {
+    const RENAMES = {
+      "מרדכי אלפרסי": "מרדכי אלפרסי - סמל",
+      "ישי לשם": "ישי לשם - מפקד",
+      "חזי דיין": "חזי דיין - מ״מ",
+      "משה נחשון": "משה נחשון - מפקד",
+      "ניב לאופר": "ניב לאופר - מפקד",
+      "ישי קבדה": "ישי קבדה - מפקד",
+      "אביאסף דריי": "אביאסף דריי - מפקד",
+    };
+    let needsMigration = false;
+    outer2: for (const dayId of Object.keys(currentAss)) {
+      for (const mid of Object.keys(currentAss[dayId]||{})) {
+        for (const type of ['commanders','soldiers']) {
+          for (const p of (currentAss[dayId][mid][type]||[])) {
+            if (p && RENAMES[p.name]) { needsMigration = true; break outer2; }
+          }
+        }
+      }
+    }
+    if (!needsMigration) return;
+    setAllAssAndSave(prev => {
+      const c = JSON.parse(JSON.stringify(prev));
+      Object.keys(c).forEach(dayId => {
+        Object.keys(c[dayId]||{}).forEach(mid => {
+          ['commanders','soldiers'].forEach(type => {
+            (c[dayId][mid][type]||[]).forEach((p,i) => {
+              if (p && RENAMES[p.name]) c[dayId][mid][type][i] = {...p, name: RENAMES[p.name]};
+            });
+          });
+        });
+      });
+      return c;
+    });
+  }, []);
+
+  React.useEffect(() => {
+    if (synced) runMigration(allAss);
+  }, [synced, allAss]);
+  React.useEffect(() => {
+    if (!synced || !isSettingsLoaded.current) return;
+    const allNames = new Set(Object.values(platoons).flatMap(p=>p.members));
+    let needsClean = false;
+    outer: for (const dayId of Object.keys(allAss)) {
+      for (const mid of Object.keys(allAss[dayId]||{})) {
+        for (const type of ['commanders','soldiers']) {
+          for (const p of (allAss[dayId][mid][type]||[])) {
+            if (p && !allNames.has(p.name)) { needsClean = true; break outer; }
+          }
+        }
+      }
+    }
+    if (!needsClean) return;
+    setAllAssAndSave(prev => {
+      const c = JSON.parse(JSON.stringify(prev));
+      Object.keys(c).forEach(dayId => {
+        Object.keys(c[dayId]||{}).forEach(mid => {
+          ['commanders','soldiers'].forEach(type => {
+            (c[dayId][mid][type]||[]).forEach((p,i) => {
+              if (p && !allNames.has(p.name)) c[dayId][mid][type][i] = null;
+            });
+          });
+        });
+      });
+      return c;
+    });
+  }, [platoons, synced]);
+
+  const getMissionForDay = React.useCallback((mission, dayId) => {
+    const ms = missionSettings[mission.id] || {};
+    const ov = (dayMissionOverrides[dayId]||{})[mission.id] || {};
+    // day override takes precedence over missionSettings, which takes precedence over MISSION_DEFS
+    const slots_commander = ov.slots_commander ?? ms.slots_commander ?? mission.slots.commander;
+    const slots_soldiers  = ov.slots_soldiers  ?? ms.slots_soldiers  ?? mission.slots.soldiers;
+    const startH = ov.startH ?? ms.startH ?? mission.startH;
+    const endH   = ov.endH   ?? ms.endH   ?? mission.endH;
+    if (slots_commander === mission.slots.commander && slots_soldiers === mission.slots.soldiers &&
+        startH === mission.startH && endH === mission.endH) return mission;
+    return {
+      ...mission,
+      slots: { commander: slots_commander, soldiers: slots_soldiers },
+      startH, endH,
+    };
+  }, [dayMissionOverrides, missionSettings]);
   const getPlatoonStyle = (platoon) => {
     const p = platoons[platoon];
     if (!p) return { background:"#555", color:"#fff" };
@@ -712,7 +841,7 @@ function App() {
   // שמירה אוטומטית של כל ההגדרות ל-Firebase
   React.useEffect(() => {
     if (!fbReady || !isSettingsLoaded.current) return;
-    const patch = {missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, platoons: Object.fromEntries(Object.entries(platoons).map(([k,p])=>[k,p.members]))};
+    const patch = {missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, dayMissionOverrides, platoons: Object.fromEntries(Object.entries(platoons).map(([k,p])=>[k,p.members]))};
     clearTimeout(_settingsSaveTimer.current);
     _settingsSaveTimer.current = setTimeout(() => {
       // סמן כ-local write כדי למנוע overwrite של שיבוצים
@@ -721,7 +850,7 @@ function App() {
         .catch(()=>{})
         .finally(()=>{ setTimeout(()=>{ isLocalWrite.current = false; }, 1000); });
     }, 1000);
-  }, [missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, platoons, fbReady]);
+  }, [missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, dayMissionOverrides, platoons, fbReady]);
 
   // מסך סיסמה — רק אחרי כל ה-hooks
   const [showAftarSelect,setShowAftarSelect] = useState(false);
@@ -738,7 +867,26 @@ function App() {
     col: m.col || 1,
     isSpont: true,
   })), [spontMissions]);
-  const allMissionDefs = React.useMemo(() => [...MISSION_DEFS, ...spontMissionDefs], [spontMissionDefs]);
+  const allMissionDefs = React.useMemo(() => [
+    ...MISSION_DEFS.map(m => {
+      const s = missionSettings[m.id];
+      if (!s) return m;
+      return { ...m, slots: { commander: s.slots_commander ?? m.slots.commander, soldiers: s.slots_soldiers ?? m.slots.soldiers } };
+    }),
+    ...spontMissionDefs
+  ], [spontMissionDefs, missionSettings]);
+
+  // allMissionDefs adjusted for active day overrides
+  const allMissionDefsForDay = React.useMemo(() =>
+    allMissionDefs.map(m => {
+      const ov = (dayMissionOverrides[activeDay]||{})[m.id];
+      if (!ov) return m;
+      return { ...m, slots: {
+        commander: ov.slots_commander ?? m.slots.commander,
+        soldiers: ov.slots_soldiers ?? m.slots.soldiers,
+      }, startH: ov.startH ?? m.startH, endH: ov.endH ?? m.endH };
+    }),
+  [allMissionDefs, activeDay, dayMissionOverrides]);
 
   const assignedThisDay = useMemo(() => {
     const visibleIds = new Set(
@@ -760,8 +908,9 @@ function App() {
 
   const { blocked, blockedReasons } = useMemo(() => {
     if (!mission) return { blocked: new Set(), blockedReasons: {} };
-    return getBlockedNames(allAss, activeDay, mission, missionSettings, platoons);
-  }, [allAss, activeDay, activeMission]);
+    const missionForDay = getMissionForDay(mission, activeDay);
+    return getBlockedNames(allAss, activeDay, missionForDay, missionSettings, platoons);
+  }, [allAss, activeDay, activeMission, dayMissionOverrides, missionSettings]);
 
   const gimelThisDay = useMemo(() => new Set(
     [...(dayAss["gimel"]?.soldiers||[])].filter(Boolean).map(p=>p.name)
@@ -807,13 +956,19 @@ function App() {
   function slotClick(type, idx) {
     if (selPeople.length === 0) return;
     const activeMissionDef = allMissionDefs.find(m=>m.id===activeMission);
+    const mDay = getMissionForDay(activeMissionDef || {slots:{commander:0,soldiers:1}}, activeDay);
     setAllAssAndSave(prev => {
       const c = JSON.parse(JSON.stringify(prev));
       if (!c[activeDay]) c[activeDay] = {};
       if (!c[activeDay][activeMission]) c[activeDay][activeMission] = {
-        commanders: Array(activeMissionDef?.slots?.commander||0).fill(null),
-        soldiers: Array(activeMissionDef?.slots?.soldiers||1).fill(null),
+        commanders: Array(mDay.slots.commander).fill(null),
+        soldiers: Array(mDay.slots.soldiers).fill(null),
       };
+      // הרחב את המערך אם צריך לפי override
+      const needed = type==='commanders' ? mDay.slots.commander : mDay.slots.soldiers;
+      while ((c[activeDay][activeMission][type]||[]).length < needed) {
+        c[activeDay][activeMission][type].push(null);
+      }
       const slots = c[activeDay][activeMission][type];
       let qi = 0;
       for (let i = idx; i < slots.length && qi < selPeople.length; i++) {
@@ -913,12 +1068,12 @@ function App() {
               </div>
             </div>
           )}
-          {col1.length>0 && <div className="display-col">{col1.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col2.length>0 && <div className="display-col">{col2.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col3.length>0 && <div className="display-col">{col3.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col4.length>0 && <div className="display-col">{col4.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col5.length>0 && <div className="display-col">{col5.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col6.length>0 && <div className="display-col">{col6.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col1.length>0 && <div className="display-col">{col1.map(m=><SafeDisplayCard key={m.id} mission={getMissionForDay(m,activeDay)} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col2.length>0 && <div className="display-col">{col2.map(m=><SafeDisplayCard key={m.id} mission={getMissionForDay(m,activeDay)} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col3.length>0 && <div className="display-col">{col3.map(m=><SafeDisplayCard key={m.id} mission={getMissionForDay(m,activeDay)} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col4.length>0 && <div className="display-col">{col4.map(m=><SafeDisplayCard key={m.id} mission={getMissionForDay(m,activeDay)} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col5.length>0 && <div className="display-col">{col5.map(m=><SafeDisplayCard key={m.id} mission={getMissionForDay(m,activeDay)} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col6.length>0 && <div className="display-col">{col6.map(m=><SafeDisplayCard key={m.id} mission={getMissionForDay(m,activeDay)} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
         </div>
         </div>
       </div>
@@ -937,7 +1092,8 @@ function App() {
               return true;
             }).map(m=>{
               const isHidden = isMissionHiddenOnDay(activeDay, m.id);
-              const a=dayAss[m.id], assignedPeople=[...(a?.commanders||[]),...(a?.soldiers||[])].filter(Boolean), f=assignedPeople.length, t=m.slots.commander+m.slots.soldiers, done=f===t;
+              const mDay = getMissionForDay(m, activeDay);
+              const a=dayAss[m.id], assignedPeople=[...(a?.commanders||[]),...(a?.soldiers||[])].filter(Boolean), f=assignedPeople.length, t=mDay.slots.commander+mDay.slots.soldiers, done=f===t;
               return (
                 <div key={m.id} style={{display:"flex",alignItems:"center",gap:2}}>
                   <button className={`mpick-btn ${activeMission===m.id&&!isHidden?"active":""}`}
@@ -963,31 +1119,41 @@ function App() {
               <div>
                 <div style={{fontWeight:700,fontSize:16}}>{mission.label}</div>
                 {mission.time&&<div style={{fontSize:12,color:"var(--text2)"}}>{mission.time}</div>}
+                {(dayMissionOverrides[activeDay]||{})[activeMission] && <div style={{fontSize:10,color:"var(--accent)"}}>● override פעיל ליום זה</div>}
               </div>
             </div>
             <div className="amcard-body">
-              {mission.slots.commander>0&&(
-                <div>
-                  {!mission.noLabel&&<div className="slot-label">מפקד</div>}
-                  <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                    {dayAss[mission.id].commanders.map((p,i)=>(
-                      <SlotBox key={i} label="מפקד ריק" assigned={p} highlight={selPeople.length>0&&!p}
-                        onClick={()=>!p&&slotClick("commanders",i)} onRemove={()=>removePerson("commanders",i)}/>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {mission.slots.soldiers>0&&(
-                <div>
-                  <div className="slot-label">חיילים</div>
-                  <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                    {dayAss[mission.id].soldiers.map((p,i)=>(
-                      <SlotBox key={i} label="חייל ריק" assigned={p} highlight={selPeople.length>0&&!p}
-                        onClick={()=>!p&&slotClick("soldiers",i)} onRemove={()=>removePerson("soldiers",i)}/>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {(() => {
+                const mDay = getMissionForDay(mission, activeDay);
+                const da = dayAss[mission.id] || {commanders:Array(mDay.slots.commander).fill(null),soldiers:Array(mDay.slots.soldiers).fill(null)};
+                // resize arrays if override changed slots
+                const cmdArr = Array(mDay.slots.commander).fill(null).map((_,i)=>da.commanders?.[i]||null);
+                const solArr = Array(mDay.slots.soldiers).fill(null).map((_,i)=>da.soldiers?.[i]||null);
+                return (<>
+                  {mDay.slots.commander>0&&(
+                    <div>
+                      {!mission.noLabel&&<div className="slot-label">מפקד</div>}
+                      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                        {cmdArr.map((p,i)=>(
+                          <SlotBox key={i} label="מפקד ריק" assigned={p} highlight={selPeople.length>0&&!p}
+                            onClick={()=>!p&&slotClick("commanders",i)} onRemove={()=>removePerson("commanders",i)}/>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {mDay.slots.soldiers>0&&(
+                    <div>
+                      <div className="slot-label">חיילים</div>
+                      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                        {solArr.map((p,i)=>(
+                          <SlotBox key={i} label="חייל ריק" assigned={p} highlight={selPeople.length>0&&!p}
+                            onClick={()=>!p&&slotClick("soldiers",i)} onRemove={()=>removePerson("soldiers",i)}/>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>);
+              })()}
               {selPeople.length>0&&(
                 <div className="sel-banner">
                   <div style={{display:"flex",flexWrap:"wrap",gap:5,flex:1}}>
@@ -1343,7 +1509,7 @@ function App() {
                     </div>
                     {/* כפתורי ימים */}
                     {!isEditing && (
-                      <div style={{display:"flex",flexWrap:"wrap",gap:2,padding:"0 14px 8px"}}>
+                      <div style={{display:"flex",flexWrap:"wrap",gap:2,padding:"0 14px 4px"}}>
                         {DAYS.map(d=>{
                           const hidden = isMissionHiddenOnDay(d.id, m.id);
                           return <button key={d.id} className="day-toggle-btn" onClick={()=>toggleMissionDay(d.id,m.id)}
@@ -1353,6 +1519,73 @@ function App() {
                         })}
                       </div>
                     )}
+                    {/* הגדרות יום ספציפי */}
+                    {!isEditing && (() => {
+                      const [showDayOv, setShowDayOv] = React.useState(false);
+                      const [ovDay, setOvDay] = React.useState(activeDay);
+                      const [ovDraft, setOvDraft] = React.useState({});
+                      const existing = (dayMissionOverrides[ovDay]||{})[m.id] || {};
+                      const base = missionSettings[m.id] || {};
+                      const hasAny = Object.values(dayMissionOverrides).some(d=>d[m.id] && Object.keys(d[m.id]).length>0);
+                      return (
+                        <div style={{padding:"0 14px 8px"}}>
+                          <button onClick={()=>setShowDayOv(p=>!p)} style={{...btn(),fontSize:10,padding:"2px 8px",color:hasAny?"var(--accent)":"var(--text3)"}}>
+                            📅 הגדרות יום ספציפי {hasAny?"●":""}
+                          </button>
+                          {showDayOv && (
+                            <div style={{marginTop:8,background:"var(--surface2)",borderRadius:10,padding:"10px 12px",display:"flex",flexDirection:"column",gap:8}}>
+                              <label style={{fontSize:11,color:"var(--text2)"}}>בחר יום:
+                                <select style={{...inp,marginTop:2}} value={ovDay} onChange={e=>{setOvDay(e.target.value);setOvDraft({});}}>
+                                  {DAYS.map(d=><option key={d.id} value={d.id}>{d.label} {d.date}</option>)}
+                                </select>
+                              </label>
+                              {Object.keys((dayMissionOverrides[ovDay]||{})[m.id]||{}).length>0 && (
+                                <div style={{fontSize:10,color:"var(--accent)"}}>● יש override פעיל ליום זה</div>
+                              )}
+                              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(110px,1fr))",gap:6}}>
+                                {[
+                                  {key:"slots_commander",label:"מפקדים",type:"number",min:0,max:10},
+                                  {key:"slots_soldiers",label:"חיילים",type:"number",min:0,max:20},
+                                  {key:"restHours",label:"מנוחה (שע')",type:"number",min:0,max:24},
+                                  {key:"startH",label:"שעת התחלה",type:"number",min:0,max:30},
+                                  {key:"endH",label:"שעת סיום",type:"number",min:0,max:30},
+                                ].map(f=>(
+                                  <label key={f.key} style={{fontSize:10,color:"var(--text2)"}}>
+                                    {f.label}
+                                    <input type={f.type} min={f.min} max={f.max} style={{...inp,fontSize:11,padding:"3px 6px"}}
+                                      placeholder={String(existing[f.key]??base[f.key]??"")}
+                                      value={ovDraft[f.key]??existing[f.key]??""}
+                                      onChange={e=>setOvDraft(d=>({...d,[f.key]:+e.target.value}))}/>
+                                  </label>
+                                ))}
+                              </div>
+                              <div style={{display:"flex",gap:6}}>
+                                <button style={btn({background:"var(--accent)",color:"#fff",fontWeight:700,fontSize:11,flex:1})} onClick={()=>{
+                                  const merged={...existing,...ovDraft};
+                                  if(Object.keys(merged).length===0) return;
+                                  setDayMissionOverrides(prev=>({...prev,[ovDay]:{...(prev[ovDay]||{}),[m.id]:merged}}));
+                                  setOvDraft({});
+                                }}>✓ שמור</button>
+                                {Object.keys(existing).length>0 && (
+                                  <button style={btn({color:"#ef5350",fontSize:11})} onClick={()=>{
+                                    setDayMissionOverrides(prev=>{const n={...prev};if(n[ovDay]){const d={...n[ovDay]};delete d[m.id];n[ovDay]=d;}return n;});
+                                  }}>🗑 מחק</button>
+                                )}
+                              </div>
+                              {/* כל ה-overrides הפעילים למשימה זו */}
+                              {hasAny && (
+                                <div style={{fontSize:10,color:"var(--text3)"}}>
+                                  {Object.entries(dayMissionOverrides).filter(([,v])=>v[m.id]&&Object.keys(v[m.id]).length>0).map(([dayId,v])=>{
+                                    const ov=v[m.id], d=DAYS.find(x=>x.id===dayId);
+                                    return <div key={dayId}>📅 {d?.date}: {Object.entries(ov).map(([k,val])=>`${k}=${val}`).join(", ")}</div>;
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
                     {/* עריכה */}
                     {isEditing && (
                       <div style={{padding:"0 14px 14px",display:"flex",flexDirection:"column",gap:8}}>
@@ -1593,7 +1826,7 @@ function App() {
             const counts = {};
             allMembers.forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
             // נתונים ידניים — תורני מטבח מכוח חץ דרוך
-            const manualMatbahMap = {"יעקב נרי":1,"אברהם גולדשטיין":1,"יאיר ספיר":1,"ישי אדרי":1,"ניב לאופר":3,"דימה":1,"רועי שאג":1.5,"נאור גזולי":-0.5,"דניאל ברדריק":0.5};
+            const manualMatbahMap = {"יעקב נרי":1,"אברהם גולדשטיין":1,"יאיר ספיר":1,"ישי אדרי":1,"ניב לאופר - מפקד":3,"דימה":1,"רועי שאג":1.5,"נאור גזולי":-0.5,"דניאל ברדריק":0.5};
             Object.entries(manualMatbahMap).forEach(([name, count]) => {
               if (counts[name] !== undefined) counts[name].count += count;
             });
@@ -1764,6 +1997,74 @@ function App() {
     </div>
   );
 
+  const MemberRow = ({ name, platoonKey, idx, getPlatoonStyleFn, setPlatoons, setAllAssAndSave, btn, inp }) => {
+    const [editing, setEditing] = React.useState(false);
+    const [editVal, setEditVal] = React.useState(name);
+    return (
+      <div style={{display:"flex",alignItems:"center",gap:4}}>
+        {editing ? (
+          <>
+            <input style={{...inp,flex:1,fontSize:11,padding:"2px 6px"}} value={editVal}
+              onChange={e=>setEditVal(e.target.value)}
+              onKeyDown={e=>{
+                if(e.key==='Enter'&&editVal.trim()){
+                  const oldName = name;
+                  const newName = editVal.trim();
+                  setPlatoons(prev=>{const n=JSON.parse(JSON.stringify(prev));n[platoonKey].members[idx]=newName;return n;});
+                  setAllAssAndSave(prev=>{
+                    const c=JSON.parse(JSON.stringify(prev));
+                    Object.keys(c).forEach(dayId=>{
+                      Object.keys(c[dayId]||{}).forEach(mid=>{
+                        ['commanders','soldiers'].forEach(type=>{
+                          (c[dayId][mid][type]||[]).forEach((p,i)=>{
+                            if(p&&p.name===oldName) c[dayId][mid][type][i]={...p,name:newName};
+                          });
+                        });
+                      });
+                    });
+                    return c;
+                  });
+                  setEditing(false);
+                } else if(e.key==='Escape') setEditing(false);
+              }}
+              autoFocus/>
+            <button style={btn({fontSize:10,padding:"2px 6px",color:"var(--green)",background:"var(--green)22"})} onClick={()=>{
+              if(editVal.trim()){
+                const oldName = name;
+                const newName = editVal.trim();
+                setPlatoons(prev=>{const n=JSON.parse(JSON.stringify(prev));n[platoonKey].members[idx]=newName;return n;});
+                // עדכון שיבוצים קיימים
+                setAllAssAndSave(prev=>{
+                  const c=JSON.parse(JSON.stringify(prev));
+                  Object.keys(c).forEach(dayId=>{
+                    Object.keys(c[dayId]||{}).forEach(mid=>{
+                      ['commanders','soldiers'].forEach(type=>{
+                        (c[dayId][mid][type]||[]).forEach((p,i)=>{
+                          if(p&&p.name===oldName) c[dayId][mid][type][i]={...p,name:newName};
+                        });
+                      });
+                    });
+                  });
+                  return c;
+                });
+                setEditing(false);
+              }
+            }}>✓</button>
+            <button style={btn({fontSize:10,padding:"2px 6px"})} onClick={()=>setEditing(false)}>✕</button>
+          </>
+        ) : (
+          <>
+            <div style={{...getPlatoonStyleFn(platoonKey),borderRadius:6,padding:"2px 8px",fontSize:12,flex:1}}>{name}</div>
+            <button style={btn({fontSize:10,padding:"2px 5px"})} onClick={()=>{setEditVal(name);setEditing(true);}}>✏️</button>
+            <button style={btn({fontSize:10,padding:"2px 5px",color:"#ef5350"})} onClick={()=>{
+              if(confirm(`למחוק את ${name}?`)){setPlatoons(prev=>{const n=JSON.parse(JSON.stringify(prev));n[platoonKey].members=n[platoonKey].members.filter((_,i)=>i!==idx);return n;});}
+            }}>🗑</button>
+          </>
+        )}
+      </div>
+    );
+  };
+
   const SpecialsView = () => {
     const inp = {display:"block",width:"100%",marginTop:3,padding:"5px 8px",borderRadius:7,border:"1px solid var(--border2)",background:"var(--surface2)",color:"var(--text)",fontFamily:"Heebo,sans-serif",fontSize:13};
     const btn = (extra={}) => ({background:"var(--surface2)",border:"1px solid var(--border2)",borderRadius:7,color:"var(--text2)",cursor:"pointer",fontFamily:"Heebo,sans-serif",fontSize:12,padding:"4px 10px",...extra});
@@ -1846,18 +2147,13 @@ function App() {
             }}>✓ הוסף</button>
           </div>
           {/* Show all platoons and their members */}
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:10}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:10}}>
             {Object.entries(platoons).map(([k,p])=>(
               <div key={k} style={{background:"var(--surface)",border:"1.5px solid var(--border)",borderRadius:12,padding:"12px 14px"}}>
                 <div style={{fontWeight:700,fontSize:13,color:"var(--text)",marginBottom:8}}>{p.label}</div>
                 <div style={{display:"flex",flexDirection:"column",gap:4}}>
-                  {p.members.map(name=>(
-                    <div key={name} style={{display:"flex",alignItems:"center",gap:6}}>
-                      <div style={{...getPlatoonStyle(k),borderRadius:6,padding:"2px 8px",fontSize:12,flex:1}}>{name}</div>
-                      <button style={btn({fontSize:10,padding:"2px 6px",color:"#ef5350"})} onClick={()=>{
-                        if(confirm(`למחוק את ${name}?`)){ setPlatoons(prev => { const n=JSON.parse(JSON.stringify(prev)); n[k].members=n[k].members.filter(m=>m!==name); return n; }); }
-                      }}>✕</button>
-                    </div>
+                  {p.members.map((name,idx)=>(
+                    <MemberRow key={name+k+idx} name={name} platoonKey={k} idx={idx} getPlatoonStyleFn={getPlatoonStyle} setPlatoons={setPlatoons} setAllAssAndSave={setAllAssAndSave} btn={btn} inp={inp}/>
                   ))}
                 </div>
               </div>

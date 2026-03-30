@@ -133,9 +133,9 @@ body{background:var(--bg);color:var(--text);font-family:'Heebo',sans-serif;font-
 const { useState, useMemo } = React;
 
 const PLATOONS_DEFAULT = {
-  cmd1:     { label:"מפקדי מחלקה 1", color:"#ff9800", textColor:"#0a0f1a", members:["חזי דיין","דניאל בר-שי","צבי ווגל","מרדכי אלפרסי"] },
-  soldiers1:{ label:"חיילי מחלקה 1",  color:"#4db6e8", textColor:"#0a0f1a", members:["ישי לשם","יהודה ישי","יהודה וויזר","שלמה לייבל","אלי ברץ","מקסים שמורקוב","רועי שמיר","דניס שחרוביץ","שילה דוד","דימה","תומר כנר","אולג"] },
-  cmd2:     { label:"מפקדי מחלקה 2", color:"#ab47bc", textColor:"#fff",    members:["ידידיה שמואליאן","אליאור מרטן","נאור גדמו","משה נחשון","ישי קבדה","ניב לאופר"] },
+  cmd1:     { label:"מפקדי מחלקה 1", color:"#ff9800", textColor:"#0a0f1a", members:["חזי דיין - מ״מ","דניאל בר-שי","צבי ווגל","מרדכי אלפרסי - סמל"] },
+  soldiers1:{ label:"חיילי מחלקה 1",  color:"#4db6e8", textColor:"#0a0f1a", members:["ישי לשם - מפקד","יהודה ישי","יהודה וויזר","שלמה לייבל","אלי ברץ","מקסים שמורקוב","רועי שמיר","דניס שחרוביץ","שילה דוד","דימה","תומר כנר","אולג"] },
+  cmd2:     { label:"מפקדי מחלקה 2", color:"#ab47bc", textColor:"#fff",    members:["ידידיה שמואליאן","אליאור מרטן","נאור גדמו","משה נחשון - מפקד","ישי קבדה - מפקד","ניב לאופר - מפקד"] },
   soldiers2:{ label:"חיילי מחלקה 2",  color:"#ce93d8", textColor:"#0a0f1a", members:["לזבניק","יוני אמרה","יוני אקנין","משה חזן","דניאל ברדריק","יוסי וורקו","אראל רחימי","נאור גזולי","גורדון","גיטלמן","שחר מרגלית","עזריאל סון","פנחס לניאדו"] },
   cmd3:     { label:"מפקדי מחלקה 3", color:"#66bb6a", textColor:"#0a0f1a", members:["אריאל טופז","דורון בוכהולץ","חנן שטיין","רפאל מבשר"] },
   soldiers3:{ label:"חיילי מחלקה 3",  color:"#a5d6a7", textColor:"#0a0f1a", members:["ישי אדרי","אביב אוחנה","אברהם גולדשטיין","ירדן גיאת","אביחן לוי","אהרון נתניא","יאיר ספיר","נאור עזרא","יעקב נרי","נעם קפלנסקי","רועי שאג","יצחק שטטמן"] },
@@ -145,13 +145,13 @@ const PLATOONS_DEFAULT = {
 
 const CMD_PLATOONS = new Set(["cmd1","cmd2","cmd3","pluga","pluga2"]);
 // רק אלה יכולים לבצע כמה משימות במקביל וללא מנוחה
-const MULTI_MISSION_OFFICERS = new Set(["אריאל טופז","ידידיה שמואליאן","חזי דיין","ידידיה אבולעפיה","שמואל ברגלס","איתן שוורץ","משה חדד"]);
+const MULTI_MISSION_OFFICERS = new Set(["אריאל טופז","ידידיה שמואליאן","חזי דיין - מ״מ","ידידיה אבולעפיה","שמואל ברגלס","איתן שוורץ","משה חדד"]);
 // פטור ממנוחה בין ש"גים לחיילים ספציפיים
 const SG_REST_EXEMPT = new Set(["איתן שוורץ","ידידיה אבולעפיה","שמואל ברגלס","משה חדד"]);
 
 // חריגים ממנוחה לפי יום ומשימה
 const REST_EXEMPTIONS_DEFAULT = {
-  "2026_03_10": { siyur_tzo: new Set(["מרדכי אלפרסי","ישי לשם","אלי ברץ"]) }
+  "2026_03_10": { siyur_tzo: new Set(["מרדכי אלפרסי - סמל","ישי לשם - מפקד","אלי ברץ"]) }
 };
 
 const NEW_GAZRA = ["2026_03_13","2026_03_14","2026_03_15","2026_03_16","2026_03_17","2026_03_18","2026_03_19","2026_03_20","2026_03_21","2026_03_22","2026_03_23","2026_03_24","2026_03_25","2026_03_26","2026_03_27","2026_03_28","2026_03_29","2026_03_30","2026_03_31","2026_04_01","2026_04_02","2026_04_03","2026_04_04","2026_04_05","2026_04_06","2026_04_07","2026_04_08","2026_04_09","2026_04_10","2026_04_11","2026_04_12","2026_04_13","2026_04_14","2026_04_15","2026_04_16","2026_04_17","2026_04_18","2026_04_19","2026_04_20","2026_04_21","2026_04_22","2026_04_23","2026_04_24","2026_04_25","2026_04_26","2026_04_27","2026_04_28","2026_04_29","2026_04_30"];
@@ -184,7 +184,7 @@ const MISSION_DEFS = [
   { id:"siyur_tzo",   label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
   { id:"siyur_layla", label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:6, startH:22, endH:30, isSiyur:true, isNightPatrol:true, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
   { id:"maatzar",     label:"פעילות מבצעית",  icon:"🔒", slots:{commander:0,soldiers:10},time:"",               border:"#ef5350", col:4, startH:0,  endH:24, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
-  { id:"katzin",      label:"קצין מוצב",      icon:"🟡", slots:{commander:1,soldiers:0}, time:"החל מ-6:00",     border:"#555",    col:1, startH:0,  endH:24, noLabel:true, allowedNames:["אריאל טופז","חזי דיין","ידידיה שמואליאן","איתי דרייר"] },
+  { id:"katzin",      label:"קצין מוצב",      icon:"🟡", slots:{commander:1,soldiers:0}, time:"החל מ-6:00",     border:"#555",    col:1, startH:0,  endH:24, noLabel:true, allowedNames:["אריאל טופז","חזי דיין - מ״מ","ידידיה שמואליאן","איתי דרייר"] },
   { id:"gimel",       label:"גימל",           icon:"🤒", slots:{commander:0,soldiers:2}, time:"",               border:"#78909c", col:6, startH:0,  endH:24, noCount:true, hideFromDisplay:true },
   { id:"rachpan",     label:"קורס רחפנים",    icon:"🚁", slots:{commander:0,soldiers:1}, time:"",               border:"#80cbc4", col:6, startH:0,  endH:24, showOnDays:["2026_03_09","2026_03_10","2026_03_11","2026_03_12"] },
 
@@ -400,9 +400,12 @@ function SafeDisplayCard(props) {
 function DisplayCard({ mission, assignment, dayId }) {
   if (!assignment) return null;
   const normalizeArr = (arr, size) => {
-    const a = Array(size).fill(null);
-    (arr||[]).forEach((v,i) => { if(i<size) a[i]=v; });
-    return a;
+    const current = Array.isArray(arr) ? [...arr] : [];
+    // לא לחתוך - רק להרחיב אם צריך
+    while (current.length < size) {
+      current.push(null);
+    }
+    return current;
   };
   const ass = {
     commanders: normalizeArr(Array.isArray(assignment.commanders)?assignment.commanders:[], mission.slots.commander),
@@ -592,13 +595,17 @@ function App() {
             if (m.showOnDays && !m.showOnDays.includes(day)) return;
             if (m.hideOnDays && m.hideOnDays.includes(day)) return;
             const normalize = (arr, size) => {
-              const a = Array(size).fill(null);
-              if (!arr) return a;
+              if (!arr) return Array(size).fill(null);
               if (!Array.isArray(arr)) {
-                Object.entries(arr).forEach(([k,v]) => { if (parseInt(k)<size) a[parseInt(k)]=v; });
+                const a = [];
+                Object.entries(arr).forEach(([k,v]) => { a[parseInt(k)] = v; });
+                // הרחבת מערך אם צריך
+                while (a.length < size) a.push(null);
                 return a;
               }
-              arr.forEach((v,i) => { if (i<size) a[i]=v; });
+              // לא לחתוך, רק להרחיב אם צריך
+              const a = [...arr];
+              while (a.length < size) a.push(null);
               return a;
             };
             base[day][mid] = {
@@ -630,10 +637,54 @@ function App() {
             }
           });
         });
+        // עדכן שמות קדומים בתוך Firebase load
+        const renames = [
+          ["משה נחשון", "משה נחשון - מפקד"],
+          ["חזי דיין", "חזי דיין - מ״מ"],
+          ["מרדכי אלפרסי", "מרדכי אלפרסי - סמל"],
+          ["ישי לשם", "ישי לשם - מפקד"],
+          ["ישי קבדה", "ישי קבדה - מפקד"],
+          ["ניב לאופר", "ניב לאופר - מפקד"]
+        ];
+        renames.forEach(([oldName, newName]) => {
+          DAY_IDS.forEach(day => {
+            if (!base[day]) return;
+            Object.keys(base[day]).forEach(mid => {
+              ['commanders','soldiers'].forEach(type => {
+                (base[day][mid][type]||[]).forEach((p,i) => {
+                  if (p && p.name === oldName) {
+                    base[day][mid][type][i] = { name: newName, platoon: p.platoon };
+                  }
+                });
+              });
+            });
+          });
+        });
         setAllAss(base);
       }
       setSynced(true);
     });
+
+    // פונקציה לתיקון גודל assignments לפי dayMissionOverrides
+    window._fixAssignmentSizesAfterOverrides = (ass, overrides) => {
+      const result = JSON.parse(JSON.stringify(ass));
+      Object.entries(overrides || {}).forEach(([dayId, dayOv]) => {
+        if (!result[dayId]) result[dayId] = {};
+        Object.entries(dayOv).forEach(([missionId, ov]) => {
+          if (!result[dayId][missionId]) return;
+          const a = result[dayId][missionId];
+          // הרחבת מפקדים אם צריך
+          if (ov.slots_commander && (a.commanders||[]).length < ov.slots_commander) {
+            while (a.commanders.length < ov.slots_commander) a.commanders.push(null);
+          }
+          // הרחבת חיילים אם צריך
+          if (ov.slots_soldiers && (a.soldiers||[]).length < ov.slots_soldiers) {
+            while (a.soldiers.length < ov.slots_soldiers) a.soldiers.push(null);
+          }
+        });
+      });
+      return result;
+    };
 
     // ניקוי שמות ישנים — מריץ פעם אחת אחרי טעינת settings
     window._cleanOldNames = (platoons, allAss, setAllAssAndSave) => {
@@ -647,6 +698,27 @@ function App() {
               (c[dayId][mid][type]||[]).forEach((p,i) => {
                 if (p && !allNames.has(p.name)) {
                   c[dayId][mid][type][i] = null;
+                  changed = true;
+                }
+              });
+            });
+          });
+        });
+        return changed ? c : prev;
+      });
+    };
+
+    // עדכון שמות ישנים לשמות חדשים — שמור את כל הזיכרון
+    window._renameInAllAss = (allAss, setAllAssAndSave, oldName, newName) => {
+      setAllAssAndSave(prev => {
+        const c = JSON.parse(JSON.stringify(prev));
+        let changed = false;
+        Object.keys(c).forEach(dayId => {
+          Object.keys(c[dayId]||{}).forEach(mid => {
+            ['commanders','soldiers'].forEach(type => {
+              (c[dayId][mid][type]||[]).forEach((p,i) => {
+                if (p && p.name === oldName) {
+                  c[dayId][mid][type][i] = { name: newName, platoon: p.platoon };
                   changed = true;
                 }
               });
@@ -682,6 +754,20 @@ function App() {
           setPlatoons(prev => {
             const next = JSON.parse(JSON.stringify(prev));
             Object.entries(s.platoons).forEach(([k,members]) => { if (next[k]) next[k].members = members; });
+            // עדכן שמות קדומים בplatoons
+            const renames = [
+              ["משה נחשון", "משה נחשון - מפקד"],
+              ["חזי דיין", "חזי דיין - מ״מ"],
+              ["מרדכי אלפרסי", "מרדכי אלפרסי - סמל"],
+              ["ישי לשם", "ישי לשם - מפקד"],
+              ["ישי קבדה", "ישי קבדה - מפקד"],
+              ["ניב לאופר", "ניב לאופר - מפקד"]
+            ];
+            renames.forEach(([oldName, newName]) => {
+              Object.keys(next).forEach(platoonKey => {
+                next[platoonKey].members = next[platoonKey].members.map(m => m === oldName ? newName : m);
+              });
+            });
             return next;
           });
         }
@@ -691,6 +777,12 @@ function App() {
 
     return () => { unsubAss(); unsubAftar(); };
   }, [fbReady, authed]);
+
+  // תיקון גודל assignments לפי dayMissionOverrides
+  React.useEffect(() => {
+    if (!window._fixAssignmentSizesAfterOverrides) return;
+    setAllAss(prev => window._fixAssignmentSizesAfterOverrides(prev, dayMissionOverrides));
+  }, [dayMissionOverrides]);
 
   // שמירה ל-Firebase בכל שינוי
   const isLocalWrite = React.useRef(false);
@@ -763,7 +855,46 @@ function App() {
   React.useEffect(() => { window._platoons = platoons; }, [platoons]);
   React.useEffect(() => { window._spontMissions = spontMissions.map(m=>({...m,slots:{commander:m.slots_commander||0,soldiers:m.slots_soldiers||1}})); }, [spontMissions]);
 
-  // (cleanup removed - was causing assignments to be deleted)
+  // עדכום Firebase assignments עם שמות חדשים (חד-פעמי)
+  React.useEffect(() => {
+    if (!isSettingsLoaded.current || !fbReady) return;
+    if (window._updatedAssignmentsWithNewNames) return;
+    window._updatedAssignmentsWithNewNames = true;
+    
+    // עדכן שמות בassignments
+    const renames = [
+      ["משה נחשון", "משה נחשון - מפקד"],
+      ["חזי דיין", "חזי דיין - מ״מ"],
+      ["מרדכי אלפרסי", "מרדכי אלפרסי - סמל"],
+      ["ישי לשם", "ישי לשם - מפקד"],
+      ["ישי קבדה", "ישי קבדה - מפקד"],
+      ["ניב לאופר", "ניב לאופר - מפקד"]
+    ];
+    
+    setAllAss(prev => {
+      const updated = JSON.parse(JSON.stringify(prev));
+      renames.forEach(([oldName, newName]) => {
+        DAY_IDS.forEach(day => {
+          if (!updated[day]) return;
+          Object.keys(updated[day]).forEach(mid => {
+            ['commanders','soldiers'].forEach(type => {
+              (updated[day][mid][type]||[]).forEach((p,i) => {
+                if (p && p.name === oldName) {
+                  updated[day][mid][type][i] = { name: newName, platoon: p.platoon };
+                }
+              });
+            });
+          });
+        });
+      });
+      
+      // שמור ל-Firebase
+      if (fbReady) {
+        window._firebaseSet(window._firebaseRef(window._firebaseDb, 'shabzak/ass'), updated).catch(()=>{});
+      }
+      return updated;
+    });
+  }, [isSettingsLoaded, fbReady]);
 
   const getMissionForDay = React.useCallback((mission, dayId) => {
     const ms = missionSettings[mission.id] || {};
@@ -1082,10 +1213,10 @@ function App() {
             <div className="amcard-body">
               {(() => {
                 const mDay = getMissionForDay(mission, activeDay);
-                const da = dayAss[mission.id] || {commanders:Array(mDay.slots.commander).fill(null),soldiers:Array(mDay.slots.soldiers).fill(null)};
-                // resize arrays if override changed slots
-                const cmdArr = Array(mDay.slots.commander).fill(null).map((_,i)=>da.commanders?.[i]||null);
-                const solArr = Array(mDay.slots.soldiers).fill(null).map((_,i)=>da.soldiers?.[i]||null);
+                const da = dayAss[mission.id] || {commanders:[],soldiers:[]};
+                // הרחבת מערכים אם override גדל את הגודל
+                const cmdArr = Array(mDay.slots.commander).fill(null).map((_,i)=>(da.commanders||[])[i]||null);
+                const solArr = Array(mDay.slots.soldiers).fill(null).map((_,i)=>(da.soldiers||[])[i]||null);
                 return (<>
                   {mDay.slots.commander>0&&(
                     <div>
@@ -1796,7 +1927,7 @@ function App() {
             const counts = {};
             allMembers.forEach(m => { counts[m.name] = { count: 0, platoon: m.platoon }; });
             // נתונים ידניים — תורני מטבח מכוח חץ דרוך
-            const manualMatbahMap = {"יעקב נרי":1,"אברהם גולדשטיין":1,"יאיר ספיר":1,"ישי אדרי":1,"ניב לאופר":3,"דימה":1,"רועי שאג":1.5,"נאור גזולי":-0.5,"דניאל ברדריק":0.5};
+            const manualMatbahMap = {"יעקב נרי":1,"אברהם גולדשטיין":1,"יאיר ספיר":1,"ישי אדרי":1,"ניב לאופר - מפקד":3,"דימה":1,"רועי שאג":1.5,"נאור גזולי":-0.5,"דניאל ברדריק":0.5};
             Object.entries(manualMatbahMap).forEach(([name, count]) => {
               if (counts[name] !== undefined) counts[name].count += count;
             });

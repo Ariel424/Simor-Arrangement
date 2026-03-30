@@ -150,7 +150,7 @@ const MULTI_MISSION_OFFICERS = new Set(["אריאל טופז","ידידיה שמ
 const SG_REST_EXEMPT = new Set(["איתן שוורץ","ידידיה אבולעפיה","שמואל ברגלס","משה חדד"]);
 
 // חריגים ממנוחה לפי יום ומשימה
-const REST_EXEMPTIONS = {
+const REST_EXEMPTIONS_DEFAULT = {
   "2026_03_10": { siyur_tzo: new Set(["מרדכי אלפרסי","ישי לשם","אלי ברץ"]) }
 };
 
@@ -174,12 +174,12 @@ const OLD_GAZRA_HIDE = NEW_GAZRA; // המשימות הישנות נסתרות ב
 
 const MISSION_DEFS = [
   // ═══ גזרה ישנה (עד 11/3) ═══
-  { id:"agamim",      label:"אגמים",          icon:"🏊", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#f06292", col:1, startH:0,  endH:24, hideOnDays:OLD_GAZRA_HIDE },
+  { id:"agamim",      label:"אגמים",          icon:"🏊", slots:{commander:1,soldiers:7}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#f06292", col:1, startH:0,  endH:24, hideOnDays:OLD_GAZRA_HIDE },
   { id:"matbah",      label:"מטבח",           icon:"🍳", slots:{commander:0,soldiers:1}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#555",    col:2, startH:8,  endH:14, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"], hideFromDisplay:true },
   { id:"matbah_boker", label:"תורנות מטבח א׳ (עד 14:00)",     icon:"🍳", slots:{commander:0,soldiers:1}, time:"8:30 - 14:00",    border:"#555",    col:1, startH:8,  endH:14, showOnDays:null, hideFromDisplay:false },
   { id:"matbah_tzaharayim", label:"תורנות מטבח ב׳ (14:00+)", icon:"🍳", slots:{commander:0,soldiers:1}, time:"14:00 - סוף יום", border:"#555", col:1, startH:14, endH:20, showOnDays:null, hideFromDisplay:false },
-  { id:"hilton",      label:"פילבוקס ביתילו", icon:"🏠", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#f06292", col:1, startH:0,  endH:24, hideOnDays:OLD_GAZRA_HIDE },
-  { id:"konnut",      label:"כוננות (חץ)",    icon:"🤜", slots:{commander:1,soldiers:4}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#26c6da", col:2, startH:14, endH:24, hideOnDays:OLD_GAZRA_HIDE },
+  { id:"hilton",      label:"פילבוקס ביתילו", icon:"🏠", slots:{commander:1,soldiers:7}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#f06292", col:1, startH:0,  endH:24, hideOnDays:OLD_GAZRA_HIDE },
+  { id:"konnut",      label:"כוננות (חץ)",    icon:"🤜", slots:{commander:2,soldiers:6}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#26c6da", col:2, startH:14, endH:24, hideOnDays:OLD_GAZRA_HIDE },
   { id:"siyur_boker", label:"סיור בוקר",      icon:"🚗", slots:{commander:1,soldiers:2}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#26c6da", col:3, startH:6,  endH:14, isSiyur:true, hideOnDays:OLD_GAZRA_HIDE },
   { id:"siyur_tzo",   label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
   { id:"siyur_layla", label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:6, startH:22, endH:30, isSiyur:true, isNightPatrol:true, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
@@ -206,11 +206,11 @@ const MISSION_DEFS = [
   { id:"siyur_boker2",  label:"סיור בוקר",      icon:"🚗", slots:{commander:1,soldiers:2}, time:"6:00 - 14:00",   border:"#26c6da", col:3, startH:6,  endH:14, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_tzo2",    label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_layla2",  label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:3, startH:22, endH:30, isSiyur:true, isNightPatrol:true, showOnDays:NEW_GAZRA },
-  { id:"hetz",  label:"חץ דרוך", icon:"🏹", slots:{commander:1,soldiers:7}, time:"החל מ-14:00", border:"#26c6da", col:4, startH:0, endH:24, showOnDays:NEW_GAZRA.filter(d=>d<"2026_03_18") },
+  { id:"hetz",  label:"חץ דרוך", icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00", border:"#26c6da", col:4, startH:0, endH:24, showOnDays:NEW_GAZRA.filter(d=>d<"2026_03_18") },
   { id:"hetz2", label:"חץ דרוך", icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00", border:"#26c6da", col:4, startH:0, endH:24, showOnDays:NEW_GAZRA.filter(d=>d>="2026_03_18"&&d<="2026_03_26") },
-  { id:"hetz3", label:"חץ דרוך", icon:"🏹", slots:{commander:3,soldiers:5}, time:"החל מ-14:00", border:"#26c6da", col:4, startH:0, endH:24, showOnDays:NEW_GAZRA.filter(d=>d>="2026_03_27"&&d<="2026_03_28") },
+  { id:"hetz3", label:"חץ דרוך", icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00", border:"#26c6da", col:4, startH:0, endH:24, showOnDays:NEW_GAZRA.filter(d=>d>="2026_03_27"&&d<="2026_03_28") },
   { id:"hetz4", label:"חץ דרוך", icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00", border:"#26c6da", col:4, startH:0, endH:24, showOnDays:NEW_GAZRA.filter(d=>d>"2026_03_28") },
-  { id:"philbox_horsa", label:"פילבוקס חורסה",  icon:"🏠", slots:{commander:2,soldiers:6}, time:"החל מ-14:00",    border:"#f06292", col:5, startH:0,  endH:24, showOnDays:NEW_GAZRA },
+  { id:"philbox_horsa", label:"פילבוקס חורסה",  icon:"🏠", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#f06292", col:5, startH:0,  endH:24, showOnDays:NEW_GAZRA },
   { id:"amada_maaravit_a",label:"עמדה מערבית א׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 3:00",  border:"#7e57c2", col:5, startH:24, endH:27, showOnDays:NEW_GAZRA.filter(d=>d!=="2026_03_13"&&d!=="2026_03_14") },
   { id:"amada_maaravit_b",label:"עמדה מערבית ב׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"3:00 - 6:00",   border:"#7e57c2", col:5, startH:27, endH:30, showOnDays:NEW_GAZRA.filter(d=>d!=="2026_03_13"&&d!=="2026_03_14") },
   { id:"karem_negoshot",label:"כרם נגוהות",     icon:"🌿", slots:{commander:1,soldiers:3}, time:"",               border:"#aed581", col:6, startH:0,  endH:24, showOnDays:[] },
@@ -297,7 +297,7 @@ function initDayAssignments() {
   return init;
 }
 
-function getBlockedNames(allAss, targetDayId, targetMission, missionSettings, platoons) {
+function getBlockedNames(allAss, targetDayId, targetMission, missionSettings, platoons, restExemptions) {
   const ms = missionSettings || {};
   const plugaMembers = new Set([...(platoons?.pluga?.members||[]), ...(platoons?.pluga2?.members||[])]);
   const blocked = new Set(), reasons = {};
@@ -307,8 +307,8 @@ function getBlockedNames(allAss, targetDayId, targetMission, missionSettings, pl
   const isPilboxNextDay = (targetMission.id==="hilton" || targetMission.id==="agamim");
   const isHetz = (targetMission.id==="hetz" || targetMission.id==="hetz2" || targetMission.id==="hetz3" || targetMission.id==="hetz4");
 
-  // פעילות מבצעית — ללא מנוחה וללא חסימה
-  if (targetMission.id==="maatzar") return { blocked, blockedReasons: reasons };
+  // פעילות מבצעית — ללא מנוחה וללא חסימה (אלא אם כן ה-bypassConstraints דומה)
+  if (targetMission.id==="maatzar") return { blocked: new Set(), blockedReasons: {} };
 
   // קורס רחפנים — מי שבקורס חסום לכל משימה אחרת
   if (targetMission.id !== "rachpan") {
@@ -352,7 +352,7 @@ function getBlockedNames(allAss, targetDayId, targetMission, missionSettings, pl
         const isSameSlot = (dayId===targetDayId && sm.id===targetMission.id);
         const targetIsAfterPatrolStart = tStart >= di*24 + sm.startH;
         if (tStart < sEnd+restH && !isSameSlot && targetIsAfterPatrolStart) {
-          const dayExempt = (REST_EXEMPTIONS[targetDayId]||{});
+          const dayExempt = ((restExemptions||{})[targetDayId]||{});
           const missionExempt = dayExempt[targetMission.id];
           if (missionExempt && missionExempt.has(person.name)) return;
           const isNextDay = di === ti-1;
@@ -364,7 +364,7 @@ function getBlockedNames(allAss, targetDayId, targetMission, missionSettings, pl
     });
 
     // מנוחה אחרי ש"ג ועמדה מערבית — לפי missionSettings
-    MISSION_DEFS.filter(m => m.id.startsWith("sg") || m.id==="amada_maaravit" || m.id==="amada_maaravit_a" || m.id==="amada_maaravit_b" || m.id==="toren_rasp" || m.id==="hetz" || m.id==="hetz2").forEach(sm => {
+    MISSION_DEFS.filter(m => m.id.startsWith("sg") || m.id==="amada_maaravit" || m.id==="amada_maaravit_a" || m.id==="amada_maaravit_b" || m.id==="toren_rasp" || m.id==="hetz" || m.id==="hetz2" || m.id==="siyur_boker2" || m.id==="siyur_tzo2").forEach(sm => {
       const ass = da[sm.id]; if (!ass) return;
       const restH = ms[sm.id]?.restHours ?? (sm.id==="toren_rasp" ? 8 : (sm.id==="hetz"||sm.id==="hetz2") ? 12 : 12);
       if (restH === 0) return;
@@ -399,14 +399,19 @@ function SafeDisplayCard(props) {
 
 function DisplayCard({ mission, assignment, dayId }) {
   if (!assignment) return null;
+  const normalizeArr = (arr, size) => {
+    const a = Array(size).fill(null);
+    (arr||[]).forEach((v,i) => { if(i<size) a[i]=v; });
+    return a;
+  };
   const ass = {
-    commanders: Array.isArray(assignment.commanders) ? assignment.commanders : Array(mission.slots.commander).fill(null),
-    soldiers:   Array.isArray(assignment.soldiers)   ? assignment.soldiers   : Array(mission.slots.soldiers).fill(null),
+    commanders: normalizeArr(Array.isArray(assignment.commanders)?assignment.commanders:[], mission.slots.commander),
+    soldiers:   normalizeArr(Array.isArray(assignment.soldiers)  ?assignment.soldiers:  [], mission.slots.soldiers),
   };
   const filled = [...ass.commanders,...ass.soldiers].filter(Boolean).length;
   const total = mission.slots.commander + mission.slots.soldiers;
   const done = filled===total && total>0;
-  const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="amada_maaravit_a" || mission.id==="amada_maaravit_b" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2" || mission.id==="bimuy_oyev" || mission.id==="kurs_pritza" || mission.id==="toren_rasp";
+  const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="amada_maaravit_a" || mission.id==="amada_maaravit_b" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2" || mission.id==="bimuy_oyev" || mission.id==="kurs_pritza" || mission.id==="toren_rasp" || mission.id==="matbah_new2" || mission.id==="hetz" || mission.id==="hetz2" || mission.id==="hetz3" || mission.id==="hetz4";
   const displayTime = (DAY_TIME_OVERRIDES[dayId]||{})[mission.id] || mission.time;
   return (
     <div className={`mcard${isCompact?" compact":""}`} style={{ borderColor: mission.border!=="#555" ? mission.border+"88" : undefined }}>
@@ -422,15 +427,21 @@ function DisplayCard({ mission, assignment, dayId }) {
         </div>
       </div>
       <div className="mcard-body">
-        {/* סיורים, כוננות, הילטון, אגמים — מפקד ביחד עם חיילים בגריד */}
-        {(mission.id==="siyur_boker"||mission.id==="siyur_tzo"||mission.id==="siyur_layla"||mission.id==="konnut"||mission.id==="hilton"||mission.id==="agamim") ? (
-          <div className="ntag-grid">
+        {/* סיורים, כוננות, הילטון, אגמים, חץ דרוך, פילבוקס חורסה — מפקד בקו מלא, חיילים בנפרד */}
+        {(mission.id==="siyur_boker"||mission.id==="siyur_tzo"||mission.id==="siyur_layla"||mission.id==="konnut"||mission.id==="hilton"||mission.id==="agamim"||mission.id==="hetz"||mission.id==="hetz2"||mission.id==="hetz3"||mission.id==="hetz4"||mission.id==="philbox_horsa"||mission.id==="siyur_boker2"||mission.id==="siyur_tzo2"||mission.id==="siyur_layla2") ? (
+          <div style={{display:"flex",flexDirection:"column",gap:4}}>
+            {/* מפקדים — קו אחד מלא לכל מפקד */}
             {assignment.commanders.map((p,i)=>(
-              <div key={"c"+i} className={`ntag ${p?"filled":"empty"}`} style={p?getPlatoonStyle(p.platoon):{}}>{p?p.name:"מפקד"}</div>
+              <div key={"c"+i} className={`ntag ${p?"filled":"empty"}`} style={{...(p?getPlatoonStyle(p.platoon):{}),width:"100%",textAlign:"center",fontSize:13,fontWeight:700,padding:"6px 8px"}}>{p?p.name:"מפקד"}</div>
             ))}
-            {assignment.soldiers.map((p,i)=>(
-              <div key={"s"+i} className={`ntag ${p?"filled":"empty"}`} style={p?getPlatoonStyle(p.platoon):{}}>{p?p.name:"חייל"}</div>
-            ))}
+            {/* חיילים — גריד של 2 עמודות */}
+            {assignment.soldiers.length > 0 && (
+              <div className="ntag-grid">
+                {assignment.soldiers.map((p,i)=>(
+                  <div key={"s"+i} className={`ntag ${p?"filled":"empty"}`} style={p?getPlatoonStyle(p.platoon):{}}>{p?p.name:"חייל"}</div>
+                ))}
+              </div>
+            )}
           </div>
         ) : mission.id==="katzin" ? (
           /* קצין מוצב — קוביה אחת צמודה */
@@ -580,11 +591,9 @@ function App() {
             if (!m) return;
             if (m.showOnDays && !m.showOnDays.includes(day)) return;
             if (m.hideOnDays && m.hideOnDays.includes(day)) return;
-            // נרמול: Firebase מוחק null מתוך arrays, משחזרים בגודל נכון
             const normalize = (arr, size) => {
               const a = Array(size).fill(null);
               if (!arr) return a;
-              // Firebase מחזיר object עם keys מספריים אם יש nulls
               if (!Array.isArray(arr)) {
                 Object.entries(arr).forEach(([k,v]) => { if (parseInt(k)<size) a[parseInt(k)]=v; });
                 return a;
@@ -598,10 +607,55 @@ function App() {
             };
           });
         });
+        // תיקון: איפוס hetz2/hetz3/hetz4 לגודל הנכון (1+7)
+        DAY_IDS.forEach(day => {
+          ["hetz","hetz2","hetz3","hetz4"].forEach(hid => {
+            if (saved[day]?.[hid]) {
+              const hm = MISSION_DEFS.find(x=>x.id===hid);
+              if (!hm) return;
+              // בנה מחדש את המערכים בגודל הנכון
+              const fixArr = (arr, size) => {
+                const a = Array(size).fill(null);
+                if (!arr) return a;
+                const src = Array.isArray(arr) ? arr : Object.entries(arr).sort(([a],[b])=>+a-+b).map(([,v])=>v);
+                src.forEach((v,i) => { if(i<size) a[i]=v; });
+                return a;
+              };
+              if (base[day]) {
+                base[day][hid] = {
+                  commanders: fixArr(saved[day][hid].commanders, hm.slots.commander),
+                  soldiers:   fixArr(saved[day][hid].soldiers,   hm.slots.soldiers),
+                };
+              }
+            }
+          });
+        });
         setAllAss(base);
       }
       setSynced(true);
     });
+
+    // ניקוי שמות ישנים — מריץ פעם אחת אחרי טעינת settings
+    window._cleanOldNames = (platoons, allAss, setAllAssAndSave) => {
+      const allNames = new Set(Object.values(platoons).flatMap(p=>p.members));
+      setAllAssAndSave(prev => {
+        const c = JSON.parse(JSON.stringify(prev));
+        let changed = false;
+        Object.keys(c).forEach(dayId => {
+          Object.keys(c[dayId]||{}).forEach(mid => {
+            ['commanders','soldiers'].forEach(type => {
+              (c[dayId][mid][type]||[]).forEach((p,i) => {
+                if (p && !allNames.has(p.name)) {
+                  c[dayId][mid][type][i] = null;
+                  changed = true;
+                }
+              });
+            });
+          });
+        });
+        return changed ? c : prev;
+      });
+    };
 
     const unsubAftar = onValue(ref(db, 'shabzak/aftar'), snap => {
       if (snap.exists()) {
@@ -622,7 +676,8 @@ function App() {
         if (s.spontMissions) setSpontMissions(s.spontMissions);
         if (s.hiddenMissionsByDay) setHiddenMissionsByDay(s.hiddenMissionsByDay);
         if (s.deletedMissions) setDeletedMissions(s.deletedMissions);
-        if (s.dayMissionOverrides) setDayMissionOverrides(s.dayMissionOverrides);
+        if (s.dayMissionOverrides) setDayMissionOverrides(prev => ({...prev, ...s.dayMissionOverrides}));
+        if (s.restExemptions) setRestExemptions(s.restExemptions);
         if (s.platoons) {
           setPlatoons(prev => {
             const next = JSON.parse(JSON.stringify(prev));
@@ -691,16 +746,24 @@ function App() {
   const [aftarSettings, setAftarSettings] = useState({ startH: 14, endH: 14 });
   const [specials, setSpecials] = useState([]);
   const [spontMissions, setSpontMissions] = useState([]);
+  const [restExemptions, setRestExemptions] = useState(REST_EXEMPTIONS_DEFAULT);
   const [hiddenMissionsByDay, setHiddenMissionsByDay] = useState(() => {
     const init = {};
     DAY_IDS.forEach(d => { init[d] = ["matbah_boker","matbah_tzaharayim"]; });
     return init;
   });
   const [deletedMissions, setDeletedMissions] = useState([]);
-  const [dayMissionOverrides, setDayMissionOverrides] = useState({}); // {dayId: {missionId: {slots_commander, slots_soldiers, restHours, startH, endH}}}
+  const [dayMissionOverrides, setDayMissionOverrides] = useState({
+    "2026_03_30": {
+      "matbah_boker":       { slots_soldiers: 2 },
+      "matbah_tzaharayim":  { slots_soldiers: 2 },
+    }
+  }); // {dayId: {missionId: {slots_commander, slots_soldiers, restHours, startH, endH}}}
   const [platoons, setPlatoons] = useState(() => JSON.parse(JSON.stringify(PLATOONS_DEFAULT)));
   React.useEffect(() => { window._platoons = platoons; }, [platoons]);
   React.useEffect(() => { window._spontMissions = spontMissions.map(m=>({...m,slots:{commander:m.slots_commander||0,soldiers:m.slots_soldiers||1}})); }, [spontMissions]);
+
+  // (cleanup removed - was causing assignments to be deleted)
 
   const getMissionForDay = React.useCallback((mission, dayId) => {
     const ms = missionSettings[mission.id] || {};
@@ -735,7 +798,7 @@ function App() {
   // שמירה אוטומטית של כל ההגדרות ל-Firebase
   React.useEffect(() => {
     if (!fbReady || !isSettingsLoaded.current) return;
-    const patch = {missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, dayMissionOverrides, platoons: Object.fromEntries(Object.entries(platoons).map(([k,p])=>[k,p.members]))};
+    const patch = {missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, dayMissionOverrides, platoons: Object.fromEntries(Object.entries(platoons).map(([k,p])=>[k,p.members])), restExemptions};
     clearTimeout(_settingsSaveTimer.current);
     _settingsSaveTimer.current = setTimeout(() => {
       // סמן כ-local write כדי למנוע overwrite של שיבוצים
@@ -744,7 +807,7 @@ function App() {
         .catch(()=>{})
         .finally(()=>{ setTimeout(()=>{ isLocalWrite.current = false; }, 1000); });
     }, 1000);
-  }, [missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, dayMissionOverrides, platoons, fbReady]);
+  }, [missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, dayMissionOverrides, platoons, restExemptions, fbReady]);
 
   // מסך סיסמה — רק אחרי כל ה-hooks
   const [showAftarSelect,setShowAftarSelect] = useState(false);
@@ -803,8 +866,8 @@ function App() {
   const { blocked, blockedReasons } = useMemo(() => {
     if (!mission) return { blocked: new Set(), blockedReasons: {} };
     const missionForDay = getMissionForDay(mission, activeDay);
-    return getBlockedNames(allAss, activeDay, missionForDay, missionSettings, platoons);
-  }, [allAss, activeDay, activeMission, dayMissionOverrides, missionSettings]);
+    return getBlockedNames(allAss, activeDay, missionForDay, missionSettings, platoons, restExemptions);
+  }, [allAss, activeDay, activeMission, missionSettings, platoons, restExemptions]);
 
   const gimelThisDay = useMemo(() => new Set(
     [...(dayAss["gimel"]?.soldiers||[])].filter(Boolean).map(p=>p.name)
@@ -850,13 +913,19 @@ function App() {
   function slotClick(type, idx) {
     if (selPeople.length === 0) return;
     const activeMissionDef = allMissionDefs.find(m=>m.id===activeMission);
+    const mDay = getMissionForDay(activeMissionDef || {slots:{commander:0,soldiers:1}}, activeDay);
     setAllAssAndSave(prev => {
       const c = JSON.parse(JSON.stringify(prev));
       if (!c[activeDay]) c[activeDay] = {};
       if (!c[activeDay][activeMission]) c[activeDay][activeMission] = {
-        commanders: Array(activeMissionDef?.slots?.commander||0).fill(null),
-        soldiers: Array(activeMissionDef?.slots?.soldiers||1).fill(null),
+        commanders: Array(mDay.slots.commander).fill(null),
+        soldiers: Array(mDay.slots.soldiers).fill(null),
       };
+      // הרחב את המערך אם צריך לפי override
+      const needed = type==='commanders' ? mDay.slots.commander : mDay.slots.soldiers;
+      while ((c[activeDay][activeMission][type]||[]).length < needed) {
+        c[activeDay][activeMission][type].push(null);
+      }
       const slots = c[activeDay][activeMission][type];
       let qi = 0;
       for (let i = idx; i < slots.length && qi < selPeople.length; i++) {
@@ -956,12 +1025,12 @@ function App() {
               </div>
             </div>
           )}
-          {col1.length>0 && <div className="display-col">{col1.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col2.length>0 && <div className="display-col">{col2.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col3.length>0 && <div className="display-col">{col3.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col4.length>0 && <div className="display-col">{col4.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col5.length>0 && <div className="display-col">{col5.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
-          {col6.length>0 && <div className="display-col">{col6.map(m=><SafeDisplayCard key={m.id} mission={m} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col1.length>0 && <div className="display-col">{col1.map(m=><SafeDisplayCard key={m.id} mission={getMissionForDay(m,activeDay)} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col2.length>0 && <div className="display-col">{col2.map(m=><SafeDisplayCard key={m.id} mission={getMissionForDay(m,activeDay)} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col3.length>0 && <div className="display-col">{col3.map(m=><SafeDisplayCard key={m.id} mission={getMissionForDay(m,activeDay)} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col4.length>0 && <div className="display-col">{col4.map(m=><SafeDisplayCard key={m.id} mission={getMissionForDay(m,activeDay)} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col5.length>0 && <div className="display-col">{col5.map(m=><SafeDisplayCard key={m.id} mission={getMissionForDay(m,activeDay)} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
+          {col6.length>0 && <div className="display-col">{col6.map(m=><SafeDisplayCard key={m.id} mission={getMissionForDay(m,activeDay)} assignment={dayAss[m.id]} dayId={activeDay}/>)}</div>}
         </div>
         </div>
       </div>
@@ -1451,12 +1520,25 @@ function App() {
                                 <button style={btn({background:"var(--accent)",color:"#fff",fontWeight:700,fontSize:11,flex:1})} onClick={()=>{
                                   const merged={...existing,...ovDraft};
                                   if(Object.keys(merged).length===0) return;
-                                  setDayMissionOverrides(prev=>({...prev,[ovDay]:{...(prev[ovDay]||{}),[m.id]:merged}}));
+                                  setDayMissionOverrides(prev=>{
+                                    const next = {...prev,[ovDay]:{...(prev[ovDay]||{}),[m.id]:merged}};
+                                    saveSettingsToFb({dayMissionOverrides:next});
+                                    return next;
+                                  });
                                   setOvDraft({});
                                 }}>✓ שמור</button>
                                 {Object.keys(existing).length>0 && (
                                   <button style={btn({color:"#ef5350",fontSize:11})} onClick={()=>{
-                                    setDayMissionOverrides(prev=>{const n={...prev};if(n[ovDay]){const d={...n[ovDay]};delete d[m.id];n[ovDay]=d;}return n;});
+                                    setDayMissionOverrides(prev=>{
+                                      const n={...prev};
+                                      if(n[ovDay]){
+                                        const d={...n[ovDay]};
+                                        delete d[m.id];
+                                        n[ovDay]=d;
+                                      }
+                                      saveSettingsToFb({dayMissionOverrides:n});
+                                      return n;
+                                    });
                                   }}>🗑 מחק</button>
                                 )}
                               </div>
@@ -1885,7 +1967,7 @@ function App() {
     </div>
   );
 
-  const MemberRow = ({ name, platoonKey, idx, getPlatoonStyleFn, setPlatoons, btn, inp }) => {
+  const MemberRow = ({ name, platoonKey, idx, getPlatoonStyleFn, setPlatoons, setAllAssAndSave, btn, inp }) => {
     const [editing, setEditing] = React.useState(false);
     const [editVal, setEditVal] = React.useState(name);
     return (
@@ -1896,13 +1978,47 @@ function App() {
               onChange={e=>setEditVal(e.target.value)}
               onKeyDown={e=>{
                 if(e.key==='Enter'&&editVal.trim()){
-                  setPlatoons(prev=>{const n=JSON.parse(JSON.stringify(prev));n[platoonKey].members[idx]=editVal.trim();return n;});
+                  const oldName = name;
+                  const newName = editVal.trim();
+                  setPlatoons(prev=>{const n=JSON.parse(JSON.stringify(prev));n[platoonKey].members[idx]=newName;return n;});
+                  setAllAssAndSave(prev=>{
+                    const c=JSON.parse(JSON.stringify(prev));
+                    Object.keys(c).forEach(dayId=>{
+                      Object.keys(c[dayId]||{}).forEach(mid=>{
+                        ['commanders','soldiers'].forEach(type=>{
+                          (c[dayId][mid][type]||[]).forEach((p,i)=>{
+                            if(p&&p.name===oldName) c[dayId][mid][type][i]={...p,name:newName};
+                          });
+                        });
+                      });
+                    });
+                    return c;
+                  });
                   setEditing(false);
                 } else if(e.key==='Escape') setEditing(false);
               }}
               autoFocus/>
             <button style={btn({fontSize:10,padding:"2px 6px",color:"var(--green)",background:"var(--green)22"})} onClick={()=>{
-              if(editVal.trim()){setPlatoons(prev=>{const n=JSON.parse(JSON.stringify(prev));n[platoonKey].members[idx]=editVal.trim();return n;});setEditing(false);}
+              if(editVal.trim()){
+                const oldName = name;
+                const newName = editVal.trim();
+                setPlatoons(prev=>{const n=JSON.parse(JSON.stringify(prev));n[platoonKey].members[idx]=newName;return n;});
+                // עדכון שיבוצים קיימים
+                setAllAssAndSave(prev=>{
+                  const c=JSON.parse(JSON.stringify(prev));
+                  Object.keys(c).forEach(dayId=>{
+                    Object.keys(c[dayId]||{}).forEach(mid=>{
+                      ['commanders','soldiers'].forEach(type=>{
+                        (c[dayId][mid][type]||[]).forEach((p,i)=>{
+                          if(p&&p.name===oldName) c[dayId][mid][type][i]={...p,name:newName};
+                        });
+                      });
+                    });
+                  });
+                  return c;
+                });
+                setEditing(false);
+              }
             }}>✓</button>
             <button style={btn({fontSize:10,padding:"2px 6px"})} onClick={()=>setEditing(false)}>✕</button>
           </>
@@ -2007,7 +2123,7 @@ function App() {
                 <div style={{fontWeight:700,fontSize:13,color:"var(--text)",marginBottom:8}}>{p.label}</div>
                 <div style={{display:"flex",flexDirection:"column",gap:4}}>
                   {p.members.map((name,idx)=>(
-                    <MemberRow key={name+k+idx} name={name} platoonKey={k} idx={idx} getPlatoonStyleFn={getPlatoonStyle} setPlatoons={setPlatoons} btn={btn} inp={inp}/>
+                    <MemberRow key={name+k+idx} name={name} platoonKey={k} idx={idx} getPlatoonStyleFn={getPlatoonStyle} setPlatoons={setPlatoons} setAllAssAndSave={setAllAssAndSave} btn={btn} inp={inp}/>
                   ))}
                 </div>
               </div>

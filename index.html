@@ -1599,7 +1599,7 @@ function App() {
     // ── MISSIONS TAB ──
     const [editId, setEditId] = useState(null);
     const [draft, setDraft] = useState({});
-    const HIDE_FROM_SETTINGS = new Set(["agamim","hilton","konnut","rachpan","siyur_boker","siyur_tzo","siyur_layla","maatzor","bimuy_oyev","amada_maaravit","matbah","hetz","hetz3","hetz4","karem_negoshot"]);
+    const HIDE_FROM_SETTINGS = new Set(["agamim","hilton","konnut","rachpan","siyur_boker","siyur_tzo","siyur_layla","maatzor","bimuy_oyev","amada_maaravit","matbah","hetz3","karem_negoshot"]);
     const visibleForSettings = MISSION_DEFS.filter(m => !m.hideFromDisplay && !HIDE_FROM_SETTINGS.has(m.id) && !deletedMissions.includes(m.id));
     const startEdit = (m) => { setEditId(m.id); setDraft({...missionSettings[m.id]}); };
     const saveEdit = () => {

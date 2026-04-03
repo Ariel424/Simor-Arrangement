@@ -173,6 +173,11 @@ const DAY_TIME_OVERRIDES = {
 const OLD_GAZRA_HIDE = NEW_GAZRA; // המשימות הישנות נסתרות בגזרה החדשה
 
 const MISSION_DEFS = [
+  // ═══ קצין מוצב (עדיפות ראשונה) ═══
+  { id:"katzin_a",    label:"קצין מוצב א׳",  icon:"🟡", slots:{commander:1,soldiers:0}, time:"6:00 - 14:00",     border:"#555",    col:1, startH:6,  endH:14, noLabel:true, allowedNames:["אריאל טופז","חזי דיין - מ״מ","ידידיה שמואליאן","איתי דרייר"] },
+  { id:"katzin_b",    label:"קצין מוצב ב׳",  icon:"🟡", slots:{commander:1,soldiers:0}, time:"14:00 - 6:00",     border:"#555",    col:1, startH:14, endH:30, noLabel:true, allowedNames:["אריאל טופז","חזי דיין - מ״מ","ידידיה שמואליאן","איתי דרייר"] },
+  { id:"katzin",      label:"קצין מוצב",      icon:"🟡", slots:{commander:1,soldiers:0}, time:"החל מ-6:00",     border:"#555",    col:1, startH:0,  endH:24, noLabel:true, allowedNames:["אריאל טופז","חזי דיין - מ״מ","ידידיה שמואליאן","איתי דרייר"] },
+  
   // ═══ גזרה ישנה (עד 11/3) ═══
   { id:"agamim",      label:"אגמים",          icon:"🏊", slots:{commander:1,soldiers:7}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#f06292", col:1, startH:0,  endH:24, hideOnDays:OLD_GAZRA_HIDE },
   { id:"matbah",      label:"מטבח",           icon:"🍳", slots:{commander:0,soldiers:1}, time:"אמורים לרדת ב-12:00 ואז לצאת לאפטר, אבל מכירים ת'חיים 😄", border:"#555",    col:2, startH:8,  endH:14, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"], hideFromDisplay:true },
@@ -184,7 +189,6 @@ const MISSION_DEFS = [
   { id:"siyur_tzo",   label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
   { id:"siyur_layla", label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:6, startH:22, endH:30, isSiyur:true, isNightPatrol:true, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
   { id:"maatzar",     label:"פעילות מבצעית",  icon:"🔒", slots:{commander:0,soldiers:10},time:"",               border:"#ef5350", col:4, startH:0,  endH:24, hideOnDays:[...OLD_GAZRA_HIDE,"2026_03_12"] },
-  { id:"katzin",      label:"קצין מוצב",      icon:"🟡", slots:{commander:1,soldiers:0}, time:"החל מ-6:00",     border:"#555",    col:1, startH:0,  endH:24, noLabel:true, allowedNames:["אריאל טופז","חזי דיין - מ״מ","ידידיה שמואליאן","איתי דרייר"] },
   { id:"gimel",       label:"גימל",           icon:"🤒", slots:{commander:0,soldiers:2}, time:"",               border:"#78909c", col:6, startH:0,  endH:24, noCount:true, hideFromDisplay:true },
   { id:"rachpan",     label:"קורס רחפנים",    icon:"🚁", slots:{commander:0,soldiers:1}, time:"",               border:"#80cbc4", col:6, startH:0,  endH:24, showOnDays:["2026_03_09","2026_03_10","2026_03_11","2026_03_12"] },
 
@@ -414,7 +418,7 @@ function DisplayCard({ mission, assignment, dayId }) {
   const filled = [...ass.commanders,...ass.soldiers].filter(Boolean).length;
   const total = mission.slots.commander + mission.slots.soldiers;
   const done = filled===total && total>0;
-  const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="amada_maaravit_a" || mission.id==="amada_maaravit_b" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2" || mission.id==="bimuy_oyev" || mission.id==="kurs_pritza" || mission.id==="toren_rasp" || mission.id==="matbah_new2" || mission.id==="hetz" || mission.id==="hetz2" || mission.id==="hetz3" || mission.id==="hetz4";
+  const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="amada_maaravit_a" || mission.id==="amada_maaravit_b" || mission.id==="katzin_a" || mission.id==="katzin_b" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2" || mission.id==="bimuy_oyev" || mission.id==="kurs_pritza" || mission.id==="toren_rasp" || mission.id==="matbah_new2" || mission.id==="hetz" || mission.id==="hetz2" || mission.id==="hetz3" || mission.id==="hetz4";
   const displayTime = (DAY_TIME_OVERRIDES[dayId]||{})[mission.id] || mission.time;
   return (
     <div className={`mcard${isCompact?" compact":""}`} style={{ borderColor: mission.border!=="#555" ? mission.border+"88" : undefined }}>
@@ -1073,7 +1077,7 @@ function App() {
         return true;
       }).map(m=>m.id)
     );
-    const excludedIds = new Set(["katzin","maatzar","gimel","rachpan","hetz","hetz2","hetz3","hetz4","amada_maaravit","amada_maaravit_a","amada_maaravit_b","toren_rasp","matbah_new","matbah_new2"]);
+    const excludedIds = new Set(["katzin","katzin_a","katzin_b","maatzar","gimel","rachpan","hetz","hetz2","hetz3","hetz4","amada_maaravit","amada_maaravit_a","amada_maaravit_b","toren_rasp","matbah_new","matbah_new2"]);
     return new Set(
       Object.entries(dayAss)
         .filter(([mid]) => visibleIds.has(mid) && !excludedIds.has(mid))

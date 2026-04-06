@@ -140,7 +140,7 @@ const PLATOONS_DEFAULT = {
   cmd3:     { label:"מפקדי מחלקה 3", color:"#66bb6a", textColor:"#0a0f1a", members:["אריאל טופז","דורון בוכהולץ - מפקד","חנן שטיין - סמל","רפאל מבשר - מפקד"] },
   soldiers3:{ label:"חיילי מחלקה 3",  color:"#a5d6a7", textColor:"#0a0f1a", members:["ישי אדרי","אביב אוחנה","אברהם גולדשטיין","ירדן גיאת","אביחן לוי","אהרון נתניא","יאיר ספיר","נאור עזרא","יעקב נרי","נעם קפלנסקי","רועי שאג","יצחק שטטמן"] },
   pluga:    { label:"מחלקת המסופחים", color:"#ffd54f", textColor:"#0a0f1a", members:["ידידיה אבולעפיה","שמואל ברגלס","איתן שוורץ","משה חדד"] },
-  pluga2:   { label:"מפקדת פלוגה",    color:"#ff9800", textColor:"#0a0f1a", members:[] },
+  pluga2:   { label:"מפקדת פלוגה",    color:"#26c6da", textColor:"#0a0f1a", members:[] },
 };
 
 const CMD_PLATOONS = new Set(["cmd1","cmd2","cmd3","pluga","pluga2"]);
@@ -538,6 +538,56 @@ function App() {
 
   const freshAss = () => { const r={}; DAY_IDS.forEach(id=>{r[id]=initDayAssignments();}); return r; };
   const freshAftar = () => { const r={}; DAY_IDS.forEach(id=>{r[id]=[];}); return r; };
+
+  // ═══ משפטים אופטימיים ═══
+  const optimisticQuotes = [
+    "אתם לא רק שכפ״ץ של מדינה, אתם עמוד השדרה שזוקף את קומתה.",
+    "הבוץ על הנעליים והאבק על המדים הם סימני העיטור המפוארים ביותר של דורנו.",
+    "גבורה היא לא זינוק חד-פעמי, אלא ההתמדה השקטה בתוך השחיקה למען הכלל.",
+    "אתם המגן שמאפשר לילדים לחלום, ולאמהות לישון, ולאומה להמשיך לנשום.",
+    "כל לילה ללא שינה בחזית הוא עוד שעה של חסד ושקט בעומק המדינה.",
+    "אתם לא רק לוחמים במלחמה, אתם הבנאים של חומת הנצח של עם ישראל.",
+    "העוצמה שלכם היא לא בנשק שביד, אלא ברוח שנושבת בכם גם אחרי שנה ומעלה.",
+    "הגוף אולי מבקש מנוחה, אבל הנשמה שלכם יודעת שהיא כותבת עכשיו את העתיד.",
+    "אתם הניצחון של הרוח על החומר, של המסירות על הנוחות, ושל האור על החושך.",
+    "כשתישאל השאלה 'איפה הייתם?', התשובה שלכם תהיה חקוקה בביטחון של כל אזרח.",
+    "אתם הופכים את הבלתי ייאמן לשגרה, ואת ההקרבה למפעל חיים.",
+    "החוסן שלכם הוא המצפן שעל פיו כל החברה הישראלית מכיילת את ערכיה.",
+    "אתם לא 'מילואימניקים', אתם נבחרת החלומות של אומה שנלחמת על חייה.",
+    "כל יום נוסף שאתם שם הוא עדות לכך שהחופש שלנו נקנה בעמלכם הבלתי פוסק.",
+    "הגבורה שלכם היא השקט שבו אתם עוזבים הכל ומתייצבים, פעם אחר פעם, ללא תנאי.",
+    "אתם הלב הפועם שדוחף דם של תקווה וביטחון לכל קצות הארץ.",
+    "השחיקה שלכם היא עדות למשקל הכבד והקדוש שאתם נושאים על כתפיכם עבור כולנו.",
+    "אתם לא רק חלק מההיסטוריה, אתם אלו שמעצבים אותה במו ידיכם ובזיעת אפכם.",
+    "החוסן שלכם הוא השורשים העמוקים שמחזיקים את העץ הישראלי יציב ברוח הסערה.",
+    "אתם ההוכחה שגבורה היא לא מילה בספרים, אלא דרך חיים של אנשים חיים.",
+    "העיניים העייפות שלכם רואות את מה שכולנו מייחלים לו – בוקר של שלום וביטחון.",
+    "כל רגע של התמודדות בחזית הוא עוד ניצחון קטן של הנחישות על הייאוש.",
+    "אתם המופת של הדור הזה, המגדלור שמראה לנו את הדרך הביתה.",
+    "בזכותכם, דברי הימים של ישראל ייכתבו בטון של ניצחון, עוצמה וגאווה יהודית.",
+  ];
+  const getRandomQuote = (dayId) => {
+    // החל מ-7/4 (2026_04_07) נשתמש במשפטים החדשים
+    const startDay = "2026_04_07";
+    if (dayId < startDay) {
+      // משפטים ישנים לימים לפני 7/4
+      const oldQuotes = [
+        "🌟 כוחו של הצוות הוא בעבודה משותפת!",
+        "💪 כל יום הוא הזדמנות חדשה להשיג הצלחה!",
+        "🎯 עם תכנון טוב, הכל אפשרי!",
+        "🚀 אנחנו לא חוקרים חלל, אנחנו חוקרים סידור!",
+      ];
+      const index = (parseInt(dayId.replace(/\D/g, '')) || 0) % oldQuotes.length;
+      return oldQuotes[index];
+    } else {
+      // משפטים חדשים החל מ-7/4
+      const currentIdx = DAY_IDS.indexOf(dayId);
+      const startIdx = DAY_IDS.indexOf(startDay);
+      const offset = Math.max(0, currentIdx - startIdx);
+      const index = offset % optimisticQuotes.length;
+      return optimisticQuotes[index];
+    }
+  };
 
   // ═══ הגנת סיסמה ═══
   const PASSWORDS = ["סימור", "ידידיה", "חצי"];
@@ -1211,9 +1261,19 @@ function App() {
             }}>
               <span style={{fontSize:18}}>📅</span>
               <div style={{textAlign:"center"}}>
-                <div style={{fontSize:11,color:"var(--text2)",fontWeight:500,letterSpacing:1}}>יום {activeDayObj?.label}</div>
+                <div style={{fontSize:9,color:"white",fontWeight:700,letterSpacing:0,marginBottom:8,fontStyle:"normal",lineHeight:1.35,fontFamily:"Heebo, sans-serif"}}>
+                  {getRandomQuote(activeDay)}
+                </div>
+                <div style={{fontSize:11,color:"white",fontWeight:500,letterSpacing:1}}>יום {activeDayObj?.label}</div>
                 <div style={{fontSize:22,fontWeight:800,color:"var(--accent)",letterSpacing:1,lineHeight:1.1}}>{activeDayObj?.date}</div>
-                <div style={{fontSize:10,color:"var(--text3)",fontWeight:600,letterSpacing:2,marginTop:2}}>שבצ"ק</div>
+                <div style={{fontSize:10,color:"white",fontWeight:600,letterSpacing:2,marginTop:2}}>שבצ"ק</div>
+                <div style={{fontSize:11,color:"white",fontWeight:600,marginTop:6}}>
+                  {(() => {
+                    const currentIdx = DAY_IDS.indexOf(activeDay);
+                    const remaining = DAY_IDS.length - currentIdx - 1;
+                    return remaining >= 0 ? `${remaining} ימים עד לסיום` : 'סיימנו! 🎉';
+                  })()}
+                </div>
               </div>
             </div>
           </div>

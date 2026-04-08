@@ -875,6 +875,16 @@ function App() {
     setAllAss(prev => window._fixAssignmentSizesAfterOverrides(prev, dayMissionOverrides));
   }, [dayMissionOverrides]);
 
+  // עדכן allAss כשplatoons משתנה (כדי לתפוס עדכונים של שמות חיילים)
+  React.useEffect(() => {
+    const allCurrentMembers = new Set();
+    Object.values(platoons).forEach(p => {
+      p.members.forEach(m => allCurrentMembers.add(m));
+    });
+    // בדוק אם יש שמות ישנים שכבר לא בplatoons, ועדכן אותם בallAss
+    // אל תעשה כלום כרגע כי זה יגרום לי לופ אינסופי
+  }, [platoons]);
+
   // שמירה ל-Firebase בכל שינוי
   const setAllAssAndSave = React.useCallback((valOrFn) => {
     setAllAss(prev => {
@@ -1234,9 +1244,13 @@ function App() {
     const f = visibleMissions.filter(m => !m.hideFromDisplay);
     const col1=f.filter(m=>m.col===1), col2=f.filter(m=>m.col===2), col3=f.filter(m=>m.col===3), col4=f.filter(m=>m.col===4), col5=f.filter(m=>m.col===5), col6=f.filter(m=>m.col===6);
     const numCols = [col1,col2,col3,col4,col5,col6].filter(c=>c.length>0).length + (aftarThisDay.length>0 ? 1 : 0);
+    const currentIdx = DAY_IDS.indexOf(activeDay);
+    const remaining = DAY_IDS.length - currentIdx - 1;
     return (
       <div className="main">
         <div style={{position:"relative"}}>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:16,paddingX:0}}>
+        </div>
         {activeDay==="2026_03_10" && (
           <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}}>
             <div style={{background:"#1a2a1a",border:"1px solid #4caf5066",borderRadius:10,padding:"8px 14px",fontSize:12,color:"#a5d6a7",display:"flex",gap:6,alignItems:"center"}}>
@@ -1267,12 +1281,8 @@ function App() {
                 <div style={{fontSize:11,color:"white",fontWeight:500,letterSpacing:1}}>יום {activeDayObj?.label}</div>
                 <div style={{fontSize:22,fontWeight:800,color:"var(--accent)",letterSpacing:1,lineHeight:1.1}}>{activeDayObj?.date}</div>
                 <div style={{fontSize:10,color:"white",fontWeight:600,letterSpacing:2,marginTop:2}}>שבצ"ק</div>
-                <div style={{fontSize:11,color:"white",fontWeight:600,marginTop:6}}>
-                  {(() => {
-                    const currentIdx = DAY_IDS.indexOf(activeDay);
-                    const remaining = DAY_IDS.length - currentIdx - 1;
-                    return remaining >= 0 ? `${remaining} ימים עד לסיום` : 'סיימנו! 🎉';
-                  })()}
+                <div style={{fontSize:9,color:"white",fontWeight:700,letterSpacing:0,marginTop:6,fontStyle:"normal",lineHeight:1.35,fontFamily:"Heebo, sans-serif"}}>
+                  כל יום במילואים שווה לך עוד 133 ש"ח ב-1.5.27 בעובר ושב!
                 </div>
               </div>
             </div>

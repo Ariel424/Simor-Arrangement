@@ -213,7 +213,7 @@ const MISSION_DEFS = [
   { id:"amada_maaravit_b",label:"עמדה מערבית ב׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"3:00 - 6:00",   border:"#7e57c2", col:5, startH:27, endH:30, showOnDays:NEW_GAZRA.filter(d=>d!=="2026_03_13"&&d!=="2026_03_14") },
   { id:"karem_negoshot",label:"כרם נגוהות",     icon:"🌿", slots:{commander:1,soldiers:3}, time:"",               border:"#aed581", col:6, startH:0,  endH:24, showOnDays:[] },
   { id:"yom_tipul_rekavim", label:"יום טיפול לרכבי הפלוגה", icon:"🔧", slots:{commander:0,soldiers:1}, time:"7:00 - 17:00", border:"#29b6f6", col:2, startH:7, endH:17, showOnDays:["2026_04_06"] },
-  { id:"ugda_yehuda_konnut", label:"חטיבת יהודה - כוננות ושמירות", icon:"🛡️", slots:{commander:0,soldiers:2}, time:"החל מ-16:00", border:"#ef5350", col:1, startH:16, endH:24, showOnDays:NEW_GAZRA.filter(d=>d>="2026_04_09") },
+  { id:"ugda_yehuda_konnut", label:"חטיבת יהודה - כוננות ושמירות", icon:"🛡️", slots:{commander:0,soldiers:3}, time:"החל מ-16:00", border:"#ef5350", col:1, startH:16, endH:24, showOnDays:NEW_GAZRA.filter(d=>d>="2026_04_09") },
 ];
 
 const DAYS = [
@@ -826,7 +826,17 @@ function App() {
     window._firebaseGet(ref(db, 'shabzak/settings')).then(snap => {
       if (snap && snap.exists()) {
         const s = snap.val();
-        if (s.missionSettings) setMissionSettings(prev => ({...prev, ...s.missionSettings}));
+        if (s.missionSettings) {
+          // עדכן את מissionSettings עם הערכים החדשים מ-MISSION_DEFS
+          const updated = {...s.missionSettings};
+          MISSION_DEFS.forEach(m => {
+            if (updated[m.id]) {
+              updated[m.id].slots_commander = m.slots.commander;
+              updated[m.id].slots_soldiers = m.slots.soldiers;
+            }
+          });
+          setMissionSettings(prev => ({...prev, ...updated}));
+        }
         if (s.aftarSettings) setAftarSettings(s.aftarSettings);
         if (s.specials) setSpecials(s.specials);
         if (s.spontMissions) setSpontMissions(s.spontMissions);

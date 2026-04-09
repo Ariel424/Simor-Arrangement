@@ -207,7 +207,7 @@ const MISSION_DEFS = [
   { id:"siyur_boker2",  label:"סיור בוקר",      icon:"🚗", slots:{commander:1,soldiers:2}, time:"6:00 - 14:00",   border:"#26c6da", col:3, startH:6,  endH:14, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_tzo2",    label:"סיור צהריים",    icon:"🚗", slots:{commander:1,soldiers:2}, time:"14:00 - 22:00",  border:"#26c6da", col:3, startH:14, endH:22, isSiyur:true, showOnDays:NEW_GAZRA },
   { id:"siyur_layla2",  label:"סיור לילה",      icon:"🌙", slots:{commander:1,soldiers:2}, time:"22:00 - 6:00",   border:"#26c6da", col:3, startH:22, endH:30, isSiyur:true, isNightPatrol:true, showOnDays:NEW_GAZRA },
-  { id:"hetz4", label:"חץ דרוך", icon:"🏹", slots:{commander:1,soldiers:7}, time:"החל מ-14:00", border:"#26c6da", col:4, startH:0, endH:24, showOnDays:NEW_GAZRA },
+  { id:"hetz4", label:"חץ דרוך", icon:"🏹", slots:{commander:2,soldiers:6}, time:"החל מ-14:00", border:"#26c6da", col:4, startH:0, endH:24, showOnDays:NEW_GAZRA },
   { id:"philbox_horsa", label:"פילבוקס חורסה",  icon:"🏠", slots:{commander:1,soldiers:7}, time:"החל מ-14:00",    border:"#f06292", col:5, startH:0,  endH:24, showOnDays:NEW_GAZRA },
   { id:"amada_maaravit_a",label:"עמדה מערבית א׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"00:00 - 3:00",  border:"#7e57c2", col:5, startH:24, endH:27, showOnDays:NEW_GAZRA.filter(d=>d!=="2026_03_13"&&d!=="2026_03_14") },
   { id:"amada_maaravit_b",label:"עמדה מערבית ב׳", icon:"🔭", slots:{commander:0,soldiers:1}, time:"3:00 - 6:00",   border:"#7e57c2", col:5, startH:27, endH:30, showOnDays:NEW_GAZRA.filter(d=>d!=="2026_03_13"&&d!=="2026_03_14") },
@@ -830,6 +830,7 @@ function App() {
         if (s.aftarSettings) setAftarSettings(s.aftarSettings);
         if (s.specials) setSpecials(s.specials);
         if (s.spontMissions) setSpontMissions(s.spontMissions);
+        // טען מהגדרות אחרות
         if (s.hiddenMissionsByDay) setHiddenMissionsByDay(s.hiddenMissionsByDay);
         if (s.deletedMissions) setDeletedMissions(s.deletedMissions);
         if (s.dayMissionOverrides) setDayMissionOverrides(prev => ({...prev, ...s.dayMissionOverrides}));
@@ -876,14 +877,52 @@ function App() {
     setAllAss(prev => window._fixAssignmentSizesAfterOverrides(prev, dayMissionOverrides));
   }, [dayMissionOverrides]);
 
+  // עדכן allAss כשplatoons משתנה - זה יתפוס שינויים בשמות
+  React.useEffect(() => {
+    // כל פעם שplatoons משתנה, בדוק אם יש שמות שהשתנו
+    // וגם עדכן אותם בallAss
+    setAllAss(prevAss => {
+      const updated = JSON.parse(JSON.stringify(prevAss));
+      const renames = [
+        ["משה נחשון", "משה נחשון - מפקד"],
+        ["חזי דיין", "חזי דיין - מ״מ"],
+        ["מרדכי אלפרסי", "מרדכי אלפרסי - סמל"],
+        ["ישי לשם", "ישי לשם - מפקד"],
+        ["ישי קבדה", "ישי קבדה - מפקד"],
+        ["ניב לאופר", "ניב לאופר - מפקד"],
+        ["רפאל מבשר", "רפאל מבשר - מפקד"],
+        ["חנן שטיין", "חנן שטיין - סמל"],
+        ["דניס שחרוביץ", "דניס שחרוביץ'"],
+        ["אליאור מרטן", "אליאור מרטן - סמל"],
+        ["דורון בוכהולץ", "דורון בוכהולץ - מפקד"],
+        ["נאור גדמו", "נאור גדמו - מפקד"],
+        ["דניאל בר-שי", "דניאל בר-שי - מפקד"],
+        ["אביאסף דרי", "אביאסף דרי - מפקד"]
+      ];
+      renames.forEach(([oldName, newName]) => {
+        Object.keys(updated).forEach(day => {
+          if (updated[day]) {
+            Object.keys(updated[day]).forEach(mission => {
+              if (updated[day][mission].commanders) {
+                updated[day][mission].commanders = updated[day][mission].commanders.map(c => c === oldName ? newName : c);
+              }
+              if (updated[day][mission].soldiers) {
+                updated[day][mission].soldiers = updated[day][mission].soldiers.map(s => s === oldName ? newName : s);
+              }
+            });
+          }
+        });
+      });
+      return updated;
+    });
+  }, [platoons]);
+
   // עדכן allAss כשplatoons משתנה (כדי לתפוס עדכונים של שמות חיילים)
   React.useEffect(() => {
-    const allCurrentMembers = new Set();
-    Object.values(platoons).forEach(p => {
-      p.members.forEach(m => allCurrentMembers.add(m));
-    });
-    // בדוק אם יש שמות ישנים שכבר לא בplatoons, ועדכן אותם בallAss
-    // אל תעשה כלום כרגע כי זה יגרום לי לופ אינסופי
+    // כל פעם שplatoons משתנה, פשוט נטוען את allAss מחדש מהState
+    // זה יוודא שהשמות החדשים בplatoons יופיעו בתצוגה
+    const allCurrentMembers = Object.values(platoons).flatMap(p => p.members);
+    // אין צורך לעשות שום דבר, allAss כבר מעודכן בפני עצמו
   }, [platoons]);
 
   // שמירה ל-Firebase בכל שינוי
@@ -945,12 +984,7 @@ function App() {
     return init;
   });
   const [deletedMissions, setDeletedMissions] = useState([]);
-  const [dayMissionOverrides, setDayMissionOverrides] = useState({
-    "2026_03_30": {
-      "matbah_boker":       { slots_soldiers: 2 },
-      "matbah_tzaharayim":  { slots_soldiers: 2 },
-    }
-  }); // {dayId: {missionId: {slots_commander, slots_soldiers, restHours, startH, endH}}}
+  const [dayMissionOverrides, setDayMissionOverrides] = useState({});
   const [platoons, setPlatoons] = useState(() => JSON.parse(JSON.stringify(PLATOONS_DEFAULT)));
   React.useEffect(() => { window._platoons = platoons; }, [platoons]);
   React.useEffect(() => { window._spontMissions = spontMissions.map(m=>({...m,slots:{commander:m.slots_commander||0,soldiers:m.slots_soldiers||1}})); }, [spontMissions]);

@@ -881,11 +881,30 @@ function App() {
     return () => { unsubAss(); unsubAftar(); };
   }, [fbReady, authed]);
 
-  // תיקון גודל assignments לפי dayMissionOverrides
+  // תיקון גודל assignments לפי dayMissionOverrides ו-missionSettings
   React.useEffect(() => {
     if (!window._fixAssignmentSizesAfterOverrides) return;
-    setAllAss(prev => window._fixAssignmentSizesAfterOverrides(prev, dayMissionOverrides));
-  }, [dayMissionOverrides]);
+    setAllAss(prev => {
+      const result = window._fixAssignmentSizesAfterOverrides(prev, dayMissionOverrides);
+      // גם עדכן לפי missionSettings
+      Object.keys(result).forEach(dayId => {
+        Object.keys(result[dayId]).forEach(missionId => {
+          const ms = missionSettings[missionId];
+          if (!ms) return;
+          const a = result[dayId][missionId];
+          // הרחבת מפקדים אם צריך לפי missionSettings
+          if (ms.slots_commander && (a.commanders||[]).length < ms.slots_commander) {
+            while (a.commanders.length < ms.slots_commander) a.commanders.push(null);
+          }
+          // הרחבת חיילים אם צריך לפי missionSettings
+          if (ms.slots_soldiers && (a.soldiers||[]).length < ms.slots_soldiers) {
+            while (a.soldiers.length < ms.slots_soldiers) a.soldiers.push(null);
+          }
+        });
+      });
+      return result;
+    });
+  }, [dayMissionOverrides, missionSettings]);
 
   // עדכן allAss כשplatoons משתנה - זה יתפוס שינויים בשמות
   React.useEffect(() => {
@@ -964,9 +983,22 @@ function App() {
     if (!fbReady) return;
     clearTimeout(_settingsSaveTimer.current);
     _settingsSaveTimer.current = setTimeout(() => {
-      window._firebaseSet(window._firebaseRef(window._firebaseDb, 'shabzak/settings'), patch).catch(()=>{});
+      // בנה את ה-patch המלא עם כל ההגדרות
+      const fullPatch = {
+        missionSettings,
+        aftarSettings,
+        specials,
+        spontMissions,
+        hiddenMissionsByDay,
+        deletedMissions,
+        dayMissionOverrides,
+        platoons: Object.fromEntries(Object.entries(platoons).map(([k,p])=>[k,p.members])),
+        restExemptions,
+        ...patch
+      };
+      window._firebaseSet(window._firebaseRef(window._firebaseDb, 'shabzak/settings'), fullPatch).catch(()=>{});
     }, 600);
-  }, [fbReady]);
+  }, [fbReady, missionSettings, aftarSettings, specials, spontMissions, hiddenMissionsByDay, deletedMissions, dayMissionOverrides, platoons, restExemptions]);
 
   const [missionSettings, setMissionSettings] = useState(() => {
     const s = {};
@@ -1730,7 +1762,10 @@ function App() {
     const startEdit = (m) => { setEditId(m.id); setDraft({...missionSettings[m.id]}); };
     const saveEdit = () => {
       const prev_s = missionSettings[editId];
-      setMissionSettings(prev=>({...prev,[editId]:{...draft}}));
+      const updated = {...missionSettings,[editId]:{...draft}};
+      setMissionSettings(prev=>updated);
+      // שמור ל-Firebase
+      saveSettingsToFb({});
       // עדכון גודל מערכי השיבוץ אם שינינו כמות slots
       if (draft.slots_commander !== prev_s?.slots_commander || draft.slots_soldiers !== prev_s?.slots_soldiers) {
         setAllAssAndSave(prev => {

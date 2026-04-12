@@ -358,6 +358,8 @@ function getBlockedNames(allAss, targetDayId, targetMission, missionSettings, pl
           const isNextDay = di === ti-1;
           if (sm.id==="siyur_tzo" && isNextDay && isMorningDutyNextDay) return;
           if (isNextDay && isPilboxNextDay) return;
+          // אל תחסום מטבח אחרי סיור צהריים או ש"ג ערב
+          if ((sm.id==="siyur_tzo" || sm.id==="siyur_tzo2" || sm.id.startsWith("sg")) && isNextDay && (targetMission.id==="matbah_boker"||targetMission.id==="matbah_new"||targetMission.id==="matbah_tzaharayim"||targetMission.id==="matbah_new2")) return;
           blocked.add(person.name); reasons[person.name] = `במנוחה לאחר ${sm.label}`;
         }
       });
@@ -659,35 +661,17 @@ function App() {
               while (a.length < size) a.push(null);
               return a;
             };
+            // בדוק אם יש override ליום זה
+            const ov = (s.dayMissionOverrides?.[day]||{})[mid] || {};
+            const cmdSize = ov.slots_commander ?? m.slots.commander;
+            const solSize = ov.slots_soldiers ?? m.slots.soldiers;
             base[day][mid] = {
-              commanders: normalize(s.commanders, m.slots.commander),
-              soldiers:   normalize(s.soldiers,   m.slots.soldiers),
+              commanders: normalize(s.commanders, cmdSize),
+              soldiers:   normalize(s.soldiers,   solSize),
             };
           });
         });
-        // תיקון: איפוס hetz2/hetz3/hetz4 לגודל הנכון (1+7)
-        DAY_IDS.forEach(day => {
-          ["hetz4"].forEach(hid => {
-            if (saved[day]?.[hid]) {
-              const hm = MISSION_DEFS.find(x=>x.id===hid);
-              if (!hm) return;
-              // בנה מחדש את המערכים בגודל הנכון
-              const fixArr = (arr, size) => {
-                const a = Array(size).fill(null);
-                if (!arr) return a;
-                const src = Array.isArray(arr) ? arr : Object.entries(arr).sort(([a],[b])=>+a-+b).map(([,v])=>v);
-                src.forEach((v,i) => { if(i<size) a[i]=v; });
-                return a;
-              };
-              if (base[day]) {
-                base[day][hid] = {
-                  commanders: fixArr(saved[day][hid].commanders, hm.slots.commander),
-                  soldiers:   fixArr(saved[day][hid].soldiers,   hm.slots.soldiers),
-                };
-              }
-            }
-          });
-        });
+        // הקוד הכללי למעלה כבר מטפל בכל משימה כולל hetz4 עם dayMissionOverrides
         // עדכן שמות קדומים בתוך Firebase load
         const renames = [
           ["משה נחשון", "משה נחשון - מפקד"],
@@ -1027,8 +1011,14 @@ function App() {
   });
   const [deletedMissions, setDeletedMissions] = useState([]);
   const [dayMissionOverrides, setDayMissionOverrides] = useState({
-    "2026_04_12": { philbox_horsa: { slots_commander: 3, slots_soldiers: 5 } },
-    "2026_04_13": { philbox_horsa: { slots_commander: 3, slots_soldiers: 5 } },
+    "2026_04_12": { 
+      philbox_horsa: { slots_commander: 3, slots_soldiers: 5 },
+      hetz4: { slots_commander: 2, slots_soldiers: 6 }
+    },
+    "2026_04_13": { 
+      philbox_horsa: { slots_commander: 3, slots_soldiers: 5 },
+      hetz4: { slots_commander: 3, slots_soldiers: 6 }
+    },
     "2026_04_14": { philbox_horsa: { slots_commander: 3, slots_soldiers: 5 } },
   });
   const [platoons, setPlatoons] = useState(() => JSON.parse(JSON.stringify(PLATOONS_DEFAULT)));
@@ -1768,8 +1758,22 @@ function App() {
       const prev_s = missionSettings[editId];
       const updated = {...missionSettings,[editId]:{...draft}};
       setMissionSettings(prev=>updated);
-      // שמור ל-Firebase
-      saveSettingsToFb({});
+      // שמור ל-Firebase עם הערכים המעודכנים
+      clearTimeout(_settingsSaveTimer.current);
+      _settingsSaveTimer.current = setTimeout(() => {
+        const fullPatch = {
+          missionSettings: updated,
+          aftarSettings,
+          specials,
+          spontMissions,
+          hiddenMissionsByDay,
+          deletedMissions,
+          dayMissionOverrides,
+          platoons: Object.fromEntries(Object.entries(platoons).map(([k,p])=>[k,p.members])),
+          restExemptions
+        };
+        window._firebaseSet(window._firebaseRef(window._firebaseDb, 'shabzak/settings'), fullPatch).catch(()=>{});
+      }, 600);
       // עדכון גודל מערכי השיבוץ אם שינינו כמות slots
       if (draft.slots_commander !== prev_s?.slots_commander || draft.slots_soldiers !== prev_s?.slots_soldiers) {
         setAllAssAndSave(prev => {

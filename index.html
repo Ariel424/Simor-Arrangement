@@ -214,6 +214,7 @@ const MISSION_DEFS = [
   { id:"karem_negoshot",label:"כרם נגוהות",     icon:"🌿", slots:{commander:1,soldiers:3}, time:"",               border:"#aed581", col:6, startH:0,  endH:24, showOnDays:[] },
   { id:"yom_tipul_rekavim", label:"יום טיפול לרכבי הפלוגה", icon:"🔧", slots:{commander:0,soldiers:1}, time:"7:00 - 17:00", border:"#29b6f6", col:2, startH:7, endH:17, showOnDays:["2026_04_06"] },
   { id:"ugda_yehuda_konnut", label:"חטיבת יהודה - כוננות ושמירות", icon:"🛡️", slots:{commander:0,soldiers:2}, time:"החל מ-14:00", border:"#ef5350", col:4, startH:14, endH:24, showOnDays:NEW_GAZRA.filter(d=>d>="2026_04_09") },
+  { id:"chatam_yehuda_shimrut", label:"חטמ״ר יהודה - שמירות וכוננות", icon:"🛡️", slots:{commander:0,soldiers:2}, time:"14:00 - 14:00", border:"#ef5350", col:6, startH:14, endH:14, showOnDays:NEW_GAZRA },
 ];
 
 const DAYS = [
@@ -416,7 +417,7 @@ function DisplayCard({ mission, assignment, dayId }) {
   const filled = [...ass.commanders,...ass.soldiers].filter(Boolean).length;
   const total = mission.slots.commander + mission.slots.soldiers;
   const done = filled===total && total>0;
-  const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="amada_maaravit_a" || mission.id==="amada_maaravit_b" || mission.id==="katzin_a" || mission.id==="katzin_b" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2" || mission.id==="bimuy_oyev" || mission.id==="kurs_pritza" || mission.id==="toren_rasp" || mission.id==="matbah_new2" || mission.id==="hetz4" || mission.id==="ugda_yehuda_konnut";
+  const isCompact = mission.id.startsWith("sg") || mission.id==="amada_maaravit" || mission.id==="amada_maaravit_a" || mission.id==="amada_maaravit_b" || mission.id==="katzin_a" || mission.id==="katzin_b" || mission.id==="siyur_boker2" || mission.id==="siyur_tzo2" || mission.id==="siyur_layla2" || mission.id==="bimuy_oyev" || mission.id==="kurs_pritza" || mission.id==="toren_rasp" || mission.id==="matbah_new2" || mission.id==="hetz4" || mission.id==="ugda_yehuda_konnut" || mission.id==="chatam_yehuda_shimrut";
   const displayTime = (DAY_TIME_OVERRIDES[dayId]||{})[mission.id] || mission.time;
   return (
     <div className={`mcard${isCompact?" compact":""}`} style={{ borderColor: mission.border!=="#555" ? mission.border+"88" : undefined }}>
@@ -1203,7 +1204,7 @@ function App() {
         return true;
       }).map(m=>m.id)
     );
-    const excludedIds = new Set(["katzin","katzin_a","katzin_b","maatzar","gimel","rachpan","hetz4","amada_maaravit","toren_rasp","matbah_new","matbah_new2","ugda_yehuda_konnut"]);
+    const excludedIds = new Set(["katzin","katzin_a","katzin_b","maatzar","gimel","rachpan","hetz4","amada_maaravit","toren_rasp","matbah_new","matbah_new2"]);
     return new Set(
       Object.entries(dayAss)
         .filter(([mid]) => visibleIds.has(mid) && !excludedIds.has(mid))

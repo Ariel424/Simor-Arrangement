@@ -2664,6 +2664,23 @@ function App() {
         </label>
       </div>
       {view==="display" ? <DisplayView visibleMissions={visibleMissions}/> : view==="settings" ? <SettingsView/> : view==="specials" ? <SpecialsView key="specials"/> : view==="tracking" ? <TrackingView/> : <BuilderView key="builder"/>}
+      
+      {/* תיבת הסיום */}
+      {view==="display" && activeDay === "2026_05_01" && (
+        <div style={{margin:"40px auto",maxWidth:900,padding:"30px",background:"linear-gradient(135deg, #1a237e 0%, #283593 100%)",border:"2px solid #5c6bc0",borderRadius:16,textAlign:"center",color:"white"}}>
+          <div style={{fontSize:16,fontWeight:700,marginBottom:20,lineHeight:1.6}}>
+            אז לאחר צו של 81 יום, תזכרו שהולך להיכנס לכם ב-1.5.2027 מענק בשווי 16,581 שקל
+            <br/>
+            (אלא אם כן נעשה עוד מילואים השנה, ואז המענק יגדל בהתאם)
+          </div>
+          <div style={{fontSize:14,fontWeight:700,marginBottom:20}}>🎖️</div>
+          <div style={{fontSize:14,color:"#b3e5fc",lineHeight:1.8}}>
+            עד הפעם הבאה, תמיד כאן בשבילכם
+            <br/>
+            <span style={{fontSize:16,fontWeight:800,color:"#fff"}}>שבצ"ק סימור</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
